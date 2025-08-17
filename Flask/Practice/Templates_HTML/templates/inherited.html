@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <title>Hello World</title>
+{% endblock %}
+
+{% block body %}
+    <H1>Inherited Html</H1>
+
+    <p>{{Name}}</p>
+    <p>{{Name|upper}}</p>
+    <p>{{Name|lower}}</p>
+    <p>{{Name|title}}</p>
+    <p>{{Name|replace('a',"A")}}</p>
+    
+    
+    {# 
+        Custom Filter 
+    #}
+
+    <p>{{Name|reverse}}</p>
+    <p>{{Name|repeat(5)}}</p>
+    
+
+
+{% endblock %}

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask app</title>
+</head>
+<body>
+    <h1>Hello World</h1>
+    <p>{{Name}}</p>
+    <ul>
+        {% for i in List %}
+            {% if i == 3 %}
+                <li style="color: red;">{{i}}</li>
+            {% else %}
+                <li>{{i}}</li>
+            {% endif%}
+            
+        {% endfor %}
+    </ul>
+</body>
+</html>
