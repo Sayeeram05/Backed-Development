@@ -29,7 +29,7 @@
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container-fluid">
-        <a class="navbar-brand" href="/" style="font-weight: bold;">Notes</a>
+        <label class="navbar-brand mb-0 h1" style="font-weight: bold; font-size: 2rem;">Notes</label>
         <button
           class="navbar-toggler"
           type="button"
@@ -43,21 +43,77 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/Login">Login</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/Logout">Logout</a>
-            </li><li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/SignUp">SignUp </a>
-            </li>
+            {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/" style="font-size: 1.3rem;">Home</a>
+                </li>
+            {% else %}
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/Login" style="font-size: 1.3rem;">Login</a>
+                </li>
+            {% endif %}
+            
+            {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/Logout" style="font-size: 1.3rem;">Logout</a>
+                </li>
+            {% else %}
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/SignUp" style="font-size: 1.3rem;">SignUp </a>
+                </li>
+            {% endif %}
           </ul>
         </div>
       </div>
     </nav>
+
+    <div class="position-relative" style="min-height: 1px;">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+          <div class="position-absolute start-0 end-0" style="top:0; z-index:1055;">
+              {% for category, message in messages %}
+                  {% if category == "error" %}
+                      <div class="alert alert-danger alert-dismissible fade show rounded-0 mb-0 w-100" role="alert">
+                          {{ message }}
+                          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
+                  {% elif category == "success" %}
+                      <div class="alert alert-success alert-dismissible fade show rounded-0 mb-0 w-100" role="alert">
+                          {{ message }}
+                          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
+                  {% endif %}
+              {% endfor %}
+          </div>
+          <script>
+            setTimeout(function() {
+              document.querySelectorAll('.alert').forEach(function(alert) {
+                var bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+                bsAlert.close();
+              });
+            }, 2000);
+          </script>
+      {% endif %}
+      {% endwith %}
+    </div>
+
+    <script text="text/javascript" src="{{url_for('static',filename='index.js')}}"></script>
+    <script>
+      function deleteNote(noteId) {
+          fetch('/delete-note', {
+              method: 'POST',
+              body: JSON.stringify({ noteId: noteId }),
+              headers: {
+                  'Content-Type': 'application/json'
+              }
+          }).then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.reload();
+                }
+            });
+      }
+    </script>
 
     {% block Body %} {% endblock %}
   </body>

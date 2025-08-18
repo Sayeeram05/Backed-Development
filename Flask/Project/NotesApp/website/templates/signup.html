@@ -4,9 +4,29 @@
 <title>SignUp</title>
 {% endblock %}
 
-
-
 {% block Body %}
-
-
+<div class="container min-vh-100 d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);">
+    <div class="card shadow-lg p-4" style="max-width: 400px; width: 100%; border-radius: 1rem;">
+        <h1 class="text-center mb-4 text-primary fw-bold">Sign UP</h1>
+        <form action="" method="post">
+            <div class="mb-3">
+                <label for="Username" class="form-label">Username</label>
+                <input type="text" class="form-control" id="Username" name="username" required>
+            </div>
+            <div class="mb-3">
+                <label for="Email" class="form-label">Email address</label>
+                <input type="email" class="form-control" id="Email" name="email" required>
+            </div>
+            <div class="mb-3">
+                <label for="Password1" class="form-label">Password</label>
+                <input type="password" class="form-control" id="Password1" name="password1" required>
+            </div>
+            <div class="mb-3">
+                <label for="Password2" class="form-label">Confirm Password</label>
+                <input type="password" class="form-control" id="Password2" name="password2" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 fw-semibold">SUBMIT</button>
+        </form>
+    </div>
+</div>
 {% endblock %}
