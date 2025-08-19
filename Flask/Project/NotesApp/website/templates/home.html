@@ -7,7 +7,7 @@
 {% block Body %} 
 <div class="container py-5">
     <h1 class="mb-4 text-center text-primary fw-bold">NOTES</h1>
-    <form action="" method="post" class="mb-4">
+    <form action="/add-note" method="post" class="mb-4">
         <div class="mb-3">
             <label for="notes-data" class="form-label fw-semibold">Your Note</label>
             <textarea name="note" id="notes-data" class="form-control" rows="5" placeholder="Write your note here..." required></textarea>
@@ -21,6 +21,7 @@
             </button>
         </div>
     </form>
+
     <!-- Example notes list -->
     <div class="card shadow-sm">
         <div class="card-header bg-primary text-white fw-semibold">
