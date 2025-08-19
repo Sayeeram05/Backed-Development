@@ -1,0 +1,92 @@
+/* Page background */
+body {
+    background: linear-gradient(120deg, #e0f7fa 0%, #b2ebf2 100%);
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+/* Center the form and heading */
+h1 {
+    text-align: center;
+    color: #0097a7;
+    letter-spacing: 2px;
+    margin-top: 2.5rem;
+    margin-bottom: 1.5rem;
+    font-size: 2.3rem;
+    font-weight: 800;
+    text-shadow: 0 2px 8px rgba(0,188,212,0.10);
+}
+
+/* Form styling */
+form {
+    max-width: 420px;
+    margin: 0 auto 3rem auto;
+    background: #fff;
+    padding: 2.5rem 2rem 2rem 2rem;
+    border-radius: 22px;
+    box-shadow: 0 8px 32px rgba(0,188,212,0.18);
+    display: flex;
+    flex-direction: column;
+    gap: 1.3rem;
+    border: 2px solid #00bcd4;
+    animation: floatIn 0.8s cubic-bezier(.68,-0.55,.27,1.55);
+}
+
+@keyframes floatIn {
+    from {
+        opacity: 0;
+        transform: translateY(40px) scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+form label {
+    font-weight: 700;
+    color: #0097a7;
+    margin-bottom: 0.2rem;
+    letter-spacing: 0.5px;
+    font-size: 1.08rem;
+}
+
+form input[type="text"],
+form input[type="email"],
+form input[type="password"] {
+    padding: 0.8rem 1rem;
+    border: 1.5px solid #00bcd4;
+    border-radius: 8px;
+    font-size: 1.08rem;
+    background: #f4f6f8;
+    transition: border 0.2s, box-shadow 0.2s;
+    box-shadow: 0 1px 4px rgba(0,188,212,0.07);
+}
+
+form input:focus {
+    border: 2px solid #0097a7;
+    outline: none;
+    box-shadow: 0 0 0 2px #b2ebf2;
+}
+
+form button[type="submit"] {
+    margin-top: 1.2rem;
+    padding: 0.9rem 0;
+    background: linear-gradient(90deg, #00bcd4, #0097a7 80%);
+    color: #fff;
+    font-weight: bold;
+    font-size: 1.15rem;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,188,212,0.10);
+    transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+    letter-spacing: 1px;
+}
+
+form button[type="submit"]:hover {
+    background: linear-gradient(90deg, #0097a7, #00bcd4 80%);
+    box-shadow: 0 4px 16px rgba(0,188,212,0.18);
+    transform: translateY(-2px) scale(1.03);
+}

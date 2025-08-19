@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="{{ url_for('static',filename='base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='flash.css') }}">
+
+    {% block head %}
+    {% endblock %}
+</head>
+<body>
+    <nav>
+        <ul class="navbar">
+            <li><a href="/">Home</a></li>
+            <li><a href="/login">Login</a></li>
+            <li><a href="/logout">Logout</a></li>
+            <li><a href="/signup">Signup</a></li>
+        </ul>
+    </nav>
+
+    <div id="flash-container">
+        {% with messages = get_flashed_messages(with_categories = True)  %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    {% if category == "error" %}
+                        <div class="flash-message-error">{{ message }}</div>
+                    {% else %}
+                        <div class="flash-message-success">{{ message }}</div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    {% block body %}
+    {% endblock %}
+    
+    <script>
+        // Hide flash message after 2 seconds
+        window.addEventListener('DOMContentLoaded', function() {
+            const flash = document.querySelector('.flash-message-error, .flash-message-success, .flash-message-info');
+            if (flash) {
+                setTimeout(() => {
+                    flash.classList.add('hide');
+                }, 2000);
+            }
+        });
+    </script>
+</body>
+</html>
