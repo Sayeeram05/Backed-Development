@@ -40,8 +40,16 @@ def login():
         email = request.form.get("email")
         password = request.form.get("password")
         
+        user = User.query.filter_by(email=email).first()
         
-    
+        if(user):
+            if(check_password_hash(pwhash=user.password,password=password)):
+                flash("Login : Login Sucessful","success")
+                return redirect(url_for("view.home"))
+            else:
+                flash("Login : Incorrect Password","error")
+        else:
+            flash("Login : Invalid Email","error")
     return render_template("login.html")
 
 @auth.route("/logout")
