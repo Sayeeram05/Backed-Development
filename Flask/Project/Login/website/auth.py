@@ -1,4 +1,5 @@
-from flask import Blueprint, flash, redirect, render_template, request, url_for
+import re
+from flask import Blueprint, flash, redirect, render_template, request, session, url_for
 from .models import User
 from . import db
 from flask_login import login_user,logout_user,login_required,current_user
@@ -66,9 +67,61 @@ def login():
 def logout():
     logout_user()
     flash("Logout : Successful","success")
-    return render_template("login.html",user=current_user)
+    return redirect(url_for("auth.login"))
 
-@auth.route("/forget-password")
-@login_required
-def forgetPassoword():
-    pass
+
+@auth.route("/forgot-password/send-otp",methods=["GET","POST"])
+def sendOtp():
+    if(current_user.is_authenticated):
+        flash("You are already logged in.", "error")
+        return redirect(url_for("view.home"))
+    
+    if(request.method == "POST"):
+        email = request.form.get("email")
+        
+        user = User.query.filter_by(email=email).first()
+        print(user)
+        
+        if(user):
+            session["email"] = email
+            flash("OTP sent to your email.", "success")
+            
+            return redirect(url_for("auth.verifyOtp"))
+        else:
+            flash("OTP Verification : Invalid Email","error") 
+            
+    return render_template("sendOtp.html",user=None)
+
+@auth.route("/forgot-password/verify-otp",methods=["GET","POST"])
+
+def verifyOtp():
+    if "email" not in session:
+        flash("Access denied. Please start the process from the beginning.", "error")
+        return redirect(url_for("auth.sendOtp"))
+    if(request.method == "GET"):
+        return render_template("verifyOtp.html",user=None)
+    if(request.method == "POST"):
+        email = session.get("email")
+        otp = request.form.get("otp")
+        password = request.form.get("password")
+        confirm_password = request.form.get("confirm_password")
+        
+        user = User.query.filter_by(email=email).first()
+        
+        if(otp == "12345"):
+            if(password == confirm_password):
+                if(len(password) >= 5):
+                    
+                    user.password = generate_password_hash(password=password)
+                    db.session.commit()
+                    session.pop("email",None) 
+                    flash("Password updated successfully.", "success")
+                    return redirect(url_for("auth.login"))
+                else:
+                    flash("OTP Verification : Password min length 5","error")
+            else:
+                flash("OTP Verification : Password Does't Match","error")
+        else:
+            flash("OTP Verification : OTP Does't Match","error")
+        
+        return redirect(url_for("auth.sendOtp"))

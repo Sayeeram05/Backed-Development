@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>Verify OTP</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='otpVerification.css') }}">
+{% endblock %}
+
+{% block body %}
+<h1>Verify OTP</h1>
+
+<form method="post">
+    <!-- OTP field -->
+    <div>
+        <label for="otp">OTP</label>
+        <input type="text" id="otp" name="otp" required placeholder="Enter OTP">
+    </div>
+
+    <!-- Password fields -->
+    <div>
+        <label for="password">New Password</label>
+        <input type="password" id="password" name="password" required placeholder="Enter new password">
+    </div>
+
+    <div>
+        <label for="confirm_password">Confirm Password</label>
+        <input type="password" id="confirm_password" name="confirm_password" required placeholder="Confirm new password">
+    </div>
+
+    <!-- Verify OTP button -->
+    <div class="btn-group">
+        <button type="submit" name="action" value="check" class="btn btn-check">Verify OTP</button>
+    </div>
+</form>
+{% endblock %}
