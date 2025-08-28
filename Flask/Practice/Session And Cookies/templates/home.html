@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>Home</title>
+<!-- <h1>Home</h1> -->
+{% endblock%}
+
+{% block body %}
+
+<p><h3>Message :</h3> {{message}}</p>
+
+<a href="{{ url_for('add') }}">Add Session</a>
+<br>
+<a href="{{ url_for('get') }}">Get Session</a>
+<br>
+<a href="{{ url_for('delete') }}">Delete Session</a>
+<br>
+<a href="{{ url_for('setcookies') }}">Set Cookies</a>
+<br>
+<a href="{{ url_for('getcookies') }}">Get Cookies</a>
+<br>
+<a href="{{ url_for('deletecookies') }}">delete Cookies</a>
+
+{% endblock%}
