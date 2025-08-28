@@ -1,4 +1,3 @@
-import re
 from flask import Blueprint, flash, redirect, render_template, request, session, url_for
 from .models import User
 from . import db
