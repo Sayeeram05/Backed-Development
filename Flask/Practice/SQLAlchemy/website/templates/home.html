@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <title>Home</title>
+{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white text-center">
+                    <h2>Select Action</h2>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <a href="/add-user" class="btn btn-success w-100">Add User</a>
+                        </li>
+                        <!-- <li class="list-group-item">
+                            <a href="/" class="btn btn-secondary w-100">Update User</a>
+                        </li> -->
+                        <li class="list-group-item">
+                            <a href="/view-user" class="btn btn-info w-100">View User</a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="/delete-user" class="btn btn-danger w-100">Delete User</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

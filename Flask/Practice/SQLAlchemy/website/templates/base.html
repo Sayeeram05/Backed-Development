@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    {% block head %}
+        
+    {% endblock %}
+</head>
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    
+    <div id="flash-messages" class="w-100" style="position: fixed; top: 0; left: 0; z-index: 1050;">
+        {% with Messages = get_flashed_messages(with_categories=True)  %}
+            {% for Category,Message in Messages %}
+                {% if Category == "Success" %}
+                    <div class="alert alert-success alert-dismissible fade show m-0 rounded-0 text-center" role="alert">
+                        {{Message}}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% else %}
+                    <div class="alert alert-danger alert-dismissible fade show m-0 rounded-0 text-center" role="alert">
+                        {{Message}}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endwith %}
+    </div>
+
+    <script>
+        // Auto-dismiss flash messages after 2 seconds
+        window.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                var alerts = document.querySelectorAll('#flash-messages .alert');
+                alerts.forEach(function(alert) {
+                    var bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+                    bsAlert.close();
+                });
+            }, 2000);
+        });
+    </script>
+    
+    {% block body %}
+        
+    {% endblock %}
+    
+</body>
+</html>
