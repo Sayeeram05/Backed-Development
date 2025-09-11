@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+{% block head %}
+<title>About Us | BlueCart</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/aboutus.css') }}">
+{% endblock %}
+{% block content %}
+<div class="about-container">
+    <!-- Hero Section -->
+    <section class="about-hero">
+        <div class="hero-content">
+            <h1>Our Story</h1>
+            <p>Building the future of online shopping, one cart at a time</p>
+        </div>
+    </section>
+    
+    <!-- Mission Section -->
+    <section class="about-section mission-section">
+        <div class="section-header">
+            <h2>Our Mission</h2>
+        </div>
+        <div class="section-content">
+            <div class="mission-card">
+                <p>At BlueCart, we're on a mission to transform how people shop online by creating a seamless, secure, and personalized shopping experience that connects consumers with quality products they love.</p>
+            </div>
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-number" data-count="10000">0</div>
+                    <div class="stat-label">Products</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" data-count="500">0</div>
+                    <div class="stat-label">Brands</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" data-count="25000">0</div>
+                    <div class="stat-label">Customers</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Values Section -->
+    <section class="about-section values-section">
+        <div class="section-header">
+            <h2>Our Values</h2>
+        </div>
+        <div class="values-container">
+            <div class="value-card">
+                <div class="value-icon">💎</div>
+                <h3>Quality</h3>
+                <p>We curate only the finest products that meet our high standards for quality and craftsmanship.</p>
+            </div>
+            <div class="value-card">
+                <div class="value-icon">🔒</div>
+                <h3>Trust</h3>
+                <p>Security and transparency are at the core of everything we do, from payments to data handling.</p>
+            </div>
+            <div class="value-card">
+                <div class="value-icon">🌍</div>
+                <h3>Sustainability</h3>
+                <p>We're committed to environmentally responsible practices in our operations and product selection.</p>
+            </div>
+            <div class="value-card">
+                <div class="value-icon">💡</div>
+                <h3>Innovation</h3>
+                <p>We continuously evolve our platform to provide cutting-edge shopping experiences.</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Journey Section -->
+    <section class="about-section journey-section">
+        <div class="section-header">
+            <h2>Our Journey</h2>
+        </div>
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-date">2018</div>
+                <div class="timeline-content">
+                    <h3>The Beginning</h3>
+                    <p>BlueCart was founded with a vision to create a better e-commerce experience.</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-date">2019</div>
+                <div class="timeline-content">
+                    <h3>Growing Marketplace</h3>
+                    <p>We expanded our catalog to 5,000+ products and welcomed 100+ brands.</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-date">2020</div>
+                <div class="timeline-content">
+                    <h3>Tech Innovation</h3>
+                    <p>Launched our mobile app and implemented AI-powered recommendations.</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-date">2022</div>
+                <div class="timeline-content">
+                    <h3>Global Expansion</h3>
+                    <p>Expanded operations to serve customers in 15+ countries worldwide.</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-date">2023</div>
+                <div class="timeline-content">
+                    <h3>Sustainability Focus</h3>
+                    <p>Committed to carbon-neutral shipping and sustainable packaging.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Team Section -->
+    <section class="about-section team-section">
+        <div class="section-header">
+            <h2>Meet Our Team</h2>
+        </div>
+        <div class="team-container">
+            <div class="team-card">
+                <div class="team-image"></div>
+                <h3>Alex Johnson</h3>
+                <p>Founder & CEO</p>
+            </div>
+            <div class="team-card">
+                <div class="team-image"></div>
+                <h3>Sarah Williams</h3>
+                <p>Chief Product Officer</p>
+            </div>
+            <div class="team-card">
+                <div class="team-image"></div>
+                <h3>Michael Chen</h3>
+                <p>CTO</p>
+            </div>
+            <div class="team-card">
+                <div class="team-image"></div>
+                <h3>Priya Patel</h3>
+                <p>Head of Customer Experience</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Testimonial Section -->
+    <section class="about-section testimonial-section">
+        <div class="section-header">
+            <h2>What Our Customers Say</h2>
+        </div>
+        <div class="testimonial-container">
+            <div class="testimonial-card">
+                <div class="quote">"BlueCart transformed how I shop online. The quality of products and customer service is unmatched."</div>
+                <div class="author">— Rachel K.</div>
+            </div>
+            <div class="testimonial-card">
+                <div class="quote">"I love the personalized recommendations and how easy it is to find exactly what I need."</div>
+                <div class="author">— David M.</div>
+            </div>
+            <div class="testimonial-card">
+                <div class="quote">"The fastest delivery I've experienced from any online store. BlueCart is my go-to for all my shopping needs."</div>
+                <div class="author">— Emma S.</div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="about-section cta-section">
+        <div class="cta-content">
+            <h2>Ready to Experience BlueCart?</h2>
+            <p>Join thousands of satisfied customers and discover why BlueCart is the future of online shopping.</p>
+            <a href="{{url_for('auth.signup')}}" class="cta-button">Start Shopping Now</a>
+        </div>
+    </section>
+</div>
+
+<script>
+    // Animation for counting up statistics
+    document.addEventListener('DOMContentLoaded', function() {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const statNumbers = document.querySelectorAll('.stat-number');
+                    statNumbers.forEach(stat => {
+                        const targetValue = parseInt(stat.getAttribute('data-count'));
+                        animateCounter(stat, targetValue);
+                    });
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+        
+        const statsSection = document.querySelector('.stats-container');
+        if (statsSection) {
+            observer.observe(statsSection);
+        }
+        
+        function animateCounter(element, target) {
+            let current = 0;
+            const increment = Math.ceil(target / 100); // Adjust for animation speed
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    element.textContent = target.toLocaleString();
+                    clearInterval(timer);
+                } else {
+                    element.textContent = current.toLocaleString();
+                }
+            }, 10);
+        }
+    });
+</script>
+{% endblock %}

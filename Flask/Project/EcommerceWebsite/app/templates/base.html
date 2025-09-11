@@ -14,20 +14,20 @@
                 <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Company Logo">
                 <span class="company-name">BlueCart</span>
             </a>
-            <a href="/" class="nav-link">Home</a>
-            <a href="/about" class="nav-link">About Us</a>
-            <a href="/contact" class="nav-link">Contact Us</a>
+            <a href="/" class="nav-link {% if request.path == '/' %}active{% endif %}">Home</a>
+            <a href="/aboutus" class="nav-link {% if request.path == '/aboutus' %}active{% endif %}">About Us</a>
+            <a href="/contact" class="nav-link {% if request.path == '/contact' %}active{% endif %}">Contact Us</a>
         </div>
         <form class="search-form" action="/search" method="GET">
             <input type="text" name="q" placeholder="Search products...">
             <button type="submit">&#128269;</button>
         </form>
         <div class="navbar-right">
-            <a href="/cart" class="nav-icon" title="Cart">&#128722;</a>
-            <a href="/wishlist" class="nav-icon" title="Wishlist">&#10084;</a>
-            <a href="/account" class="nav-link">Account</a>
-            <a href="/login" class="nav-link">Login</a>
-            <a href="/signup" class="nav-link signup-btn">Sign Up</a>
+            <a href="/cart" class="nav-icon {% if request.path == '/cart' %}active{% endif %}" title="Cart">&#128722;</a>
+            <a href="/wishlist" class="nav-icon {% if request.path == '/wishlist' %}active{% endif %}" title="Wishlist">&#10084;</a>
+            <a href="/account" class="nav-link {% if request.path == '/account' %}active{% endif %}">Account</a>
+            <a href="{{ url_for('auth.login') }}" class="nav-link {% if request.path == url_for('auth.login') %}active{% endif %}">Login</a>
+            <a href="{{ url_for('auth.signup') }}" class="nav-link signup-btn {% if request.path == url_for('auth.signup') %}active{% endif %}">Sign Up</a>
         </div>
     </nav>
     {% block content %}{% endblock %}
