@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block head %}
+<title>Login | BlueCart</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+{% endblock %}
+{% block content %}
+<div class="auth-container">
+    <div class="auth-bg-animated"></div>
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="logo-container">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="BlueCart Logo" class="auth-logo">
+            </div>
+            <h1>Welcome Back</h1>
+            <p>Sign in to continue your shopping journey</p>
+        </div>
+        <form method="POST" action="/login" class="auth-form">
+            <div class="input-container">
+                <div class="input-field">
+                    <input type="text" id="username" name="username" required placeholder=" " autocomplete="username">
+                    <label for="username">Username</label>
+                    <div class="input-line"></div>
+                </div>
+            </div>
+            <div class="input-container">
+                <div class="input-field">
+                    <input type="password" id="password" name="password" required placeholder=" " autocomplete="current-password">
+                    <label for="password">Password</label>
+                    <div class="input-line"></div>
+                </div>
+            </div>
+            <button type="submit" class="auth-btn">
+                <span>Login</span>
+                <div class="btn-animation"><span></span></div>
+            </button>
+            <div class="auth-footer">
+                <p>Don't have an account? <a href="/signup">Sign up</a></p>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

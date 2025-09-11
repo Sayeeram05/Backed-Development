@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block head %}
+    {% endblock %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-left">
+            <a href="/" class="navbar-logo">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Company Logo">
+                <span class="company-name">BlueCart</span>
+            </a>
+            <a href="/" class="nav-link">Home</a>
+            <a href="/about" class="nav-link">About Us</a>
+            <a href="/contact" class="nav-link">Contact Us</a>
+        </div>
+        <div class="navbar-center">
+            <form class="search-form" action="/search" method="GET">
+                <input type="text" name="q" placeholder="Search products...">
+                <button type="submit">&#128269;</button>
+            </form>
+        </div>
+        <div class="navbar-right">
+            <a href="/cart" class="nav-icon" title="Cart">&#128722;</a>
+            <a href="/wishlist" class="nav-icon" title="Wishlist">&#10084;</a>
+            <a href="/account" class="nav-link">Account</a>
+            <a href="/login" class="nav-link">Login</a>
+            <a href="/signup" class="nav-link signup-btn">Sign Up</a>
+        </div>
+    </nav>
+    {% block content %}{% endblock %}
+</body>
+</html>

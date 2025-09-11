@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block head %}
+<title>Sign Up | BlueCart</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+{% endblock %}
+{% block content %}
+<div class="auth-container">
+    <div class="auth-bg-animated"></div>
+    <div class="auth-card signup-card">
+        <div class="auth-header">
+            <div class="logo-container">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="BlueCart Logo" class="auth-logo">
+            </div>
+            <h1>Create Account</h1>
+            <p>Join our community today</p>
+        </div>
+        <form method="POST" action="/signup" class="auth-form signup-form">
+            <div class="input-container">
+                <div class="input-field">
+                    <input type="text" id="fullname" name="fullname" required placeholder=" ">
+                    <label for="fullname">Full Name</label>
+                    <div class="input-line"></div>
+                </div>
+            </div>
+            <div class="input-container">
+                <div class="input-field">
+                    <input type="email" id="email" name="email" required placeholder=" ">
+                    <label for="email">Email Address</label>
+                    <div class="input-line"></div>
+                </div>
+            </div>
+            <div class="input-container">
+                <div class="input-field">
+                    <input type="text" id="username" name="username" required placeholder=" ">
+                    <label for="username">Username</label>
+                    <div class="input-line"></div>
+                </div>
+            </div>
+            <div class="input-container">
+                <div class="input-field">
+                    <input type="password" id="password" name="password" required placeholder=" ">
+                    <label for="password">Password</label>
+                    <div class="input-line"></div>
+                </div>
+            </div>
+            <button type="submit" class="auth-btn">
+                <span>Create Account</span>
+                <div class="btn-animation"><span></span></div>
+            </button>
+            <div class="auth-footer">
+                <p>Already have an account? <a href="/login">Login</a></p>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
