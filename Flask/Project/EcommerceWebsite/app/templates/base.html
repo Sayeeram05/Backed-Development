@@ -15,8 +15,8 @@
                 <span class="company-name">BlueCart</span>
             </a>
             <a href="/" class="nav-link {% if request.path == '/' %}active{% endif %}">Home</a>
-            <a href="/aboutus" class="nav-link {% if request.path == '/aboutus' %}active{% endif %}">About Us</a>
-            <a href="/contact" class="nav-link {% if request.path == '/contact' %}active{% endif %}">Contact Us</a>
+            <a href="{{ url_for('views.about_us') }}" class="nav-link {% if request.path == url_for('views.about_us') %}active{% endif %}">About Us</a>
+            <a href="{{ url_for('views.contact') }}" class="nav-link {% if request.path == url_for('views.contact') %}active{% endif %}">Contact Us</a>
         </div>
         <form class="search-form" action="/search" method="GET">
             <input type="text" name="q" placeholder="Search products...">
