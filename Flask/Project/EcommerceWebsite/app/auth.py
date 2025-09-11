@@ -9,3 +9,10 @@ def login():
         # Handle login logic
         pass
     return render_template('login.html')
+
+@auth.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        # Handle signup logic
+        pass
+    return render_template('signup.html')

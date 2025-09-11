@@ -62,7 +62,7 @@
     max-width: 540px;
     width: 100%;
     min-height: 520px;
-    padding: 56px 48px 48px 48px;
+    padding: 48px;
     margin: 0;
     animation: fadeInUp 1.2s cubic-bezier(.68,-0.55,.27,1.55);
     color: #fff;
@@ -196,6 +196,7 @@
     text-align: left;
     border: 1.5px solid #2563eb;
     border-radius: 10px;
+    font-size: 1rem;
     background: rgba(248,250,252,0.95);
 }
 
@@ -675,4 +676,9 @@
         min-height: 0;
         padding: 24px 6vw;
     }
+}
+
+html, body {
+    height: 100vh;
+    overflow: hidden; /* Prevent scrolling and hide scroll bar */
 }
