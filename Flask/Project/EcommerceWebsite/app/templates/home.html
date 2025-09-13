@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block head %}
+<title>Home | BlueCart</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+{% endblock %}
+{% block content %}
+<div class="home-container">
+    <h1>Welcome to BlueCart</h1>
+    <p>Your one-stop shop for all your needs.</p>
+    {% print(user) %}
+    {% if user.is_authenticated %}
+        <p>Hello, {{ user.fullname }}! Explore our products and enjoy shopping.</p>
+    {% else %}
+    {% endif %}
+</div>
+{% endblock %}

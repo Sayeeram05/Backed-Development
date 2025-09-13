@@ -9,7 +9,7 @@
 </head>
 <body>
     <nav class="navbar">
-        <div class="navbar-left">
+        <div class="navbar-left">          
             <a href="/" class="navbar-logo">
                 <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Company Logo">
                 <span class="company-name">BlueCart</span>
@@ -28,8 +28,50 @@
             <a href="/account" class="nav-link {% if request.path == '/account' %}active{% endif %}">Account</a>
             <a href="{{ url_for('auth.login') }}" class="nav-link {% if request.path == url_for('auth.login') %}active{% endif %}">Login</a>
             <a href="{{ url_for('auth.signup') }}" class="nav-link signup-btn {% if request.path == url_for('auth.signup') %}active{% endif %}">Sign Up</a>
+            <a href="{{ url_for('auth.logout') }}" class="nav-link logout-btn {% if request.path == url_for('auth.logout') %}active{% endif %}">Logout</a>
         </div>
     </nav>
+
+    <div class="flash-message-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    {% if category == 'success' or category == 'error' %}
+                        <div class="flash-message {{ category }}" onclick="dismissFlash(this)">
+                            {{ message }}
+                            <button class="close-btn" onclick="dismissFlash(this.parentElement, event)">×</button>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+
+    <script>
+        function dismissFlash(element, event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            element.classList.add('dismiss');
+            setTimeout(() => {
+                element.remove();
+            }, 500);
+        }
+
+        // Auto-dismiss after 5 seconds
+        document.addEventListener('DOMContentLoaded', () => {
+            const flashMessages = document.querySelectorAll('.flash-message');
+            flashMessages.forEach(message => {
+                setTimeout(() => {
+                    if (message && message.parentElement) {
+                        dismissFlash(message);
+                    }
+                }, 5000);
+            });
+        });
+    </script>
+
     {% block content %}{% endblock %}
 </body>
 </html>
