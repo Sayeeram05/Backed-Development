@@ -1,0 +1,31 @@
+{% extends 'base.html' %} {% load static %} {% block head %}
+<title>Home - ToDo List</title>
+{% endblock %} {% block body %}
+
+<h1>Welcome to the ToDo List</h1>
+{% if tasks|length == 0 %}
+<p>No tasks available.</p>
+{% else %}
+<p>Here are your tasks:</p>
+
+   
+
+{% for task in tasks %}
+    <form action="{% url 'modify_task' %}" method="post">
+        {% csrf_token %}
+        <label>Title: </label>
+        <input type="text" name="title" value="{{ task.title }}" required />
+        <input type="text" name="task_id" value="{{ task.id }}" />
+        
+        <button type="submit" name="button" value="update">Edit</button>
+        <button type="submit" name="button" value="delete">Delete</button>
+        <button type="submit" name="button" value="view">View Details</button>
+    </form>
+{% endfor %}
+<h2>Add New Task</h2>
+<form method="post" action="{% url 'new_task' %}">
+    {% csrf_token %}
+    <label>Title: <input type="text" name="title" required /></label>
+    <button type="submit">New Task</button>
+</form>
+{% endif %} {% endblock %}

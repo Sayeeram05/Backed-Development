@@ -1,0 +1,57 @@
+{% extends 'base.html' %} 
+{% load static %} 
+{% block head %}
+    <title>Task Detail - ToDo List</title>
+{% endblock %} 
+{% block body %}
+    <a href="{% url 'home' %}">Back to All Tasks</a>
+    <h2>{{ task.title }}</h2>
+    {% if items|length == 0 %}
+        <p>No items for this task.</p>
+    {% else %}
+        <ul>
+            {% for item in items %}
+                <li>
+                    <form method="post" action="{% url 'modify_item' %}">
+                    {% csrf_token %}
+                    <label
+                        >Description:
+                        <input
+                        type="text"
+                        name="description"
+                        value="{{ item.description }}"
+                        required
+                        />
+                    </label>
+                    <label
+                        >Completed:
+                        <input
+                        type="checkbox"
+                        name="completed"
+                        {% if item.completed %}checked{% endif %}
+                        />
+                        <br>
+                    <input type="hidden" name="item_id" value="{{ item.id }}" />
+                    <button type="submit" name="button" value="update">Update</button>
+                    <button type="submit" name="button" value="delete">Delete</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+  {% endif %} 
+    <h3>Add New Item</h3>
+    <form method="post" action="{% url 'new_item' %}">
+        {% csrf_token %}
+        <label>
+            Description:
+            <input type="text" name="description" required />
+        </label>
+        <label>
+            Completed:
+            <input type="checkbox" name="completed" />
+        </label>
+        <input type="hidden" name="task_id" value="{{ task.id }}" />
+        <button type="submit">Add Item</button>
+    </form>
+{% endblock %}
+
