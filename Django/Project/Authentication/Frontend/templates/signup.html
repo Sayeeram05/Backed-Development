@@ -1,12 +1,17 @@
 {% extends 'base.html' %}
 
+{% load static %}
 {% block head %}
     <title>Sign Up Page</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
 {% endblock %}
 
 {% block body %}
-    <a href="{% url 'home' %}">back</a>
+    <a href="{% url 'home' %}" class="back-link">back</a>
     <br>
-    <h1>Welcome to the Sign Up Page</h1>
-    <p>Please enter your details to create an account.</p>
+    <h1 class="signup-form-heading">SIGN UP</h1>
+    <form method="post" class="signup-form">
+        {% csrf_token %}
+        {{ form }}
+        <button type="submit" class="signup-button">Sign Up</button>
 {% endblock %}

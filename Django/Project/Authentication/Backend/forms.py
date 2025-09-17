@@ -9,10 +9,7 @@ class Signup(forms.ModelForm):
             'password': forms.PasswordInput(),
         }
 
-class Login(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = ['username', 'password']
-        widgets = {
-            'password': forms.PasswordInput(),
-        }
+class Login(forms.Form):
+    # Regular Form that doesn't check model constraints
+    username = forms.CharField(max_length=150)
+    password = forms.CharField(widget=forms.PasswordInput())

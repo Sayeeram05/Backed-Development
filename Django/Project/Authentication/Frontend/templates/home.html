@@ -1,16 +1,18 @@
 {% extends 'base.html' %}
 
+{% load static %}
+
 {% block head %}
     <title>Home Page</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
 {% endblock %}
 
 {% block body %}
-    <h1>Welcome to the Home Page</h1>
+    <h1 class="home-main-heading">Welcome to the Home Page</h1>
     
-    <h1>Options</h1>
-    <ul>
-        <li><a href="{% url 'login' %}">Login</a></li>
-        <li><a href="{% url 'signup' %}">Sign Up</a></li>
+    <h1 class="home-options-heading">OPTIONS</h1>
+    <ul class="home-options-list">
+        <li><a href="{% url 'login' %}">LOGIN</a></li>
+        <li><a href="{% url 'signup' %}">SIGN UP</a></li>
     </ul>
-
 {% endblock %}
