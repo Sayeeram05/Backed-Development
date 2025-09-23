@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+    <title>Card Management System</title>
+    <link rel="stylesheet" href="{% static 'css/cardpage.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <header class="page-header">
+            <h1>Card Management</h1>
+        </header>
+        
+        <!-- Card Form - Hidden by default -->
+        {% if button == 'update' %}
+            <div id="card-form-container" class="card-form-container card-form-container visible">
+                <div class="form-header">
+                    <h2><i class="form-icon">✏️</i> Update Card</h2>
+                    <a href="{% url 'card_page' %}" class="form-close">&times;</a>
+                </div>
+                <form method="post" action="{% url 'modify_card' %}" class="card-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="card_id" value="{{ card_id }}">
+                    <div class="form-group">
+                        <label for="card_name">Card Name:</label>
+                        <input type="text" id="card_name" name="card_name" value="{{ cardname }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="category">Category:</label>
+                        <select id="category" name="category" required>
+                            <option value="greeting" {% if category == "greeting" %}selected{% endif %}>Greeting</option>
+                            <option value="birthday" {% if category == "birthday" %}selected{% endif %}>Birthday</option>
+                            <option value="anniversary" {% if category == "anniversary" %}selected{% endif %}>Anniversary</option>
+                            <option value="thank_you" {% if category == "thank_you" %}selected{% endif %}>Thank You</option>
+                            <option value="wedding" {% if category == "wedding" %}selected{% endif %}>Wedding</option>
+                            <option value="festival" {% if category == "festival" %}selected{% endif %}>Festival / Holiday</option>
+                            <option value="congratulations" {% if category == "congratulations" %}selected{% endif %}>Congratulations</option>
+                            <option value="get_well" {% if category == "get_well" %}selected{% endif %}>Get Well Soon</option>
+                            <option value="love_romantic" {% if category == "love_romantic" %}selected{% endif %}>Love / Romantic</option>
+                            <option value="baby_shower" {% if category == "baby_shower" %}selected{% endif %}>Baby Shower</option>
+                            <option value="graduation" {% if category == "graduation" %}selected{% endif %}>Graduation</option>
+                            <option value="retirement" {% if category == "retirement" %}selected{% endif %}>Retirement</option>
+                            <option value="sympathy" {% if category == "sympathy" %}selected{% endif %}>Sympathy / Condolence</option>
+                            <option value="invitation" {% if category == "invitation" %}selected{% endif %}>Invitation</option>
+                            <option value="business_corporate" {% if category == "business_corporate" %}selected{% endif %}>Business / Corporate</option>
+                            <option value="thanksgiving" {% if category == "thanksgiving" %}selected{% endif %}>Thanksgiving</option>
+                            <option value="new_year" {% if category == "new_year" %}selected{% endif %}>New Year</option>
+                            <option value="other" {% if category == "other" %}selected{% endif %}>Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="card_price">Card Price:</label>
+                        <input type="number" step="0.1" id="card_price" name="card_price" value="{{ card_price }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="supplier_name">Supplier Name:</label>
+                        <input type="text" id="supplier_name" name="supplier_name" value="{{ supplier_name }}">
+                    </div>
+                
+                    <div class="form-actions">
+                        <button name='button' value='update-changes' type="submit" class="btn-primary">Update Card</button>
+                    </div>
+                </form>
+            </div>
+        {% else %}
+            <div id="card-form-container" class="card-form-container">
+                <div class="form-header">
+                    <h2><i class="form-icon">+</i> Add New Card</h2>
+                    <button id="form-close" class="form-close">&times;</button>
+                </div>
+                <form method="post" action="{% url 'add_card' %}" class="card-form">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="card_name">Card Name:</label>
+                        <input type="text" id="card_name" name="card_name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="category">Category:</label>
+                        <select id="category" name="category" required>
+                            <option value="greeting">Greeting</option>
+                            <option value="birthday">Birthday</option>
+                            <option value="anniversary">Anniversary</option>
+                            <option value="thank_you">Thank You</option>
+                            <option value="wedding">Wedding</option>
+                            <option value="festival">Festival / Holiday</option>
+                            <option value="congratulations">Congratulations</option>
+                            <option value="get_well">Get Well Soon</option>
+                            <option value="love_romantic">Love / Romantic</option>
+                            <option value="baby_shower">Baby Shower</option>
+                            <option value="graduation">Graduation</option>
+                            <option value="retirement">Retirement</option>
+                            <option value="sympathy">Sympathy / Condolence</option>
+                            <option value="invitation">Invitation</option>
+                            <option value="business_corporate">Business / Corporate</option>
+                            <option value="thanksgiving">Thanksgiving</option>
+                            <option value="new_year">New Year</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="card_price">Card Price:</label>
+                        <input type="number" step="0.1" id="card_price" name="card_price" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="supplier_name">Supplier Name:</label>
+                        <input type="text" id="supplier_name" name="supplier_name">
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Add Card</button>
+                    </div>
+                </form>
+            </div>
+        {% endif %}
+        
+        <!-- Card List -->
+        <div class="card-container">
+            <div class="card-header">
+                <div class="card-stats">
+                    <p class="card-count"><span>{{ cards.count }}</span> cards found</p> 
+                </div>
+                <button type='button' name='button' value='add-card' id="add-card-button" class="add-card-button">
+                    <i class="button-icon">+</i> Add New Card
+                </button>
+            </div>
+
+            <div class="card-search">
+                <form method="get" action="{% url 'search_card' %}" class="search-form">
+                    <div class="search-group">
+                        <label for="search-column">Search by:</label>
+                        <select id="search-column" name="column">
+                            <option value="card_name" {% if selected_column == 'card_name' %}selected{% endif %}>Card Name</option>
+                            <option value="category" {% if selected_column == 'category' %}selected{% endif %}>Category</option>
+                            <option value="card_price" {% if selected_column == 'card_price' %}selected{% endif %}>Card Price</option>
+                            <option value="supplier_name" {% if selected_column == 'supplier_name' %}selected{% endif %}>Supplier Name</option>
+                            <option value="added_by" {% if selected_column == 'added_by' %}selected{% endif %}>Added By</option>
+                        </select>
+                    </div>
+                    <div class="search-group">
+                        <label for="search-input">Value:</label>
+                        <input type="text" id="search-input" name="search" {% if search_query %}
+                    value="{{ search_query }}" {% endif %} placeholder='Enter search item...' required >
+                    </div>
+                    <div class="search-actions">
+                        <button type="submit" class="search-button">Search</button>
+                        <a href="{% url 'card_page' %}" class="reset-button">Reset</a>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="table-container">
+                <table class="card-table">
+                    <thead>
+                        <tr>
+                            <th class="col-code">Card Code</th>
+                            <th class="col-name">Card Name</th>
+                            <th class="col-category">Category</th>
+                            <th class="col-price">Card Price</th>
+                            <th class="col-supplier">Supplier</th>
+                            <th class="col-added">Added By</th>
+                            <th class="col-created">Created</th>
+                            <th class="col-updated">Updated</th>
+                            <th class="col-actions" colspan="2">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for card in cards %}
+                        <tr>
+                            <form method="post" action="{% url 'modify_card' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="card_id" value="{{ card.id }}">
+                                <td class="col-code">{{ card.card_code.item_code }}</td>
+                                <td class="col-name">{{ card.card_name }}</td>
+                                <td class="col-category">{{ card.category }}</td>
+                                <td class="col-price">{{ card.card_price }}</td>
+                                <td class="col-supplier">{{ card.supplier_name|default:"-" }}</td>
+                                <td class="col-added">{% if card.added_by %}{{ card.added_by.username }}{% else %}-{% endif %}</td>
+                                <td class="col-created">{{ card.created_at|date:"Y-m-d" }}</td>
+                                <td class="col-updated">{{ card.updated_at|date:"Y-m-d" }}</td>
+                                <td class="col-action">
+                                    <button name="button" value="update" type="submit" class="btn-update">Update</button>
+                                </td>
+                                <td class="col-action">
+                                    <button class="btn-delete" name="button" value="delete" type="submit">Delete</button>
+                                </td>
+                            </form>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="10" class="no-records">No cards found. Add a new card to get started.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script src="{% static 'js/cardpage.js' %}"></script>
+{% endblock %}
