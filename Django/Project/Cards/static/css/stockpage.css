@@ -12,6 +12,8 @@
   --error-dark: #a50e0e;
   --success-color: #1e8e3e;
   --white: #ffffff;
+  --warning-color: #f9ab00;
+  --danger-color: #ea4335;
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
@@ -54,8 +56,8 @@ h1 {
   font-size: 16px;
 }
 
-/* Card form styling */
-.card-form-container {
+/* Stock form styling */
+.stock-form-container {
   background-color: var(--white);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-md);
@@ -66,7 +68,7 @@ h1 {
   border-top: 4px solid var(--primary-color);
 }
 
-.card-form-container.visible {
+.stock-form-container.visible {
   display: block;
   animation: fadeIn 0.3s ease-out;
 }
@@ -109,7 +111,7 @@ h1 {
   color: var(--error-color);
 }
 
-.card-form {
+.stock-form {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 24px;
@@ -119,7 +121,7 @@ h1 {
   margin-bottom: 8px;
 }
 
-.card-form label {
+.stock-form label {
   display: block;
   font-weight: 500;
   font-size: 14px;
@@ -127,9 +129,9 @@ h1 {
   color: var(--text-secondary);
 }
 
-.card-form input[type="text"],
-.card-form input[type="number"],
-.card-form select {
+.stock-form input[type="text"],
+.stock-form input[type="number"],
+.stock-form select {
   width: 100%;
   padding: 12px;
   border: 1px solid var(--border-color);
@@ -139,9 +141,9 @@ h1 {
   background-color: var(--white);
 }
 
-.card-form input[type="text"]:focus,
-.card-form input[type="number"]:focus,
-.card-form select:focus {
+.stock-form input[type="text"]:focus,
+.stock-form input[type="number"]:focus,
+.stock-form select:focus {
   border-color: var(--primary-color);
   outline: none;
   box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
@@ -177,28 +179,50 @@ h1 {
   background-color: var(--primary-dark);
 }
 
-/* Card list styling */
-.card-container {
+/* Add this to your CSS file for the cancel button */
+.btn-secondary {
+    background-color: #f1f3f4;
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-left: 12px;
+    display: inline-block;
+}
+
+.btn-secondary:hover {
+    background-color: #e8eaed;
+}
+
+/* Stock list styling */
+.stock-container {
   background-color: var(--white);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-md);
   padding: 24px;
 }
 
-.card-header {
+.stock-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 5px;
 }
 
-.card-stats {
+.stock-stats {
   display: flex;
   align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
-/* Style for the card count */
-.card-count {
+/* Style for the stock count */
+.stock-count {
     font-size: 18px;
     font-weight: 500;
     color: var(--text-secondary);
@@ -206,7 +230,7 @@ h1 {
     padding: 0;
 }
 
-.card-count span {
+.stock-count span {
   color: var(--primary-color);
   font-weight: 700;
   font-size: 30px;
@@ -218,7 +242,6 @@ h1 {
     color: var(--text-secondary);
     margin: 4px 0 0;
     padding: 4px 0;
-    background-color: var(--text-secondary);
 }
 
 .search-info strong {
@@ -234,7 +257,7 @@ h1 {
   border: 1px solid var(--border-color);
 }
 
-.add-card-button {
+.add-stock-button {
   background-color: var(--primary-color);
   color: var(--white);
   border: none;
@@ -248,7 +271,7 @@ h1 {
   transition: background-color 0.2s;
 }
 
-.add-card-button:hover {
+.add-stock-button:hover {
   background-color: var(--primary-dark);
 }
 
@@ -259,14 +282,14 @@ h1 {
 }
 
 /* Search section styling */
-.card-search {
+.stock-search {
   background: var(--secondary-color);
   border-radius: var(--radius-sm);
   padding: 20px;
   margin-bottom: 24px;
 }
 
-.card-search form {
+.stock-search form {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
@@ -278,7 +301,7 @@ h1 {
   min-width: 200px;
 }
 
-.card-search label {
+.stock-search label {
   display: block;
   font-size: 14px;
   font-weight: 500;
@@ -286,8 +309,8 @@ h1 {
   color: var(--text-secondary);
 }
 
-.card-search select,
-.card-search input[type="text"] {
+.stock-search select,
+.stock-search input[type="text"] {
   width: 100%;
   padding: 10px 12px;
   border: 1px solid var(--border-color);
@@ -297,8 +320,8 @@ h1 {
   transition: border 0.2s;
 }
 
-.card-search select:focus,
-.card-search input[type="text"]:focus {
+.stock-search select:focus,
+.stock-search input[type="text"]:focus {
   border-color: var(--primary-color);
   outline: none;
   box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
@@ -343,10 +366,8 @@ h1 {
   background: var(--secondary-color);
 }
 
-
-
 /* Table styling */
-.card-table {
+.stock-table {
   width: 100%;
   table-layout: fixed;
   border-collapse: separate;
@@ -354,18 +375,18 @@ h1 {
   font-size: 14px;
 }
 
-.card-table thead {
+.stock-table thead {
   position: sticky;
   top: 0;
   z-index: 10;
 }
 
-.card-table thead th {
+.stock-table thead th {
   background-color: var(--secondary-color);
   box-shadow: 0 1px 0 var(--border-color); /* Bottom border for header */
 }
 
-.card-table th {
+.stock-table th {
   background-color: var(--secondary-color);
   color: var(--text-color);
   font-weight: 500;
@@ -378,36 +399,42 @@ h1 {
   white-space: nowrap;
 }
 
-.card-table th:hover {
+.stock-table th:hover {
   background-color: var(--hover-color);
 }
 
-.card-table th.sort-asc::after {
+.stock-table th.sort-asc::after {
   content: ' ↑';
   color: var(--primary-color);
 }
 
-.card-table th.sort-desc::after {
+.stock-table th.sort-desc::after {
   content: ' ↓';
   color: var(--primary-color);
 }
 
-.card-table td {
+.stock-table td {
   padding: 14px 16px;
   border-top: 1px solid var(--border-color);
   vertical-align: middle;
   text-align: center;
 }
 
-.card-table tr:hover {  
+#no-stock-row {
+  background-color: rgba(255, 21, 0, 0.336); /* Light red background for no stock */
+  color: var(--text-color);
+}
+
+
+.stock-table tr:hover {  
   background-color: var(--hover-color);
 }
 
-.card-table tr:nth-child(even) {
+.stock-table tr:nth-child(even) {
   background-color: #fafafa;
 }
 
-.card-table tr:nth-child(even):hover {
+.stock-table tr:nth-child(even):hover {
   background-color: var(--hover-color);
 }
 
@@ -421,30 +448,31 @@ h1 {
 /* Column widths */
 .col-code { width: 15%; }
 .col-name { width: 15%; }
-.col-stock { width: 10%; }
 .col-price { width: 10%; }
+.col-stock { width: 10%; }
 .col-reorder { width: 10%; }
-.col-updated { width: 10%; }
-.col-updated-by { width: 10%; }
+.col-updated { width: 12%; }
+.col-updated-by { width: 12%; }
 .col-actions { text-align: center; }
-.col-action{ width: 10%; text-align: center;}
+.col-action{ width: 8%; text-align: center;}
 
-.card-table form {
+.stock-table form {
   display: flex;
   justify-content: center;
 }
 
-.card-table th{
+.stock-table th{
   font-size: larger;
   font-weight: bold;
   text-align: center;
 }
-.card-table td {
-  font-size:medium;
+
+.stock-table td {
+  font-size: medium;
   text-align: center;
 }
 
-.card-table button {
+.stock-table button {
   width: 100%;
   background-color: var(--primary-color);
   color: white;
@@ -456,7 +484,7 @@ h1 {
   transition: background-color 0.2s;
 }
 
-.card-table button:hover {
+.stock-table button:hover {
   background-color: var(--primary-dark);
 }
 
@@ -476,33 +504,31 @@ h1 {
   background-color: var(--error-dark) !important;
 }
 
-
-
 /* Responsiveness */
 @media (max-width: 1200px) {
-  .card-table {
+  .stock-table {
     font-size: 13px;
   }
   
-  .card-table th,
-  .card-table td {
+  .stock-table th,
+  .stock-table td {
     padding: 12px;
   }
 }
 
 @media (max-width: 992px) {
-  .card-header {
+  .stock-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
   }
   
-  .add-card-button {
+  .add-stock-button {
     width: 100%;
     justify-content: center;
   }
   
-  .card-search form {
+  .stock-search form {
     flex-direction: column;
     gap: 16px;
   }
@@ -521,7 +547,7 @@ h1 {
     text-align: center;
   }
   
-  .card-form {
+  .stock-form {
     grid-template-columns: 1fr;
   }
 }
@@ -531,12 +557,12 @@ h1 {
     padding: 16px;
   }
   
-  .card-container,
-  .card-form-container {
+  .stock-container,
+  .stock-form-container {
     padding: 16px;
   }
   
-  .card-search {
+  .stock-search {
     padding: 16px;
   }
 }

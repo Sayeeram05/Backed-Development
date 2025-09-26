@@ -13,96 +13,56 @@
             <h1>Stock Management</h1>
         </header>
         
-        <!-- Card Form - Hidden by default -->
-        {% if button == 'update' %}
-            <div id="card-form-container" class="card-form-container card-form-container visible">
+        <!-- Stock Form - Hidden by default -->
+        {% if update %}
+            <div id="stock-form-container" class="stock-form-container stock-form-container visible">
                 <div class="form-header">
-                    <h2><i class="form-icon">✏️</i> Update Card</h2>
-                    <a href="" class="form-close">&times;</a>
+                    <h2><i class="form-icon">✏️</i> Update Stock</h2>
+                    <a href="{% url 'stock_page' %}" class="form-close">&times;</a>
                 </div>
-                <form method="post" action="" class="card-form">
+                <form method="post" action="{% url 'update_stock' stock_id=stock_id %}" class="stock-form">
                     {% csrf_token %}
-                    <input type="hidden" name="card_id" value="{{ card_id }}">
+                    <input type="hidden" name="stock_id" value="{{ stock_id }}">
+                    <input type="hidden" name="card" value="{{ card }}">
+                    
                     <div class="form-group">
                         <label for="card_name">Card Name:</label>
-                        <input type="text" id="card_name" name="card_name" value="{{ cardname }}" required>
+                        <input type="text" id="card_name" name="card_name" value="{{ card.card_name }}" >
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="category">Category:</label>
-                        <select id="category" name="category" required>
-                            <option value="greeting" {% if category == "greeting" %}selected{% endif %}>Greeting</option>
-                            <option value="birthday" {% if category == "birthday" %}selected{% endif %}>Birthday</option>
-                            <option value="anniversary" {% if category == "anniversary" %}selected{% endif %}>Anniversary</option>
-                            <option value="thank_you" {% if category == "thank_you" %}selected{% endif %}>Thank You</option>
-                            <option value="wedding" {% if category == "wedding" %}selected{% endif %}>Wedding</option>
-                            <option value="festival" {% if category == "festival" %}selected{% endif %}>Festival / Holiday</option>
-                            <option value="congratulations" {% if category == "congratulations" %}selected{% endif %}>Congratulations</option>
-                            <option value="get_well" {% if category == "get_well" %}selected{% endif %}>Get Well Soon</option>
-                            <option value="love_romantic" {% if category == "love_romantic" %}selected{% endif %}>Love / Romantic</option>
-                            <option value="baby_shower" {% if category == "baby_shower" %}selected{% endif %}>Baby Shower</option>
-                            <option value="graduation" {% if category == "graduation" %}selected{% endif %}>Graduation</option>
-                            <option value="retirement" {% if category == "retirement" %}selected{% endif %}>Retirement</option>
-                            <option value="sympathy" {% if category == "sympathy" %}selected{% endif %}>Sympathy / Condolence</option>
-                            <option value="invitation" {% if category == "invitation" %}selected{% endif %}>Invitation</option>
-                            <option value="business_corporate" {% if category == "business_corporate" %}selected{% endif %}>Business / Corporate</option>
-                            <option value="thanksgiving" {% if category == "thanksgiving" %}selected{% endif %}>Thanksgiving</option>
-                            <option value="new_year" {% if category == "new_year" %}selected{% endif %}>New Year</option>
-                            <option value="other" {% if category == "other" %}selected{% endif %}>Other</option>
-                        </select>
-                    </div>
-                    
+
                     <div class="form-group">
                         <label for="card_price">Card Price:</label>
-                        <input type="number" step="0.01" id="card_price" name="card_price" value="{{ card_price }}" required>
+                        <input type="text" id="card_price" name="card_price" value="{{ card.card_price }}"> 
                     </div>
                     
                     <div class="form-group">
-                        <label for="supplier_name">Supplier Name:</label>
-                        <input type="text" id="supplier_name" name="supplier_name" value="{{ supplier_name }}">
+                        <label for="stock_quantity">Stock Quantity:</label>
+                        <input type="number" id="stock_quantity" name="stock_quantity" value="{{ update_stock.stock_quantity }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="reorder_level">Reorder Level:</label>
+                        <input type="number" id="reorder_level" name="reorder_level" value="{{ update_stock.reorder_level }}" required>
                     </div>
                 
                     <div class="form-actions">
-                        <button name='button' value='update-changes' type="submit" class="btn-primary">Update Card</button>
+                        <button name='button' value='update-changes' type="submit" class="btn-primary">Update Stock</button>
+                        <a href="{% url 'stock_page' %}" class="btn-secondary">Cancel</a>
                     </div>
                 </form>
             </div>
         {% else %}
-            <div id="card-form-container" class="card-form-container">
+            <div id="stock-form-container" class="stock-form-container">
                 <div class="form-header">
-                    <h2><i class="form-icon">+</i> Add New Stock</h2>
+                    <h2><i class="form-icon">+</i> Add Stock Details</h2>
                     <button id="form-close" class="form-close">&times;</button>
                 </div>
-                <form method="post" action="" class="card-form">
+                <form method="post" action="" class="stock-form">
                     {% csrf_token %}
                     
                     <div class="form-group">
-                        <label for="card_name">Card Name:</label>
-                        <input type="text" id="card_name" name="card_name" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="category">Category:</label>
-                        <select id="category" name="category" required>
-                            <option value="greeting">Greeting</option>
-                            <option value="birthday">Birthday</option>
-                            <option value="anniversary">Anniversary</option>
-                            <option value="thank_you">Thank You</option>
-                            <option value="wedding">Wedding</option>
-                            <option value="festival">Festival / Holiday</option>
-                            <option value="congratulations">Congratulations</option>
-                            <option value="get_well">Get Well Soon</option>
-                            <option value="love_romantic">Love / Romantic</option>
-                            <option value="baby_shower">Baby Shower</option>
-                            <option value="graduation">Graduation</option>
-                            <option value="retirement">Retirement</option>
-                            <option value="sympathy">Sympathy / Condolence</option>
-                            <option value="invitation">Invitation</option>
-                            <option value="business_corporate">Business / Corporate</option>
-                            <option value="thanksgiving">Thanksgiving</option>
-                            <option value="new_year">New Year</option>
-                            <option value="other">Other</option>
-                        </select>
+                        <label for="card_input">Select Card:</label>
+                        <input type="text" id="card_input" name="card_input" required>
                     </div>
                     
                     <div class="form-group">
@@ -111,54 +71,58 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="supplier_name">Supplier Name:</label>
-                        <input type="text" id="supplier_name" name="supplier_name">
+                        <label for="stock_quantity">Stock Quantity:</label>
+                        <input type="number" id="stock_quantity" name="stock_quantity" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="reorder_level">Reorder Level:</label>
+                        <input type="number" id="reorder_level" name="reorder_level" required>
                     </div>
                     
                     <div class="form-actions">
-                        <button type="submit" class="btn-primary">Add Card</button>
+                        <button type="submit" class="btn-primary">Add Stock</button>
                     </div>
                 </form>
             </div>
         {% endif %}
         
-        <!-- Card List -->
-        <div class="card-container">
-            <div class="card-header">
-                <div class="card-stats">
-                    <p class="card-count"><span>{{ cards.count }}</span> cards found</p> 
+        <!-- Stock List -->
+        <div class="stock-container">
+            <div class="stock-header">
+                <div class="stock-stats">
+                    <p class="stock-count"><span>{{ stocks.count }}</span> items in stock</p> 
+                    {% if search_query %}
+                        <p class="search-info">Search results for "<strong>{{ search_query }}</strong>" in column "<strong>{{ selected_column }}</strong>"</p>
+                    {% endif %}
                 </div>
-                <button type='button' name='button' value='add-card' id="add-card-button" class="add-card-button">
-                    <i class="button-icon">+</i> Add New Stock
-                </button>
             </div>
 
-            <div class="card-search">
+            <div class="stock-search">
                 <form method="get" action="" class="search-form">
                     <div class="search-group">
                         <label for="search-column">Search by:</label>
                         <select id="search-column" name="column">
-                            <option value="card_name" {% if selected_column == 'card_name' %}selected{% endif %}>Card Name</option>
-                            <option value="category" {% if selected_column == 'category' %}selected{% endif %}>Category</option>
-                            <option value="card_price" {% if selected_column == 'card_price' %}selected{% endif %}>Card Price</option>
-                            <option value="supplier_name" {% if selected_column == 'supplier_name' %}selected{% endif %}>Supplier Name</option>
-                            <option value="added_by" {% if selected_column == 'added_by' %}selected{% endif %}>Added By</option>
+                            <option value="card__card_name" {% if selected_column == 'card__card_name' %}selected{% endif %}>Card Name</option>
+                            <option value="card__card_code__item_code" {% if selected_column == 'card__card_code__item_code' %}selected{% endif %}>Card Code</option>
+                            <option value="stock_quantity" {% if selected_column == 'stock_quantity' %}selected{% endif %}>Stock Quantity</option>
+                            <option value="reorder_level" {% if selected_column == 'reorder_level' %}selected{% endif %}>Reorder Level</option>
+                            <option value="updated_by__username" {% if selected_column == 'updated_by__username' %}selected{% endif %}>Updated By</option>
                         </select>
                     </div>
                     <div class="search-group">
                         <label for="search-input">Value:</label>
-                        <input type="text" id="search-input" name="search" {% if search_query %}
-                    value="{{ search_query }}" {% endif %} placeholder='Enter search item...' required >
+                        <input type="text" id="search-input" name="search" {% if search_query %}value="{{ search_query }}"{% endif %} placeholder='Enter search term...' required>
                     </div>
                     <div class="search-actions">
                         <button type="submit" class="search-button">Search</button>
-                        <a href="" class="reset-button">Reset</a>
+                        <a href="{% url 'stock_page' %}" class="reset-button">Reset</a>
                     </div>
                 </form>
             </div>
             
             <div class="table-container">
-                <table class="card-table">
+                <table class="stock-table">
                     <thead>
                         <tr>
                             <th class="col-code">Card Code</th>
@@ -173,28 +137,48 @@
                     </thead>
                     <tbody>
                         {% for stock in stocks %}
-                        <tr>
-                            <form method="post" action="">
+                        <tr {% if stock.stock_quantity is None or stock.reorder_level is None %}id="no-stock-row"{% endif %}>
+                            <form method="post" action="{% url 'delete_stock' %}">
                                 {% csrf_token %}
-                                <input type="hidden" name="card_id" value="{{ card.id }}">
+                                <input type="hidden" name="card" value="{{ stock.card.id }}">
+                                <input type="hidden" name="stock_id" value="{{ stock.id }}">
                                 <td class="col-code">{{ stock.card.card_code.item_code }}</td>
                                 <td class="col-name">{{ stock.card.card_name }}</td>
-                                <td class="col-price">{{ stock.card.card_price }}</td>
-                                <td class="col-stock">{{ stock.stock_quantity }}</td>
-                                <td class="col-reorder">{{ stock.reorder_level }}</td>
+                                <td class="col-price">${{ stock.card.card_price }}</td>
+                                <td class="col-stock">
+                                    {% if stock.stock_quantity is not None %}
+                                        {{ stock.stock_quantity }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td class="col-reorder">
+                                    {% if stock.reorder_level is not None %}
+                                        {{ stock.reorder_level }}
+                                    {% else %}
+                                        -
+                                    {% endif %}</td>
                                 <td class="col-updated">{{ stock.last_updated|date:"Y-m-d" }}</td>
-                                <td class="col-updated-by">{{ stock.updated_by }}</td>
-                                <td class="col-action">
-                                    <button name="button" value="update" type="submit" class="btn-update">Update</button>
-                                </td>
-                                <td class="col-action">
-                                    <button class="btn-delete" name="button" value="delete" type="submit">Delete</button>
-                                </td>
+                                <td class="col-updated-by">{% if stock.updated_by %}{{ stock.updated_by.username }}{% else %}-{% endif %}</td>
+
+                                {% if stock.stock_quantity is not None or stock.reorder_level is not None %}
+                                    <td class="col-action">
+                                        <button name="button" value="update" type="submit" class="btn-update">Update</button>
+                                    </td>
+                                    <td class="col-action">
+                                        <button class="btn-delete" name="button" value="delete" type="submit">Clear</button>
+                                    </td>
+                                {% else %}
+                                    <td class="col-action" colspan="2">
+                                        <button name="button" value="update" type="submit" class="btn-update" >Update</button>
+                                    </td>
+                                {% endif %}
+                                
                             </form>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="9" class="no-records">No cards found. Add a new card to get started.</td>
+                            <td colspan="9" class="no-records">No stock items found. Add new stock to get started.</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -202,5 +186,5 @@
             </div>
         </div>
     </div>
-    <script src="{% static 'js/cardpage.js' %}"></script>
+    <script src="{% static 'js/stockpage.js' %}"></script>
 {% endblock %}

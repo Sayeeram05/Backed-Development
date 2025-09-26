@@ -3,6 +3,8 @@ from django.views import View
 
 from StockPage.models import Item
 from .models import Card
+from StockPage.models import CardsStock
+ 
 
 class CardPageView(View):
     template_name = 'cardpage.html'
@@ -36,8 +38,15 @@ class AddCardView(View):
             
         )
         new_card.save()
-
-        return redirect('card_page')
+        
+        card_stock = CardsStock(
+            card=new_card,
+            stock_quantity=None,
+            reorder_level=None,
+            updated_by=request.user if request.user.is_authenticated else None
+        )
+        card_stock.save()
+        return redirect('update_stock', stock_id=card_stock.id)
     
 
 
