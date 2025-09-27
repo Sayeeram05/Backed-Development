@@ -20,7 +20,7 @@
                     <h2><i class="form-icon">✏️</i> Update Card</h2>
                     <a href="{% url 'card_page' %}" class="form-close">&times;</a>
                 </div>
-                <form method="post" action="{% url 'modify_card' %}" class="card-form">
+                <form method="post" action="{% url 'update_card' %}" class="card-form">
                     {% csrf_token %}
                     <input type="hidden" name="card_id" value="{{ card_id }}">
                     <div class="form-group">
@@ -175,7 +175,7 @@
                     <tbody>
                         {% for card in cards %}
                         <tr>
-                            <form method="post" action="{% url 'modify_card' %}">
+                            <form method="post" action="{% url 'update_card' %}">
                                 {% csrf_token %}
                                 <input type="hidden" name="card_id" value="{{ card.id }}">
                                 <td class="col-code">{{ card.card_code.item_code }}</td>
@@ -190,7 +190,7 @@
                                     <button name="button" value="update" type="submit" class="btn-update">Update</button>
                                 </td>
                                 <td class="col-action">
-                                    <button class="btn-delete" name="button" value="delete" type="submit">Delete</button>
+                                    <button name="button" value="delete-request" type="submit" class="btn-delete">Delete</button>
                                 </td>
                             </form>
                         </tr>
@@ -205,4 +205,8 @@
         </div>
     </div>
     <script src="{% static 'js/cardpage.js' %}"></script>
+    {% if delete_confirmation == 'True' %}
+        {% include 'confirmdel.html' %}
+    {% endif %}
+    
 {% endblock %}

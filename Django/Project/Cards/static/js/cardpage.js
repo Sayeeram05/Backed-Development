@@ -86,4 +86,45 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+    
+    // Delete confirmation functionality
+    // Get all delete trigger buttons
+    const deleteTriggers = document.querySelectorAll('.delete-trigger');
+    const modal = document.getElementById('delete-confirmation');
+    const modalClose = modal.querySelector('.modal-close');
+    const modalCancel = modal.querySelector('.modal-cancel');
+    const deleteCardIdInput = document.getElementById('delete-card-id');
+    const deleteCardName = document.getElementById('delete-card-name');
+    
+    // Add click event to all delete buttons
+    deleteTriggers.forEach(button => {
+        button.addEventListener('click', function() {
+            // Get card information from data attributes
+            const cardId = this.getAttribute('data-card-id');
+            const cardName = this.getAttribute('data-card-name');
+            
+            // Populate the modal with card information
+            deleteCardIdInput.value = cardId;
+            deleteCardName.textContent = cardName;
+            
+            // Show the modal
+            modal.classList.add('visible');
+        });
+    });
+    
+    // Close modal when clicking the X or Cancel
+    modalClose.addEventListener('click', function() {
+        modal.classList.remove('visible');
+    });
+    
+    modalCancel.addEventListener('click', function() {
+        modal.classList.remove('visible');
+    });
+    
+    // Close modal when clicking outside
+    window.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            modal.classList.remove('visible');
+        }
+    });
 });

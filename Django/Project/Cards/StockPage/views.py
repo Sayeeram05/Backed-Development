@@ -8,8 +8,6 @@ class StockPageView(View):
     
     def get(self, request):
         stocks = CardsStock.objects.all()
-        print(stocks)
-        print(stocks[0].card.card_code.item_code)
         return render(request, self.template_name, {'stocks': stocks})
 
     def post(self, request):

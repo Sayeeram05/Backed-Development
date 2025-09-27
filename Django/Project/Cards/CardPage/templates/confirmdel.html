@@ -1,0 +1,56 @@
+<div id="delete-confirmation" class="modal visible">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3><i class="warning-icon">⚠️</i> Confirm Deletion</h3>
+      <span class="modal-close">&times;</span>
+    </div>
+    <div class="modal-body">
+      <p class="confirmation-message">
+        You are about to delete this card. This action cannot be undone.
+      </p>
+      <div class="item-to-delete">
+        <div class="delete-item-label">Card Code:</div>
+        <div class="delete-item-value" id="delete-card-code">
+          {{ delete_card_code }}
+        </div>
+        <div class="delete-item-label">Card Name:</div>
+        <div class="delete-item-value" id="delete-card-name">
+          {{ delete_card_name }}
+        </div>
+        <div class="delete-item-label">Category:</div>
+        <div class="delete-item-value" id="delete-card-category">
+          {{ delete_card_category }}
+        </div>
+        <div class="delete-item-label">Card Price:</div>
+        <div class="delete-item-value" id="delete-card-price">
+          {{ delete_card_price }}
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <form
+        id="delete-form"
+        method="post"
+        action="{% url 'delete_card' card_code=delete_card_code %}"
+      >
+        {% csrf_token %}
+        <button
+          name="button"
+          value="cancel"
+          type="submit"
+          class="btn-secondary modal-cancel"
+        >
+          Cancel
+        </button>
+        <button
+          name="button"
+          value="confirm"
+          type="submit"
+          class="btn-delete confirm-delete"
+        >
+          Confirm Delete
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

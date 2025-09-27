@@ -447,11 +447,13 @@ h1 {
 .card-table button {
   width: 100%;
   background-color: var(--primary-color);
+  height: 32px;
   color: white;
   border: none;
   border-radius: var(--radius-sm);
   padding: 8px 10px;
   font-size: 13px;
+  font-weight: bold;
   cursor: pointer;
   transition: background-color 0.2s;
 }
@@ -460,16 +462,21 @@ h1 {
   background-color: var(--primary-dark);
 }
 
-.btn-update {
-  background-color: var(--primary-color) !important;
-}
-
-.btn-update:hover {
-  background-color: var(--primary-dark) !important;
-}
 
 .btn-delete {
   background-color: var(--error-color) !important;
+  text-decoration: none;
+  display: block;
+  text-align: center;
+  height: 32px;
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
 .btn-delete:hover {
@@ -545,4 +552,171 @@ h1 {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-20px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* Modal styling */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(3px);
+}
+
+.modal.visible {
+  display: flex;
+  animation: fadeIn 0.25s ease-out;
+}
+
+.modal-content {
+  background-color: var(--white);
+  border-radius: var(--radius-md);
+  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15), 0 5px 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 480px;
+  transform: scale(0.95);
+  animation: scaleIn 0.3s forwards;
+  border-top: 4px solid var(--error-color);
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-color);
+  background-color: #fef8f7;
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: var(--error-color);
+  font-weight: 500;
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.warning-icon {
+  font-style: normal;
+}
+
+.modal-close {
+  font-size: 28px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.modal-close:hover {
+  color: var(--error-color);
+  background-color: rgba(217, 48, 37, 0.1);
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.confirmation-message {
+  font-size: 16px;
+  color: var(--text-color);
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.item-to-delete {
+  margin-top: 16px;
+  padding: 16px;
+  background-color: #feeeed;
+  border-radius: var(--radius-sm);
+  font-weight: 400;
+  border-left: 4px solid var(--error-color);
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 8px 12px;
+  align-items: center;
+}
+
+.delete-item-label {
+  font-weight: 500;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.delete-item-value {
+  font-weight: 500;
+  color: var(--error-color);
+  font-size: 15px;
+}
+
+.modal-footer {
+  padding: 16px 24px;
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid var(--border-color);
+  gap: 12px;
+  background-color: #f9f9f9;
+}
+
+.modal-footer form {
+  display: flex;
+  gap: 12px;
+  margin-left: auto;
+}
+
+.modal-footer .btn-secondary {
+  background-color: var(--white);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  height: 35px;
+  border-radius: var(--radius-sm);
+  padding: 10px 20px;
+  font-size: 15px;
+  font-weight: bolder;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modal-footer .btn-secondary:hover {
+  background-color: #f1f3f4;
+}
+
+.modal-footer .confirm-delete {
+  background-color: var(--error-color);
+  color: white;
+  border: none;
+  height: 35px;
+  border-radius: var(--radius-sm);
+  padding: 10px 20px;
+  font-size: 15px;
+  font-weight: bolder;
+  transition: all 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.modal-footer .confirm-delete:hover {
+  background-color: var(--error-dark);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes scaleIn {
+  0% { transform: scale(0.95); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
 }

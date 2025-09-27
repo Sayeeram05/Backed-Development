@@ -1,9 +1,9 @@
 from django.shortcuts import redirect, render
 from django.views import View
 
-from StockPage.models import Item
+from StockPage.models import Item,CardsStock
 from .models import Card
-from StockPage.models import CardsStock
+
  
 
 class CardPageView(View):
@@ -50,7 +50,7 @@ class AddCardView(View):
     
 
 
-class ModifyCardView(View):
+class UpdateCardView(View):
     template_name = 'cardpage.html'
     def post(self, request):
         button = request.POST.get('button')
@@ -75,12 +75,33 @@ class ModifyCardView(View):
             update_card.save()
             return redirect('card_page')
         
-        elif(button == 'delete'):
+        elif button == 'delete-request':
+            print("Delete request received")
             card_id = request.POST.get('card_id')
             delete_card = Card.objects.get(id=card_id)
-            delete_card.delete()
-            return redirect('card_page')
+            return redirect('delete_card', card_code=delete_card.card_code.item_code)
         
+
+class DeleteCardView(View):
+    template_name = 'cardpage.html'
+    def get(self, request, card_code):
+        print("GET request:", request)
+        cards = Card.objects.all()
+        delete_card = Card.objects.get(card_code=card_code)
+        context = {'cards': cards, 'delete_confirmation': 'True', 'delete_card_code': card_code, 'delete_card_name': delete_card.card_name, 'delete_card_category': delete_card.category, 'delete_card_price': delete_card.card_price}
+
+        return render(request, self.template_name, context)
+    
+    def post(self, request, card_code):
+        print("POST request:", request.POST)
+        
+        button = request.POST.get('button')
+        if button == 'cancel':
+            return redirect('card_page')
+        elif button == 'confirm':
+            item_card = Item.objects.get(item_code=card_code)
+            item_card.delete()
+            return redirect('card_page')
 
 class SearchCardView(View):
     template_name = 'cardpage.html'
