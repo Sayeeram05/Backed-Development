@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block head %}
-    <title>Stock Management System</title>
+    <title>{% if current_view == 'bags' %}Bags{% else %}Cards{% endif %} Management System</title>
     <link rel="stylesheet" href="{% static 'css/stockpage.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 {% endblock %}
@@ -10,29 +10,38 @@
 {% block body %}
     <div class="container">
         <header class="page-header">
-            <h1>Stock Management</h1>
+            <div class="header-content">
+                <h1>{% if current_view == 'bags' %}Bag Stock{% else %}Card Stock{% endif %}</h1>
+                <div class="view-selector">
+                    <form method="get" action="{% url 'stock_page' %}" class="view-form">
+                        <button type="submit" name="view" value="cards" class="view-button {% if current_view == 'cards' %}active{% else %}inactive{% endif %}">Cards</button>
+                        <button type="submit" name="view" value="bags" class="view-button {% if current_view == 'bags' %}active{% else %}inactive{% endif %}">Bags</button>
+                    </form>
+                </div>
+            </div>
         </header>
         
-        <!-- Stock Form - Hidden by default -->
+        <!-- Only Update Stock Form -->
         {% if update %}
             <div id="stock-form-container" class="stock-form-container stock-form-container visible">
                 <div class="form-header">
-                    <h2><i class="form-icon">✏️</i> Update Stock</h2>
-                    <a href="{% url 'stock_page' %}" class="form-close">&times;</a>
+                    <h2><i class="form-icon">✏️</i> Update {% if current_view == 'bags' %}Bag{% else %}Card{% endif %} Stock</h2>
+                    <a href="{% url 'stock_page' %}?view={{ current_view }}" class="form-close">&times;</a>
                 </div>
-                <form method="post" action="{% url 'update_stock' stock_id=stock_id %}" class="stock-form">
+                <form method="post" action="{% if current_view == 'cards' %}{% url 'update_card_stock' stock_id=stock_id %}{% else %}{% url 'update_bag_stock' stock_id=stock_id %}{% endif %}" class="stock-form">
                     {% csrf_token %}
                     <input type="hidden" name="stock_id" value="{{ stock_id }}">
                     <input type="hidden" name="card" value="{{ card }}">
+                    <input type="hidden" name="view" value="{{ current_view }}">
                     
                     <div class="form-group">
-                        <label for="card_name">Card Name:</label>
-                        <input type="text" id="card_name" name="card_name" value="{{ card.card_name }}" >
+                        <label for="item_name">{% if current_view == 'bags' %}Bag{% else %}Card{% endif %} Name:</label>
+                        <input type="text" id="item_name" name="item_name" value="{% if current_view == 'bags' %}{{ bag.bag_name }}{% else %}{{ card.card_name }}{% endif %}" disabled>
                     </div>
 
                     <div class="form-group">
-                        <label for="card_price">Card Price:</label>
-                        <input type="text" id="card_price" name="card_price" value="{{ card.card_price }}"> 
+                        <label for="item_price">{% if current_view == 'bags' %}Bag{% else %}Card{% endif %} Price:</label>
+                        <input type="text" id="item_price" name="item_price" value="{% if current_view == 'bags' %}{{ bag.bag_price }}{% else %}{{ card.card_price }}{% endif %}" disabled> 
                     </div>
                     
                     <div class="form-group">
@@ -47,41 +56,7 @@
                 
                     <div class="form-actions">
                         <button name='button' value='update-changes' type="submit" class="btn-primary">Update Stock</button>
-                        <a href="{% url 'stock_page' %}" class="btn-secondary">Cancel</a>
-                    </div>
-                </form>
-            </div>
-        {% else %}
-            <div id="stock-form-container" class="stock-form-container">
-                <div class="form-header">
-                    <h2><i class="form-icon">+</i> Add Stock Details</h2>
-                    <button id="form-close" class="form-close">&times;</button>
-                </div>
-                <form method="post" action="" class="stock-form">
-                    {% csrf_token %}
-                    
-                    <div class="form-group">
-                        <label for="card_input">Select Card:</label>
-                        <input type="text" id="card_input" name="card_input" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="card_price">Card Price:</label>
-                        <input type="number" step="0.01" id="card_price" name="card_price" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="stock_quantity">Stock Quantity:</label>
-                        <input type="number" id="stock_quantity" name="stock_quantity" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="reorder_level">Reorder Level:</label>
-                        <input type="number" id="reorder_level" name="reorder_level" required>
-                    </div>
-                    
-                    <div class="form-actions">
-                        <button type="submit" class="btn-primary">Add Stock</button>
+                        <a href="{% url 'stock_page' %}?view={{ current_view }}" class="btn-secondary">Cancel</a>
                     </div>
                 </form>
             </div>
@@ -91,7 +66,10 @@
         <div class="stock-container">
             <div class="stock-header">
                 <div class="stock-stats">
-                    <p class="stock-count"><span>{{ stocks.count }}</span> items in stock</p> 
+                    <p class="stock-count">
+                        <span>{{ stocks.count }}</span> 
+                        {% if current_view == 'bags' %}bag{% else %}card{% endif %}{% if stocks.count != 1 %}s{% endif %} in stock
+                    </p> 
                     {% if search_query %}
                         <p class="search-info">Search results for "<strong>{{ search_query }}</strong>" in column "<strong>{{ selected_column }}</strong>"</p>
                     {% endif %}
@@ -100,11 +78,17 @@
 
             <div class="stock-search">
                 <form method="get" action="" class="search-form">
+                    <input type="hidden" name="view" value="{{ current_view }}">
                     <div class="search-group">
                         <label for="search-column">Search by:</label>
                         <select id="search-column" name="column">
-                            <option value="card__card_name" {% if selected_column == 'card__card_name' %}selected{% endif %}>Card Name</option>
-                            <option value="card__card_code__item_code" {% if selected_column == 'card__card_code__item_code' %}selected{% endif %}>Card Code</option>
+                            {% if current_view == 'bags' %}
+                                <option value="bag__bag_name" {% if selected_column == 'bag__bag_name' %}selected{% endif %}>Bag Name</option>
+                                <option value="bag__bag_code__item_code" {% if selected_column == 'bag__bag_code__item_code' %}selected{% endif %}>Bag Code</option>
+                            {% else %}
+                                <option value="card__card_name" {% if selected_column == 'card__card_name' %}selected{% endif %}>Card Name</option>
+                                <option value="card__card_code__item_code" {% if selected_column == 'card__card_code__item_code' %}selected{% endif %}>Card Code</option>
+                            {% endif %}
                             <option value="stock_quantity" {% if selected_column == 'stock_quantity' %}selected{% endif %}>Stock Quantity</option>
                             <option value="reorder_level" {% if selected_column == 'reorder_level' %}selected{% endif %}>Reorder Level</option>
                             <option value="updated_by__username" {% if selected_column == 'updated_by__username' %}selected{% endif %}>Updated By</option>
@@ -116,7 +100,7 @@
                     </div>
                     <div class="search-actions">
                         <button type="submit" class="search-button">Search</button>
-                        <a href="{% url 'stock_page' %}" class="reset-button">Reset</a>
+                        <a href="{% url 'stock_page' %}?view={{ current_view }}" class="reset-button">Reset</a>
                     </div>
                 </form>
             </div>
@@ -125,9 +109,9 @@
                 <table class="stock-table">
                     <thead>
                         <tr>
-                            <th class="col-code">Card Code</th>
-                            <th class="col-name">Card Name</th>
-                            <th class="col-price">Card Price</th>
+                            <th class="col-code">{% if current_view == 'bags' %}Bag{% else %}Card{% endif %} Code</th>
+                            <th class="col-name">{% if current_view == 'bags' %}Bag{% else %}Card{% endif %} Name</th>
+                            <th class="col-price">Price</th>
                             <th class="col-stock">Stock Quantity</th>
                             <th class="col-reorder">Reorder Level</th>
                             <th class="col-updated">Last Updated</th>
@@ -137,14 +121,23 @@
                     </thead>
                     <tbody>
                         {% for stock in stocks %}
-                        <tr {% if stock.stock_quantity is None or stock.reorder_level is None %}id="no-stock-row"{% endif %}>
+                        <tr {% if stock.stock_quantity is None or stock.reorder_level is None %}class="no-stock-row"{% endif %}>
                             <form method="post" action="{% url 'delete_stock' %}">
                                 {% csrf_token %}
-                                <input type="hidden" name="card" value="{{ stock.card.id }}">
-                                <input type="hidden" name="stock_id" value="{{ stock.id }}">
-                                <td class="col-code">{{ stock.card.card_code.item_code }}</td>
-                                <td class="col-name">{{ stock.card.card_name }}</td>
-                                <td class="col-price">${{ stock.card.card_price }}</td>
+                                <input type="hidden" name="view" value="{{ current_view }}">
+                                
+                                {% if current_view == 'bags' %}
+                                    <input type="hidden" name="bag_id" value="{{ stock.bag.bag_id }}">
+                                    <td class="col-code">{{ stock.bag.bag_code.item_code }}</td>
+                                    <td class="col-name">{{ stock.bag.bag_name }}</td>
+                                    <td class="col-price">${{ stock.bag.bag_price }}</td>
+                                {% else %}
+                                    <input type="hidden" name="card_id" value="{{ stock.card.card_id }}">
+                                    <td class="col-code">{{ stock.card.card_code.item_code }}</td>
+                                    <td class="col-name">{{ stock.card.card_name }}</td>
+                                    <td class="col-price">${{ stock.card.card_price }}</td>
+                                {% endif %}
+                                
                                 <td class="col-stock">
                                     {% if stock.stock_quantity is not None %}
                                         {{ stock.stock_quantity }}
@@ -157,7 +150,8 @@
                                         {{ stock.reorder_level }}
                                     {% else %}
                                         -
-                                    {% endif %}</td>
+                                    {% endif %}
+                                </td>
                                 <td class="col-updated">{{ stock.last_updated|date:"Y-m-d" }}</td>
                                 <td class="col-updated-by">{% if stock.updated_by %}{{ stock.updated_by.username }}{% else %}-{% endif %}</td>
 
@@ -170,15 +164,16 @@
                                     </td>
                                 {% else %}
                                     <td class="col-action" colspan="2">
-                                        <button name="button" value="update" type="submit" class="btn-update" >Update</button>
+                                        <button name="button" value="update" type="submit" class="btn-update">Update</button>
                                     </td>
                                 {% endif %}
-                                
                             </form>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="9" class="no-records">No stock items found. Add new stock to get started.</td>
+                            <td colspan="9" class="no-records">
+                                No {% if current_view == 'bags' %}bag{% else %}card{% endif %} items found.
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>

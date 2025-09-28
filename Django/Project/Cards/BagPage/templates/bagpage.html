@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+    <title>Bag Management System</title>
+    <link rel="stylesheet" href="{% static 'css/bagpage.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <header class="page-header">
+            <h1>Bag Management</h1>
+            <p class="page-description">Manage your gift bag inventory</p>
+        </header>
+        
+        <!-- Bag Form - Hidden by default -->
+        {% if button == 'update' %}
+            <div id="bag-form-container" class="bag-form-container bag-form-container visible">
+                <div class="form-header">
+                    <h2><i class="form-icon">✏️</i> Update Bag</h2>
+                    <a href="{% url 'bag_page' %}" class="form-close">&times;</a>
+                </div>
+                <form method="post" action="{% url 'update_bag' %}" class="bag-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="bag_id" value="{{ bag_id }}">
+                    <div class="form-group">
+                        <label for="bag_name">Bag Name:</label>
+                        <input type="text" id="bag_name" name="bag_name" value="{{ bagname }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="category">Category:</label>
+                        <select id="category" name="category" required>
+                            <option value="birthday" {% if category == "birthday" %}selected{% endif %}>Birthday</option>
+                            <option value="wedding" {% if category == "wedding" %}selected{% endif %}>Wedding</option>
+                            <option value="holiday" {% if category == "holiday" %}selected{% endif %}>Holiday</option>
+                            <option value="thank_you" {% if category == "thank_you" %}selected{% endif %}>Thank You</option>
+                            <option value="baby_shower" {% if category == "baby_shower" %}selected{% endif %}>Baby Shower</option>
+                            <option value="anniversary" {% if category == "anniversary" %}selected{% endif %}>Anniversary</option>
+                            <option value="graduation" {% if category == "graduation" %}selected{% endif %}>Graduation</option>
+                            <option value="get_well" {% if category == "get_well" %}selected{% endif %}>Get Well</option>
+                            <option value="congratulations" {% if category == "congratulations" %}selected{% endif %}>Congratulations</option>
+                            <option value="other" {% if category == "other" %}selected{% endif %}>Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="bag_price">Bag Price:</label>
+                        <input type="number" step="0.01" id="bag_price" name="bag_price" value="{{ bag_price }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="supplier_name">Supplier Name:</label>
+                        <input type="text" id="supplier_name" name="supplier_name" value="{{ supplier_name }}">
+                    </div>
+                
+                    <div class="form-actions">
+                        <button name='button' value='update-changes' type="submit" class="btn-primary">Update Bag</button>
+                    </div>
+                </form>
+            </div>
+        {% else %}
+            <div id="bag-form-container" class="bag-form-container">
+                <div class="form-header">
+                    <h2><i class="form-icon">+</i> Add New Bag</h2>
+                    <button id="form-close" class="form-close">&times;</button>
+                </div>
+                <form method="post" action="{% url 'add_bag' %}" class="bag-form">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="bag_name">Bag Name:</label>
+                        <input type="text" id="bag_name" name="bag_name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="category">Category:</label>
+                        <select id="category" name="category" required>
+                            <option value="birthday">Birthday</option>
+                            <option value="wedding">Wedding</option>
+                            <option value="holiday">Holiday</option>
+                            <option value="thank_you">Thank You</option>
+                            <option value="baby_shower">Baby Shower</option>
+                            <option value="anniversary">Anniversary</option>
+                            <option value="graduation">Graduation</option>
+                            <option value="get_well">Get Well</option>
+                            <option value="congratulations">Congratulations</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="bag_price">Bag Price:</label>
+                        <input type="number" step="0.01" id="bag_price" name="bag_price" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="supplier_name">Supplier Name:</label>
+                        <input type="text" id="supplier_name" name="supplier_name">
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Add Bag</button>
+                    </div>
+                </form>
+            </div>
+        {% endif %}
+        
+        <!-- Bag List -->
+        <div class="bag-container">
+            <div class="bag-header">
+                <div class="bag-stats">
+                    <p class="bag-count"><span>{{ bags.count }}</span> bags found</p> 
+                </div>
+                <button type='button' name='button' value='add-bag' id="add-bag-button" class="add-bag-button">
+                    <i class="button-icon">+</i> Add New Bag
+                </button>
+            </div>
+
+            <div class="bag-search">
+                <form method="get" action="{% url 'search_bag' %}" class="search-form">
+                    <div class="search-group">
+                        <label for="search-column">Search by:</label>
+                        <select id="search-column" name="column">
+                            <option value="bag_name" {% if selected_column == 'bag_name' %}selected{% endif %}>Bag Name</option>
+                            <option value="category" {% if selected_column == 'category' %}selected{% endif %}>Category</option>
+                            <option value="bag_price" {% if selected_column == 'bag_price' %}selected{% endif %}>Bag Price</option>
+                            <option value="supplier_name" {% if selected_column == 'supplier_name' %}selected{% endif %}>Supplier Name</option>
+                            <option value="added_by" {% if selected_column == 'added_by' %}selected{% endif %}>Added By</option>
+                        </select>
+                    </div>
+                    <div class="search-group">
+                        <label for="search-input">Value:</label>
+                        <input type="text" id="search-input" name="search" {% if search_query %}value="{{ search_query }}"{% endif %} placeholder='Enter search term...' required>
+                    </div>
+                    <div class="search-actions">
+                        <button type="submit" class="search-button">Search</button>
+                        <a href="{% url 'bag_page' %}" class="reset-button">Reset</a>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="table-container">
+                <table class="bag-table">
+                    <thead>
+                        <tr>
+                            <th class="col-code">Bag Code</th>
+                            <th class="col-name">Bag Name</th>
+                            <th class="col-category">Category</th>
+                            <th class="col-price">Bag Price</th>
+                            <th class="col-supplier">Supplier</th>
+                            <th class="col-added">Added By</th>
+                            <th class="col-created">Created</th>
+                            <th class="col-updated">Updated</th>
+                            <th class="col-actions" colspan="2">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bag in bags %}
+                        <tr>
+                            <form method="post" action="{% url 'update_bag' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="bag_id" value="{{ bag.bag_id }}">
+                                <td class="col-code">{{ bag.bag_code.item_code }}</td>
+                                <td class="col-name">{{ bag.bag_name }}</td>
+                                <td class="col-category">{{ bag.category }}</td>
+                                <td class="col-price">${{ bag.bag_price }}</td>
+                                <td class="col-supplier">{{ bag.supplier_name|default:"-" }}</td>
+                                <td class="col-added">{% if bag.added_by %}{{ bag.added_by.username }}{% else %}-{% endif %}</td>
+                                <td class="col-created">{{ bag.created_at|date:"Y-m-d" }}</td>
+                                <td class="col-updated">{{ bag.updated_at|date:"Y-m-d" }}</td>
+                                <td class="col-action">
+                                    <button name="button" value="update" type="submit" class="btn-update">Update</button>
+                                </td>
+                                <td class="col-action">
+                                    <button name="button" value="delete-request" type="submit" class="btn-delete">Delete</button>
+                                </td>
+                            </form>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="10" class="no-records">No bags found. Add a new bag to get started.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script src="{% static 'js/bagpage.js' %}"></script>
+    {% if delete_confirmation == 'True' %}
+    <!-- Delete confirmation modal -->
+        {% include 'bagconfirmdel.html' %}
+    {% endif %}
+{% endblock %}

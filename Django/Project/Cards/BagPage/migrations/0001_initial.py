@@ -15,12 +15,12 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Card',
+            name='Bag',
             fields=[
-                ('card_id', models.AutoField(primary_key=True, serialize=False)),
-                ('card_name', models.CharField(max_length=100)),
+                ('bag_id', models.AutoField(primary_key=True, serialize=False)),
+                ('bag_name', models.CharField(max_length=100)),
                 ('category', models.CharField(default='greeting', max_length=50)),
-                ('card_price', models.DecimalField(decimal_places=2, max_digits=10)),
+                ('bag_price', models.DecimalField(decimal_places=2, max_digits=10)),
                 ('supplier_name', models.CharField(blank=True, max_length=100, null=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),

@@ -1,23 +1,23 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Form visibility toggle
-    const addCardButton = document.getElementById('add-card-button');
-    const cardFormContainer = document.getElementById('card-form-container');
+    const addBagButton = document.getElementById('add-bag-button');
+    const bagFormContainer = document.getElementById('bag-form-container');
     const formCloseButton = document.getElementById('form-close');
     
-    if (addCardButton && cardFormContainer) {
-        addCardButton.addEventListener('click', function() {
-            cardFormContainer.classList.add('visible');
+    if (addBagButton && bagFormContainer) {
+        addBagButton.addEventListener('click', function() {
+            bagFormContainer.classList.add('visible');
         });
         
         if (formCloseButton) {
             formCloseButton.addEventListener('click', function() {
-                cardFormContainer.classList.remove('visible');
+                bagFormContainer.classList.remove('visible');
             });
         }
     }
     
     // Table sorting functionality
-    const table = document.querySelector('.card-table');
+    const table = document.querySelector('.bag-table');
     if (table) {
         const headers = table.querySelectorAll('th');
         const tableBody = table.querySelector('tbody');
@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         headers.forEach((header, index) => {
             // Skip action column
-            if (header.textContent.trim().toLowerCase() !== 'action') {
+            if (!header.classList.contains('col-actions')) {
                 header.addEventListener('click', () => {
                     // Remove sort indicators from all headers
                     headers.forEach(h => {
@@ -62,8 +62,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                         
                         // Check if the content is a number
-                        const numA = parseFloat(cellA);
-                        const numB = parseFloat(cellB);
+                        const numA = parseFloat(cellA.replace(/[^0-9.-]+/g, ''));
+                        const numB = parseFloat(cellB.replace(/[^0-9.-]+/g, ''));
                         
                         if (!isNaN(numA) && !isNaN(numB)) {
                             return currentSortOrder === 'asc' 
@@ -86,4 +86,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+    
+    
 });

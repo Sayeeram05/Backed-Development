@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {    
+    // Remove the add-stock button functionality since the button was removed
+    
     // Table sorting functionality
     const table = document.querySelector('.stock-table');
     if (table) {

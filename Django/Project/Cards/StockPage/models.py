@@ -29,3 +29,14 @@ class CardsStock(models.Model):
     def __str__(self):
         return f"Stock for {self.card.card_name} ({self.card.card_code}) - Qty: {self.stock_quantity}"
     
+class BagsStock(models.Model):
+    id = models.AutoField(primary_key=True)
+    bag = models.OneToOneField('BagPage.Bag', on_delete=models.CASCADE, related_name='stock')
+    stock_quantity = models.IntegerField(default=None,blank=False,null=True)            # Current available stock
+    reorder_level = models.IntegerField(default=None,blank=False,null=True)             # Low stock alert threshold    # e.g
+    last_updated = models.DateTimeField(auto_now=True)           # Auto update on save
+    updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
+    
+    def __str__(self):
+        return f"Stock for {self.bag.bag_name} ({self.bag.bag_code}) - Qty: {self.stock_quantity}"
+    

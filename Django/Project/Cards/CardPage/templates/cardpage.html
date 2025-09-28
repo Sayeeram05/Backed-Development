@@ -177,7 +177,7 @@
                         <tr>
                             <form method="post" action="{% url 'update_card' %}">
                                 {% csrf_token %}
-                                <input type="hidden" name="card_id" value="{{ card.id }}">
+                                <input type="hidden" name="card_id" value="{{ card.card_id }}">
                                 <td class="col-code">{{ card.card_code.item_code }}</td>
                                 <td class="col-name">{{ card.card_name }}</td>
                                 <td class="col-category">{{ card.category }}</td>
@@ -206,7 +206,7 @@
     </div>
     <script src="{% static 'js/cardpage.js' %}"></script>
     {% if delete_confirmation == 'True' %}
-        {% include 'confirmdel.html' %}
+        {% include 'cardsconfirmdel.html' %}
     {% endif %}
     
 {% endblock %}

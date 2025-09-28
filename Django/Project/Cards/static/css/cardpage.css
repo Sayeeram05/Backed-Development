@@ -609,8 +609,9 @@ h1 {
   font-style: normal;
 }
 
-.modal-close {
+.modal-close a{
   font-size: 28px;
+  text-decoration: none;
   cursor: pointer;
   color: var(--text-secondary);
   transition: all 0.2s;

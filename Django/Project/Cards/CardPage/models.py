@@ -3,7 +3,7 @@ from django.conf import settings
 
 
 class Card(models.Model):
-    id = models.AutoField(primary_key=True)
+    card_id = models.AutoField(primary_key=True)
     card_code = models.ForeignKey('StockPage.Item', to_field='item_code', on_delete=models.CASCADE, related_name='cards')
     card_name = models.CharField(max_length=100, blank=False, null=False)
     category = models.CharField(max_length=50, default='greeting', blank=False, null=False)

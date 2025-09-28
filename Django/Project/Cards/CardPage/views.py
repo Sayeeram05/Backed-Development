@@ -57,28 +57,28 @@ class UpdateCardView(View):
         if button == 'update':
             cards = Card.objects.all()
             card_id = request.POST.get('card_id')
-            update_card = Card.objects.get(id=card_id)
-            card_name = update_card.card_name
-            category = update_card.category
-            card_price = update_card.card_price
-            supplier_name = update_card.supplier_name
-            context = {'button':'update', 'card_id': card_id, 'cardname': card_name, 'category': category, 'card_price': card_price, 'supplier_name': supplier_name, 'cards': cards}
+            updated_card = Card.objects.get(card_id=card_id)
+            card_name = updated_card.card_name
+            category = updated_card.category
+            card_price = updated_card.card_price
+            supplier_name = updated_card.supplier_name
+            context = {'button':'update', 'card_id': updated_card.card_id, 'cardname': card_name, 'category': category, 'card_price': card_price, 'supplier_name': supplier_name, 'card': updated_card, 'cards': cards}
             return render(request, self.template_name, context)
         
         elif button == 'update-changes':
             card_id = request.POST.get('card_id')
-            update_card = Card.objects.get(id=card_id)
-            update_card.card_name = request.POST.get('card_name')
-            update_card.category = request.POST.get('category')
-            update_card.card_price = request.POST.get('card_price')
-            update_card.supplier_name = request.POST.get('supplier_name')
-            update_card.save()
+            updated_card = Card.objects.get(card_id=card_id)
+            updated_card.card_name = request.POST.get('card_name')
+            updated_card.category = request.POST.get('category')
+            updated_card.card_price = request.POST.get('card_price')
+            updated_card.supplier_name = request.POST.get('supplier_name')
+            updated_card.save()
             return redirect('card_page')
         
         elif button == 'delete-request':
             print("Delete request received")
             card_id = request.POST.get('card_id')
-            delete_card = Card.objects.get(id=card_id)
+            delete_card = Card.objects.get(card_id=card_id)
             return redirect('delete_card', card_code=delete_card.card_code.item_code)
         
 

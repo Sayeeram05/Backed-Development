@@ -1,31 +1,30 @@
 <nav class="navbar">
-    {% load static %}
-    <div class="logo-container">
-        <img src="{% static 'assets/logo.png' %}" alt="Logo" class="logo">
-        <div class="brand-name">Cards Company</div>
-    </div>
-    
-    <ul class="nav-links">
-        <li><a>Home</a></li>
-        <li><a>Cards</a></li>
-        <li><a>Stock</a></li>
-        <li><a>Billing</a></li>
-        <li><a>Billing Details</a></li>
-        {% if user.is_staff %}
-        <li><a>Users</a></li>
-        {% endif %}
-        {% if user.is_authenticated %}
-        <li><a>Logout</a></li>
-        {% else %}
-        <li><a>Login</a></li>
-        <li><a>Signup</a></li>
-        {% endif %}
-    </ul>
-    
-    <div class="hamburger">
-        <div class="line1"></div>
-        <div class="line2"></div>
-        <div class="line3"></div>
-    </div>
-</nav>
+  {% load static %}
+  <div class="logo-container">
+    <img src="{% static 'assets/logo.png' %}" alt="Logo" class="logo" />
+    <div class="brand-name">Cards Company</div>
+  </div>
 
+  <ul class="nav-links">
+    <li><a>Home</a></li>
+    <li><a>Cards</a></li>
+    <li><a>Bags</a></li>
+    <li><a>Stock</a></li>
+    <li><a>Billing</a></li>
+    <li><a>Billing Details</a></li>
+    {% if user.is_staff %}
+    <li><a>Users</a></li>
+    {% endif %} {% if user.is_authenticated %}
+    <li><a>Logout</a></li>
+    {% else %}
+    <li><a>Login</a></li>
+    <li><a>Signup</a></li>
+    {% endif %}
+  </ul>
+
+  <div class="hamburger">
+    <div class="line1"></div>
+    <div class="line2"></div>
+    <div class="line3"></div>
+  </div>
+</nav>
