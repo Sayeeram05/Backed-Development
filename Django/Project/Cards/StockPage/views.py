@@ -1,8 +1,8 @@
 from django.shortcuts import redirect, render
 from django.views import View
 from .models import CardsStock, BagsStock
-
-
+from CardPage.models import Card
+from BagPage.models import Bag
 class StockPageView(View):
     template_name = 'stockpage.html'
     
@@ -13,10 +13,10 @@ class StockPageView(View):
         if current_view not in ['cards', 'bags'] or current_view == 'cards':  
             current_view = 'cards'
             stocks = CardsStock.objects.all()
+            context = {'stocks': stocks, 'current_view': current_view}
+            return render(request, self.template_name, context)
         elif current_view == 'bags':
-            stocks = BagsStock.objects.all()
-        context = {'stocks': stocks, 'current_view': current_view}
-        return render(request, self.template_name, context)
+            return redirect('bags_stock')  
 
 
 class ModifyStockView(View):
@@ -32,7 +32,7 @@ class ModifyStockView(View):
                 stock.stock_quantity = None
                 stock.reorder_level = None
                 stock.save()
-                return redirect('stock_page', view='cards')  # Specify view=cards
+                return redirect('stock_page')  # Specify view=cards
             elif(button == 'update'):
                 card_id = request.POST.get('card_id')
                 return redirect('update_card_stock', stock_id=card_id)
@@ -77,7 +77,17 @@ class UpdateCardStockView(View):
         stock.updated_by = None if not request.user.is_authenticated else request.user
         stock.save()
         return redirect('stock_page') 
+
+class BagsStockView(View):
+    template_name = 'stockpage.html'
     
+    def get(self, request):
+        print(request.GET)
+        
+        current_view = 'bags'
+        stocks = BagsStock.objects.all()
+        context = {'stocks': stocks, 'current_view': current_view}
+        return render(request, self.template_name, context)
 class UpdateBagStockView(View):
     template_name = 'stockpage.html'
     print("In UpdateBagStockView\n\n\n")
@@ -103,4 +113,55 @@ class UpdateBagStockView(View):
         stock.reorder_level = reorder_level
         stock.updated_by =  None if not request.user.is_authenticated else request.user
         stock.save()
-        return redirect('stock_page')  # Specify view=bags
+        return redirect('bags_stock')  # Specify view=bags
+
+class SearchCardView(View):
+    template_name = 'stockpage.html'
+    print("SearchCardView initialized")
+    def get(self, request):
+        print(request.GET)
+        column = request.GET.get('column', 'card_name')
+        search_query = request.GET.get('search', '')
+        print(f"Searching for {search_query} in column {column}")
+        if search_query == '-' and column in ['stock_quantity', 'reorder_level','updated_by__username']:
+            cards = CardsStock.objects.filter(**{f"{column}__isnull": True})  
+        
+        elif column =='card_name':
+            
+            cards = CardsStock.objects.filter(**{"card__card_name__icontains": search_query})
+        elif column == 'card_code':
+            cards = CardsStock.objects.filter(**{"card__card_code__item_code__icontains": search_query})
+        elif column == 'card_price':
+            cards = CardsStock.objects.filter(**{"card__card_price": search_query})
+        elif column in ['stock_quantity', 'reorder_level', 'updated_by__username']:
+            filter_kwargs = {f"{column}": search_query}
+            cards = CardsStock.objects.filter(**filter_kwargs)
+        else:
+            cards = CardsStock.objects.all()
+
+        return render(request, self.template_name, {'current_view': 'cards', 'stocks': cards, 'search_query': search_query, 'selected_column': column})
+
+class SearchBagView(View):
+    template_name = 'stockpage.html'
+    print("SearchBagView initialized")
+    def get(self, request):
+        print(request.GET)
+        column = request.GET.get('column', 'bag_name')
+        search_query = request.GET.get('search', '')
+        print(f"Searching for {search_query} in column {column}")
+        if search_query == '-' and column in ['stock_quantity', 'reorder_level','updated_by__username']:
+            bags = BagsStock.objects.filter(**{f"{column}__isnull": True})  
+        
+        elif column =='bag_name':
+            bags = BagsStock.objects.filter(**{"bag__bag_name__icontains": search_query})
+        elif column == 'bag_code':
+            bags = BagsStock.objects.filter(**{"bag__bag_code__item_code__icontains": search_query})
+        elif column == 'bag_price':
+            bags = BagsStock.objects.filter(**{"bag__bag_price": search_query})
+        elif column in ['stock_quantity', 'reorder_level', 'updated_by__username']:
+            filter_kwargs = {f"{column}": search_query}
+            bags = BagsStock.objects.filter(**filter_kwargs)
+        else:
+            bags = BagsStock.objects.all()
+
+        return render(request, self.template_name, {'current_view': 'bags', 'stocks': bags, 'search_query': search_query, 'selected_column': column})

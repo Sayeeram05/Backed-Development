@@ -165,7 +165,7 @@
                                 <td class="col-code">{{ bag.bag_code.item_code }}</td>
                                 <td class="col-name">{{ bag.bag_name }}</td>
                                 <td class="col-category">{{ bag.category }}</td>
-                                <td class="col-price">${{ bag.bag_price }}</td>
+                                <td class="col-price">₹ {{ bag.bag_price }}</td>
                                 <td class="col-supplier">{{ bag.supplier_name|default:"-" }}</td>
                                 <td class="col-added">{% if bag.added_by %}{{ bag.added_by.username }}{% else %}-{% endif %}</td>
                                 <td class="col-created">{{ bag.created_at|date:"Y-m-d" }}</td>

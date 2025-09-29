@@ -181,7 +181,7 @@
                                 <td class="col-code">{{ card.card_code.item_code }}</td>
                                 <td class="col-name">{{ card.card_name }}</td>
                                 <td class="col-category">{{ card.category }}</td>
-                                <td class="col-price">{{ card.card_price }}</td>
+                                <td class="col-price">₹ {{ card.card_price }}</td>
                                 <td class="col-supplier">{{ card.supplier_name|default:"-" }}</td>
                                 <td class="col-added">{% if card.added_by %}{{ card.added_by.username }}{% else %}-{% endif %}</td>
                                 <td class="col-created">{{ card.created_at|date:"Y-m-d" }}</td>

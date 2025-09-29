@@ -71,23 +71,42 @@
                         {% if current_view == 'bags' %}bag{% else %}card{% endif %}{% if stocks.count != 1 %}s{% endif %} in stock
                     </p> 
                     {% if search_query %}
-                        <p class="search-info">Search results for "<strong>{{ search_query }}</strong>" in column "<strong>{{ selected_column }}</strong>"</p>
+                        <p class="search-info">
+                            Search results for "<strong>{{ search_query }}</strong>" in column: 
+                            <strong>
+                                {% if selected_column == 'card_name' or selected_column == 'bag_name' %}
+                                    Card Name
+                                {% elif selected_column == 'card_code' or selected_column == 'bag_code' %}
+                                    Card Code
+                                {% elif selected_column == 'card_price' or selected_column == 'bag_price' %}
+                                    Card Price
+                                {% elif selected_column == 'stock_quantity' %}
+                                    Stock Quantity
+                                {% elif selected_column == 'reorder_level' %}
+                                    Reorder Level
+                                {% elif selected_column == 'updated_by__username' %}
+                                    Updated By
+                                {% endif %}
+                            </strong>
+                        </p>
                     {% endif %}
                 </div>
             </div>
 
             <div class="stock-search">
-                <form method="get" action="" class="search-form">
+                <form method="get" action="{% if current_view == 'bags' %}{% url 'search_bag' %}{% else %}{% url 'search_card' %}{% endif %}" class="search-form">
                     <input type="hidden" name="view" value="{{ current_view }}">
                     <div class="search-group">
                         <label for="search-column">Search by:</label>
                         <select id="search-column" name="column">
                             {% if current_view == 'bags' %}
-                                <option value="bag__bag_name" {% if selected_column == 'bag__bag_name' %}selected{% endif %}>Bag Name</option>
-                                <option value="bag__bag_code__item_code" {% if selected_column == 'bag__bag_code__item_code' %}selected{% endif %}>Bag Code</option>
+                                <option value="bag_name" {% if selected_column == 'bag_name' %}selected{% endif %}>Bag Name</option>
+                                <option value="bag_code" {% if selected_column == 'bag_code' %}selected{% endif %}>Bag Code</option>
+                                <option value="bag_price" {% if selected_column == 'bag_price' %}selected{% endif %}>Bag Price</option>
                             {% else %}
-                                <option value="card__card_name" {% if selected_column == 'card__card_name' %}selected{% endif %}>Card Name</option>
-                                <option value="card__card_code__item_code" {% if selected_column == 'card__card_code__item_code' %}selected{% endif %}>Card Code</option>
+                                <option value="card_name" {% if selected_column == 'card_name' %}selected{% endif %}>Card Name</option>
+                                <option value="card_code" {% if selected_column == 'card_code' %}selected{% endif %}>Card Code</option>
+                                <option value="card_price" {% if selected_column == 'card_price' %}selected{% endif %}>Card Price</option>
                             {% endif %}
                             <option value="stock_quantity" {% if selected_column == 'stock_quantity' %}selected{% endif %}>Stock Quantity</option>
                             <option value="reorder_level" {% if selected_column == 'reorder_level' %}selected{% endif %}>Reorder Level</option>
@@ -130,12 +149,12 @@
                                     <input type="hidden" name="bag_id" value="{{ stock.bag.bag_id }}">
                                     <td class="col-code">{{ stock.bag.bag_code.item_code }}</td>
                                     <td class="col-name">{{ stock.bag.bag_name }}</td>
-                                    <td class="col-price">${{ stock.bag.bag_price }}</td>
+                                    <td class="col-price">₹ {{ stock.bag.bag_price }}</td>
                                 {% else %}
                                     <input type="hidden" name="card_id" value="{{ stock.card.card_id }}">
                                     <td class="col-code">{{ stock.card.card_code.item_code }}</td>
                                     <td class="col-name">{{ stock.card.card_name }}</td>
-                                    <td class="col-price">${{ stock.card.card_price }}</td>
+                                    <td class="col-price">₹ {{ stock.card.card_price }}</td>
                                 {% endif %}
                                 
                                 <td class="col-stock">

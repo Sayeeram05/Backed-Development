@@ -46,7 +46,7 @@ class AddCardView(View):
             updated_by=request.user if request.user.is_authenticated else None
         )
         card_stock.save()
-        return redirect('update_stock', stock_id=card_stock.id)
+        return redirect('update_card_stock', stock_id=card_stock.id)
     
 
 

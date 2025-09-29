@@ -217,9 +217,9 @@ h1 {
   color: var(--white);
   border: none;
   border-radius: var(--radius-sm);
-  padding: 12px 24px;
-  font-size: 16px;
-  font-weight: 500;
+  padding: 8px 24px;
+  font-size: 14px;
+  font-weight: bolder;
   cursor: pointer;
   transition: background-color 0.2s;
 }
@@ -234,13 +234,13 @@ h1 {
     color: var(--text-color);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-sm);
-    padding: 12px 24px;
-    font-size: 16px;
+    padding: 8px 24px;
+    font-size: 14px;
     font-weight: 500;
     text-decoration: none;
     cursor: pointer;
     transition: background-color 0.2s;
-    margin-left: 12px;
+    margin-left: 25px;
     display: inline-block;
 }
 
