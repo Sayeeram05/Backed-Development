@@ -1,8 +1,7 @@
 from django.shortcuts import redirect, render
 from django.views import View
 from .models import CardsStock, BagsStock
-from CardPage.models import Card
-from BagPage.models import Bag
+
 class StockPageView(View):
     template_name = 'stockpage.html'
     

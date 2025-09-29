@@ -1,0 +1,148 @@
+{% extends 'base.html' %} {% block head %} {% load static %}
+<title>Invoice Settings | Cards Company</title>
+<link rel="stylesheet" href="{% static 'css/invoiceupdatepage.css' %}" />
+{% endblock %} {% block body %}
+<div class="update-container">
+  <h1>Invoice Settings</h1>
+  <form method="post" class="update-form">
+    {% csrf_token %}
+    <h2 class="section-heading">Company Information</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="company_name">Company Name</label>
+        <input
+          type="text"
+          id="company_name"
+          name="company_name"
+          value="{{ company_name }}"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="company_gstin">GSTIN</label>
+        <input
+          type="text"
+          id="company_gstin"
+          name="company_gstin"
+          value="{{ company_gstin }}"
+        />
+      </div>
+      <div class="form-group">
+        <label for="company_pan">PAN Number</label>
+        <input
+          type="text"
+          id="company_pan"
+          name="company_pan"
+          value="{{ company_pan }}"
+        />
+      </div>
+    </div>
+    <h2 class="section-heading">Address Details</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="company_address">Address</label>
+        <input
+          type="text"
+          id="company_address"
+          name="company_address"
+          required
+        >{{ company_address }}</textarea>
+      </div>
+      <div class="form-group">
+        <label for="company_district">District</label>
+        <input
+          type="text"
+          id="company_district"
+          name="company_district"
+          value="{{ company_district }}"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="company_state">State</label>
+        <input
+          type="text"
+          id="company_state"
+          name="company_state"
+          value="{{ company_state }}"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="company_pincode">Pincode</label>
+        <input
+          type="text"
+          id="company_pincode"
+          name="company_pincode"
+          value="{{ company_pincode }}"
+        />
+      </div>
+    </div>
+    <h2 class="section-heading">Contact Details</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="company_phone">Phone Number</label>
+        <input
+          type="text"
+          id="company_phone"
+          name="company_phone"
+          value="{{ company_phone }}"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="company_alt_phone">Alternate Mobile</label>
+        <input
+          type="text"
+          id="company_alt_phone"
+          name="company_alt_phone"
+          value="{{ company_alt_phone }}"
+        />
+      </div>
+      <div class="form-group">
+        <label for="company_email">Email</label>
+        <input
+          type="email"
+          id="company_email"
+          name="company_email"
+          value="{{ company_email }}"
+        />
+      </div>
+      <div class="form-group">
+        <label for="company_website">Website</label>
+        <input
+          type="text"
+          id="company_website"
+          name="company_website"
+          value="{{ company_website }}"
+        />
+      </div>
+    </div>
+    <h2 class="section-heading">Tax Details</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="company_tax">Tax %</label>
+        <input
+          type="number"
+          id="company_tax"
+          name="company_tax"
+          value="{{ company_tax }}"
+          min="0"
+          step="0.01"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="company_tax_number">Tax Number</label>
+        <input
+          type="text"
+          id="company_tax_number"
+          name="company_tax_number"
+          value="{{ company_tax_number }}"
+        />
+      </div>
+    </div>
+    <button type="submit" class="update-btn">Update Settings</button>
+  </form>
+</div>
+{% endblock %}

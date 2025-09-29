@@ -1,0 +1,141 @@
+body {
+  background: #f9f9f9;
+  font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
+}
+
+.update-container {
+  max-width: 1600px;
+  margin: 48px auto;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 18px rgba(26, 115, 232, 0.10);
+  padding: 36px 32px 28px 32px;
+  position: relative;
+}
+
+.update-container::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, #1a73e8 60%, #41c8ff 100%);
+  border-radius: 10px 10px 0 0;
+}
+
+.update-container h1 {
+  color: #1a73e8;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 28px;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.update-form {
+  width: 100%;
+}
+
+.form-row {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.form-group {
+  flex: 1 1 200px;
+  min-width: 180px;
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.update-form label {
+  font-weight: 500;
+  margin-bottom: 7px;
+  color: #202124;
+  font-size: 15px;
+}
+
+.update-form input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #dadce0;
+  border-radius: 5px;
+  font-size: 16px;
+  background: #f1f3f4;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+.update-form input:focus {
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.15);
+  outline: none;
+  background: #e8f0fe;
+}
+
+.update-btn {
+  width: 100%;
+  background: linear-gradient(90deg, #1a73e8 60%, #3498db 100%);
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 13px;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 18px;
+  box-shadow: 0 2px 8px rgba(26, 115, 232, 0.08);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+
+.update-btn:hover {
+  background: #0d62d0;
+  box-shadow: 0 4px 16px rgba(26, 115, 232, 0.15);
+}
+
+.section-heading {
+  font-size: 18px;
+  color: #1a73e8;
+  font-weight: 600;
+  margin: 32px 0 18px 0;
+  letter-spacing: 0.5px;
+  border-left: 4px solid #41c8ff;
+  padding-left: 10px;
+}
+
+.section-heading:first-of-type {
+  margin-top: 0;
+}
+
+#company_address {
+	width: 100%;
+	min-width: 320px;
+}
+
+@media (max-width: 900px) {
+  .update-container {
+    padding: 24px 10px 18px 10px;
+  }
+  .form-row {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 600px) {
+  .update-container {
+    padding: 18px 4px 18px 4px;
+  }
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+  .form-group {
+    min-width: 100%;
+    margin-bottom: 16px;
+  }
+  .update-btn {
+    font-size: 15px;
+    padding: 10px;
+  }
+}

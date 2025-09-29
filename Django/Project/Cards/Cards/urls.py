@@ -23,5 +23,10 @@ urlpatterns = [
     path('cards/', include('CardPage.urls')),
     path('bags/', include('BagPage.urls')),
     path('stock/', include('StockPage.urls')),
+    path('invoice/', include('InvoicePage.urls')),
+    path('update-invoice/', include('InvoiceUpdatePage.urls')),
+    path('billing/', include('BillingPage.urls')),
+    path('users/', include('UsersPage.urls')),
+    path('auth/', include('Authentication.urls')),
     path('admin/', admin.site.urls),
 ]

@@ -32,6 +32,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'InvoiceUpdatePage.apps.InvoiceupdatepageConfig',
+    'UsersPage.apps.UserspageConfig',
+    'InvoicePage.apps.InvoicepageConfig',
     'BagPage.apps.BagpageConfig',
     'CardPage.apps.CardpageConfig',
     'StockPage.apps.StockpageConfig',

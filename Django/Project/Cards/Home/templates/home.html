@@ -1,8 +1,358 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} {% load static %} {% block head %}
+<title>Admin Dashboard | Cards Company</title>
+<link rel="stylesheet" href="{% static 'css/home.css' %}" />
+<link
+  href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+/>
+{% endblock %} {% block body %}
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h1>Dashboard</h1>
+    <div class="dashboard-actions">
+      <div class="date-filter">
+        <select id="date-range">
+          <option value="today">Today</option>
+          <option value="week">This Week</option>
+          <option value="month" selected>This Month</option>
+          <option value="year">This Year</option>
+        </select>
+      </div>
+      <button class="btn-refresh">
+        <i class="fas fa-sync-alt"></i> Refresh
+      </button>
+    </div>
+  </div>
 
-{% block head %}{% endblock %}
+  <!-- Summary Cards -->
+  <div class="summary-cards">
+    <div class="summary-card">
+      <div class="card-icon card-icon-orange">
+        <i class="fas fa-envelope"></i>
+      </div>
+      <div class="card-content">
+        <h3>Cards</h3>
+        <div class="card-value">₹45,250</div>
+        <div class="card-change positive">
+          <i class="fas fa-arrow-up"></i> +12%
+          <span class="period">vs last month</span>
+        </div>
+      </div>
+    </div>
 
-{% block body %}
-    <h1>Welcome to Cards Company</h1>
-    <p>Your one-stop solution for all your card needs.</p>
+    <div class="summary-card">
+      <div class="card-icon card-icon-green">
+        <i class="fas fa-shopping-bag"></i>
+      </div>
+      <div class="card-content">
+        <h3>Bags</h3>
+        <div class="card-value">₹32,180</div>
+        <div class="card-change positive">
+          <i class="fas fa-arrow-up"></i> +8%
+          <span class="period">vs last month</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="card-icon card-icon-blue">
+        <i class="fas fa-chart-line"></i>
+      </div>
+      <div class="card-content">
+        <h3>Overall</h3>
+        <div class="card-value">₹77,430</div>
+        <div class="card-change positive">
+          <i class="fas fa-arrow-up"></i> +10%
+          <span class="period">vs last month</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="card-icon card-icon-purple">
+        <i class="fas fa-users"></i>
+      </div>
+      <div class="card-content">
+        <h3>Customers</h3>
+        <div class="card-value">42</div>
+        <div class="card-change positive">
+          <i class="fas fa-arrow-up"></i> +5%
+          <span class="period">vs last month</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="charts-row">
+    <div class="chart-container">
+      <div class="chart-header">
+        <h3>Sales Overview</h3>
+        <div class="chart-actions">
+          <select id="chart-type">
+            <option value="weekly">Weekly</option>
+            <option value="monthly" selected>Monthly</option>
+          </select>
+        </div>
+      </div>
+      <div class="chart-body">
+        <canvas id="salesChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tables Row -->
+  <div class="tables-row">
+    <!-- Top Selling Items -->
+    <div class="table-container">
+      <div class="table-header">
+        <h3>Top Selling Items</h3>
+        <div class="table-actions">
+          <select id="top-selling-filter">
+            <option value="all">All</option>
+            <option value="cards">Cards</option>
+            <option value="bags">Bags</option>
+          </select>
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>No.</th>
+              <th>Item</th>
+              <th>Type</th>
+              <th>Sold</th>
+              <th>Revenue</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>Wedding Card Gold Embossed</td>
+              <td><span class="badge badge-card">Card</span></td>
+              <td>120</td>
+              <td>₹24,000</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Luxury Gift Bag</td>
+              <td><span class="badge badge-bag">Bag</span></td>
+              <td>95</td>
+              <td>₹14,250</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>Birthday Card Premium</td>
+              <td><span class="badge badge-card">Card</span></td>
+              <td>87</td>
+              <td>₹8,700</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>Anniversary Special Card</td>
+              <td><span class="badge badge-card">Card</span></td>
+              <td>75</td>
+              <td>₹11,250</td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td>Designer Paper Bag</td>
+              <td><span class="badge badge-bag">Bag</span></td>
+              <td>68</td>
+              <td>₹8,160</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Low Stock Items -->
+    <div class="table-container">
+      <div class="table-header">
+        <h3>Low Stock Items</h3>
+        <div class="table-actions">
+          <select id="low-stock-filter">
+            <option value="all">All</option>
+            <option value="critical">Critical Only</option>
+          </select>
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>No.</th>
+              <th>Item</th>
+              <th>Type</th>
+              <th>Qty</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>Wedding Card Silver Design</td>
+              <td><span class="badge badge-card">Card</span></td>
+              <td>5</td>
+              <td>
+                <span class="status-badge status-critical">Critical</span>
+              </td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Premium Gift Bag Large</td>
+              <td><span class="badge badge-bag">Bag</span></td>
+              <td>8</td>
+              <td><span class="status-badge status-low">Low</span></td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>Engagement Card Special</td>
+              <td><span class="badge badge-card">Card</span></td>
+              <td>7</td>
+              <td><span class="status-badge status-low">Low</span></td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>Birthday Card Kids Edition</td>
+              <td><span class="badge badge-card">Card</span></td>
+              <td>3</td>
+              <td>
+                <span class="status-badge status-critical">Critical</span>
+              </td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td>Paper Bag Medium</td>
+              <td><span class="badge badge-bag">Bag</span></td>
+              <td>6</td>
+              <td><span class="status-badge status-low">Low</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activity -->
+  <div class="recent-activity">
+    <div class="activity-header">
+      <h3>Recent Activity</h3>
+      <a href="#" class="view-all">View All</a>
+    </div>
+    <div class="activity-list">
+      <div class="activity-item">
+        <div class="activity-icon">
+          <i class="fas fa-shopping-cart"></i>
+        </div>
+        <div class="activity-details">
+          <div class="activity-title">New Order #1089</div>
+          <div class="activity-desc">Birthday Card Premium (x5)</div>
+          <div class="activity-time">Just now</div>
+        </div>
+        <div class="activity-amount">₹1,450</div>
+      </div>
+
+      <div class="activity-item">
+        <div class="activity-icon">
+          <i class="fas fa-user-plus"></i>
+        </div>
+        <div class="activity-details">
+          <div class="activity-title">New Customer</div>
+          <div class="activity-desc">Raj Kumar registered</div>
+          <div class="activity-time">15 minutes ago</div>
+        </div>
+      </div>
+
+      <div class="activity-item">
+        <div class="activity-icon">
+          <i class="fas fa-box"></i>
+        </div>
+        <div class="activity-details">
+          <div class="activity-title">Stock Update</div>
+          <div class="activity-desc">Added 50 Wedding Cards</div>
+          <div class="activity-time">2 hours ago</div>
+        </div>
+      </div>
+
+      <div class="activity-item">
+        <div class="activity-icon">
+          <i class="fas fa-shopping-cart"></i>
+        </div>
+        <div class="activity-details">
+          <div class="activity-title">New Order #1088</div>
+          <div class="activity-desc">Designer Paper Bag (x3)</div>
+          <div class="activity-time">4 hours ago</div>
+        </div>
+        <div class="activity-amount">₹960</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Initialize Charts
+  document.addEventListener("DOMContentLoaded", function () {
+    var ctx = document.getElementById("salesChart").getContext("2d");
+    var salesChart = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"],
+        datasets: [
+          {
+            label: "Cards",
+            data: [
+              12000, 15000, 18000, 14000, 22000, 19000, 25000, 28000, 27000,
+            ],
+            borderColor: "#FF9A3C",
+            backgroundColor: "rgba(255, 154, 60, 0.1)",
+            borderWidth: 2,
+            pointBackgroundColor: "#FF9A3C",
+            tension: 0.4,
+            fill: true,
+          },
+          {
+            label: "Bags",
+            data: [8000, 10000, 12000, 9500, 15000, 14000, 18000, 19000, 18500],
+            borderColor: "#4CAF50",
+            backgroundColor: "rgba(76, 175, 80, 0.1)",
+            borderWidth: 2,
+            pointBackgroundColor: "#4CAF50",
+            tension: 0.4,
+            fill: true,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: "top",
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: {
+              display: true,
+              drawBorder: false,
+            },
+          },
+          x: {
+            grid: {
+              display: false,
+            },
+          },
+        },
+      },
+    });
+  });
+</script>
 {% endblock %}

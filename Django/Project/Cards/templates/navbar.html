@@ -6,20 +6,46 @@
   </div>
 
   <ul class="nav-links">
-    <li><a>Home</a></li>
-    <li><a>Cards</a></li>
-    <li><a>Bags</a></li>
-    <li><a>Stock</a></li>
-    <li><a>Billing</a></li>
-    <li><a>Billing Details</a></li>
-    {% if user.is_staff %}
-    <li><a>Users</a></li>
-    {% endif %} {% if user.is_authenticated %}
-    <li><a>Logout</a></li>
-    {% else %}
-    <li><a>Login</a></li>
-    <li><a>Signup</a></li>
-    {% endif %}
+    {% url 'home_page' as home_url %}
+    {% url 'card_page' as card_url %}
+    {% url 'bag_page' as bag_url %}
+    {% url 'stock_page' as stock_url %}
+    {% url 'invoice_page' as invoice_url %}
+    {% url 'billing_page' as billing_url %}
+    {% url 'invoice_update_page' as invoice_update_url %}
+    {% url 'users_page' as users_url %}
+    {% url 'login_page' as login_url %}
+
+    <li>
+      <a href="{{ home_url }}" class="nav-item {% if request.path == home_url %}active{% endif %}">Home</a>
+    </li>
+    <li>
+      <a href="{{ card_url }}" class="nav-item {% if request.path == card_url or request.path|slice:":6" == "/card/" %}active{% endif %}">Cards</a>
+    </li>
+    <li>
+      <a href="{{ bag_url }}" class="nav-item {% if request.path == bag_url or request.path|slice:":5" == "/bag/" %}active{% endif %}">Bags</a>
+    </li>
+    <li>
+      <a href="{{ stock_url }}" class="nav-item {% if request.path == stock_url or request.path|slice:":7" == "/stock/" %}active{% endif %}">Stock</a>
+    </li>
+    <li>
+      <a href="{{ invoice_url }}" class="nav-item {% if request.path == invoice_url %}active{% endif %}">Invoice</a>
+    </li>
+    <li>
+      <a href="{{ invoice_update_url }}" class="nav-item {% if request.path == invoice_update_url %}active{% endif %}">Update Invoice</a>
+    </li>
+    <li>
+      <a href="{{ billing_url }}" class="nav-item {% if request.path == billing_url %}active{% endif %}">Billings</a>
+    </li>
+    <li>
+      <a href="{{ users_url }}" class="nav-item {% if request.path == users_url %}active{% endif %}">Users</a>
+    </li>
+    <li>
+      <a href="" class="nav-item auth-logout">Logout</a>
+    </li>
+    <li>
+      <a href="{{ login_url }}" class="nav-item auth-login">Login</a>
+    </li>
   </ul>
 
   <div class="hamburger">

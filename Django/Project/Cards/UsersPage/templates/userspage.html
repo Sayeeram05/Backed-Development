@@ -1,0 +1,923 @@
+{% extends 'base.html' %} {% load static %} {% block head %}
+<title>Users Management | Card System</title>
+<link rel="stylesheet" href="{% static 'css/userpage.css' %}" />
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+/>
+<script src="{% static 'js/userpage.js' %}" defer></script>
+{% endblock %} {% block body %}
+<div class="container">
+  <header class="page-header">
+    <div class="header-content">
+      <h1>User Management</h1>
+      <div class="header-actions">
+        {% if user.is_superuser %}
+        <button class="btn-primary" id="createUserBtn">
+          <i class="fas fa-plus"></i> Create New User
+        </button>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  <div class="dashboard-tabs">
+    <button class="tab-btn active" data-tab="users">
+      <i class="fas fa-users"></i> Users
+    </button>
+    <button class="tab-btn" data-tab="roles">
+      <i class="fas fa-user-tag"></i> Roles & Permissions
+    </button>
+    <button class="tab-btn" data-tab="activity">
+      <i class="fas fa-chart-line"></i> Activity Log
+    </button>
+    {% if user.is_superuser %}
+    <button class="tab-btn" data-tab="settings">
+      <i class="fas fa-cog"></i> Settings
+    </button>
+    {% endif %}
+  </div>
+
+  <!-- Users Tab Content -->
+  <div class="tab-content active" id="users-tab">
+    <div class="panel">
+      <div class="panel-header">
+        <h2>User Directory</h2>
+        <div class="search-filter">
+          <div class="search-box">
+            <input type="text" id="userSearch" placeholder="Search users..." />
+            <button class="search-btn"><i class="fas fa-search"></i></button>
+          </div>
+          <div class="filter-group">
+            <select id="roleFilter">
+              <option value="">All Roles</option>
+              <option value="admin">Admin</option>
+              <option value="manager">Manager</option>
+              <option value="staff">Staff</option>
+            </select>
+            <select id="statusFilter">
+              <option value="">All Statuses</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="users-table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Last Login</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Sample User 1: Admin -->
+            <tr>
+              <td class="user-cell">
+                <div class="user-avatar" style="background-color: #9c27b0">
+                  A
+                </div>
+                <div class="user-info">
+                  <div class="user-name">Admin User</div>
+                  <div class="user-username">@admin</div>
+                </div>
+              </td>
+              <td>admin@cardmanagement.com</td>
+              <td>
+                <span class="badge admin">Admin</span>
+              </td>
+              <td>Sep 25, 2025</td>
+              <td>
+                <span class="status-badge active">Active</span>
+              </td>
+              <td class="actions-cell">
+                <button
+                  class="btn-icon view-user"
+                  data-id="1"
+                  title="View Details"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+                <button
+                  class="btn-icon edit-user"
+                  data-id="1"
+                  title="Edit User"
+                >
+                  <i class="fas fa-edit"></i>
+                </button>
+              </td>
+            </tr>
+
+            <!-- Sample User 2: Manager -->
+            <tr>
+              <td class="user-cell">
+                <div class="user-avatar" style="background-color: #2196f3">
+                  M
+                </div>
+                <div class="user-info">
+                  <div class="user-name">Manager User</div>
+                  <div class="user-username">@manager</div>
+                </div>
+              </td>
+              <td>manager@cardmanagement.com</td>
+              <td>
+                <span class="badge staff">Manager</span>
+              </td>
+              <td>Sep 28, 2025</td>
+              <td>
+                <span class="status-badge active">Active</span>
+              </td>
+              <td class="actions-cell">
+                <button
+                  class="btn-icon view-user"
+                  data-id="2"
+                  title="View Details"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+                <button
+                  class="btn-icon edit-user"
+                  data-id="2"
+                  title="Edit User"
+                >
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button
+                  class="btn-icon delete-user"
+                  data-id="2"
+                  title="Delete User"
+                >
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+
+            <!-- Sample User 3: Staff -->
+            <tr>
+              <td class="user-cell">
+                <div class="user-avatar" style="background-color: #4caf50">
+                  S
+                </div>
+                <div class="user-info">
+                  <div class="user-name">Staff User</div>
+                  <div class="user-username">@staff</div>
+                </div>
+              </td>
+              <td>staff@cardmanagement.com</td>
+              <td>
+                <span class="badge user">Staff</span>
+              </td>
+              <td>Sep 29, 2025</td>
+              <td>
+                <span class="status-badge active">Active</span>
+              </td>
+              <td class="actions-cell">
+                <button
+                  class="btn-icon view-user"
+                  data-id="3"
+                  title="View Details"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+                <button
+                  class="btn-icon edit-user"
+                  data-id="3"
+                  title="Edit User"
+                >
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button
+                  class="btn-icon delete-user"
+                  data-id="3"
+                  title="Delete User"
+                >
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+
+            <!-- Sample User 4: Inactive Staff -->
+            <tr>
+              <td class="user-cell">
+                <div class="user-avatar" style="background-color: #9e9e9e">
+                  I
+                </div>
+                <div class="user-info">
+                  <div class="user-name">Inactive User</div>
+                  <div class="user-username">@inactive</div>
+                </div>
+              </td>
+              <td>inactive@cardmanagement.com</td>
+              <td>
+                <span class="badge user">Staff</span>
+              </td>
+              <td>Aug 15, 2025</td>
+              <td>
+                <span class="status-badge inactive">Inactive</span>
+              </td>
+              <td class="actions-cell">
+                <button
+                  class="btn-icon view-user"
+                  data-id="4"
+                  title="View Details"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+                <button
+                  class="btn-icon edit-user"
+                  data-id="4"
+                  title="Edit User"
+                >
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button
+                  class="btn-icon delete-user"
+                  data-id="4"
+                  title="Delete User"
+                >
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination">
+        <a href="?page=1" class="page-btn"
+          ><i class="fas fa-angle-double-left"></i
+        ></a>
+        <a href="?page=1" class="page-btn"><i class="fas fa-angle-left"></i></a>
+        <span class="page-btn active">1</span>
+        <a href="?page=1" class="page-btn">2</a>
+        <a href="?page=1" class="page-btn">3</a>
+        <a href="?page=1" class="page-btn"
+          ><i class="fas fa-angle-right"></i
+        ></a>
+        <a href="?page=1" class="page-btn"
+          ><i class="fas fa-angle-double-right"></i
+        ></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Roles Tab Content -->
+  <div class="tab-content" id="roles-tab">
+    <div class="panel">
+      <div class="panel-header">
+        <h2>Roles & Permissions</h2>
+        {% if user.is_superuser %}
+        <button class="btn-secondary" id="editRolesBtn">
+          <i class="fas fa-edit"></i> Edit Roles
+        </button>
+        {% endif %}
+      </div>
+
+      <div class="roles-container">
+        <div class="role-card">
+          <div class="role-header admin">
+            <i class="fas fa-user-shield"></i>
+            <h3>Administrator</h3>
+          </div>
+          <div class="role-body">
+            <div class="role-description">
+              Full system access with all privileges. Can manage users, roles,
+              and system settings.
+            </div>
+            <div class="permission-list">
+              <h4>Permissions</h4>
+              <ul>
+                <li><i class="fas fa-check"></i> User Management</li>
+                <li><i class="fas fa-check"></i> Role Management</li>
+                <li><i class="fas fa-check"></i> System Settings</li>
+                <li><i class="fas fa-check"></i> View Reports & Analytics</li>
+                <li><i class="fas fa-check"></i> Inventory Management</li>
+                <li><i class="fas fa-check"></i> Billing & Invoices</li>
+              </ul>
+            </div>
+            <div class="role-users">
+              <h4>Users with this role</h4>
+              <div class="avatar-group">
+                <!-- Sample admin user avatar -->
+                <div
+                  class="user-avatar"
+                  title="Admin User"
+                  style="background-color: #9c27b0"
+                >
+                  A
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="role-card">
+          <div class="role-header manager">
+            <i class="fas fa-user-tie"></i>
+            <h3>Manager</h3>
+          </div>
+          <div class="role-body">
+            <div class="role-description">
+              Can manage inventory, view reports, and handle billing operations.
+            </div>
+            <div class="permission-list">
+              <h4>Permissions</h4>
+              <ul>
+                <li><i class="fas fa-check"></i> View Reports & Analytics</li>
+                <li><i class="fas fa-check"></i> Inventory Management</li>
+                <li><i class="fas fa-check"></i> Billing & Invoices</li>
+                <li><i class="fas fa-times"></i> User Management</li>
+                <li><i class="fas fa-times"></i> Role Management</li>
+                <li><i class="fas fa-times"></i> System Settings</li>
+              </ul>
+            </div>
+            <div class="role-users">
+              <h4>Users with this role</h4>
+              <div class="avatar-group">
+                <!-- Sample manager user avatar -->
+                <div
+                  class="user-avatar"
+                  title="Manager User"
+                  style="background-color: #2196f3"
+                >
+                  M
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="role-card">
+          <div class="role-header staff">
+            <i class="fas fa-user"></i>
+            <h3>Staff</h3>
+          </div>
+          <div class="role-body">
+            <div class="role-description">
+              Basic access to the system. Can view and update inventory and
+              generate bills.
+            </div>
+            <div class="permission-list">
+              <h4>Permissions</h4>
+              <ul>
+                <li><i class="fas fa-check"></i> Inventory Management</li>
+                <li><i class="fas fa-check"></i> Billing & Invoices</li>
+                <li><i class="fas fa-times"></i> User Management</li>
+                <li><i class="fas fa-times"></i> Role Management</li>
+                <li><i class="fas fa-times"></i> System Settings</li>
+                <li><i class="fas fa-times"></i> View Reports & Analytics</li>
+              </ul>
+            </div>
+            <div class="role-users">
+              <h4>Users with this role</h4>
+              <div class="avatar-group">
+                <!-- Sample staff user avatars -->
+                <div
+                  class="user-avatar"
+                  title="Staff User"
+                  style="background-color: #4caf50"
+                >
+                  S
+                </div>
+                <div
+                  class="user-avatar"
+                  title="Inactive User"
+                  style="background-color: #9e9e9e"
+                >
+                  I
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Activity Log Tab Content -->
+  <div class="tab-content" id="activity-tab">
+    <div class="panel">
+      <div class="panel-header">
+        <h2>Activity Log</h2>
+        <div class="filter-group">
+          <select id="activityFilter">
+            <option value="">All Activities</option>
+            <option value="login">Login</option>
+            <option value="inventory">Inventory</option>
+            <option value="billing">Billing</option>
+            <option value="user">User Management</option>
+          </select>
+          <div class="date-range">
+            <input type="date" id="startDate" placeholder="Start Date" />
+            <span>to</span>
+            <input type="date" id="endDate" placeholder="End Date" />
+            <button class="btn-filter">Apply</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="activity-timeline">
+        <!-- Sample activity 1 -->
+        <div class="activity-item">
+          <div class="activity-icon login">
+            <i class="fas fa-sign-in-alt"></i>
+          </div>
+          <div class="activity-content">
+            <div class="activity-header">
+              <h4>User Login</h4>
+              <span class="activity-time">Sep 30, 2025 09:45</span>
+            </div>
+            <div class="activity-details">
+              <p>User logged in successfully</p>
+              <div class="activity-meta">
+                <span class="activity-user">
+                  <i class="fas fa-user"></i> admin
+                </span>
+                <span class="activity-ip">
+                  <i class="fas fa-network-wired"></i> 192.168.1.105
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sample activity 2 -->
+        <div class="activity-item">
+          <div class="activity-icon inventory">
+            <i class="fas fa-boxes"></i>
+          </div>
+          <div class="activity-content">
+            <div class="activity-header">
+              <h4>Inventory Update</h4>
+              <span class="activity-time">Sep 29, 2025 16:30</span>
+            </div>
+            <div class="activity-details">
+              <p>
+                Updated stock quantity for Wedding Card Gold Embossed from 5 to
+                15 units
+              </p>
+              <div class="activity-meta">
+                <span class="activity-user">
+                  <i class="fas fa-user"></i> manager
+                </span>
+                <span class="activity-ip">
+                  <i class="fas fa-network-wired"></i> 192.168.1.110
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sample activity 3 -->
+        <div class="activity-item">
+          <div class="activity-icon billing">
+            <i class="fas fa-file-invoice-dollar"></i>
+          </div>
+          <div class="activity-content">
+            <div class="activity-header">
+              <h4>Invoice Generated</h4>
+              <span class="activity-time">Sep 29, 2025 14:15</span>
+            </div>
+            <div class="activity-details">
+              <p>
+                Generated invoice #INV-20250929-001 for customer "Raj
+                Enterprises" with total amount ₹12,500
+              </p>
+              <div class="activity-meta">
+                <span class="activity-user">
+                  <i class="fas fa-user"></i> staff
+                </span>
+                <span class="activity-ip">
+                  <i class="fas fa-network-wired"></i> 192.168.1.115
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sample activity 4 -->
+        <div class="activity-item">
+          <div class="activity-icon user">
+            <i class="fas fa-user-cog"></i>
+          </div>
+          <div class="activity-content">
+            <div class="activity-header">
+              <h4>User Account Created</h4>
+              <span class="activity-time">Sep 28, 2025 11:20</span>
+            </div>
+            <div class="activity-details">
+              <p>Created new staff user account "staff2"</p>
+              <div class="activity-meta">
+                <span class="activity-user">
+                  <i class="fas fa-user"></i> admin
+                </span>
+                <span class="activity-ip">
+                  <i class="fas fa-network-wired"></i> 192.168.1.105
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sample activity 5 -->
+        <div class="activity-item">
+          <div class="activity-icon inventory">
+            <i class="fas fa-boxes"></i>
+          </div>
+          <div class="activity-content">
+            <div class="activity-header">
+              <h4>Inventory Update</h4>
+              <span class="activity-time">Sep 28, 2025 09:45</span>
+            </div>
+            <div class="activity-details">
+              <p>
+                Updated stock quantity for Premium Gift Bag from 8 to 20 units
+              </p>
+              <div class="activity-meta">
+                <span class="activity-user">
+                  <i class="fas fa-user"></i> manager
+                </span>
+                <span class="activity-ip">
+                  <i class="fas fa-network-wired"></i> 192.168.1.110
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pagination">
+        <a href="?activity_page=1" class="page-btn"
+          ><i class="fas fa-angle-double-left"></i
+        ></a>
+        <a href="?activity_page=1" class="page-btn"
+          ><i class="fas fa-angle-left"></i
+        ></a>
+        <span class="page-btn active">1</span>
+        <a href="?activity_page=2" class="page-btn">2</a>
+        <a href="?activity_page=3" class="page-btn">3</a>
+        <a href="?activity_page=2" class="page-btn"
+          ><i class="fas fa-angle-right"></i
+        ></a>
+        <a href="?activity_page=5" class="page-btn"
+          ><i class="fas fa-angle-double-right"></i
+        ></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Tab Content -->
+  <div class="tab-content" id="settings-tab">
+    <div class="panel">
+      <div class="panel-header">
+        <h2>System Settings</h2>
+        <button class="btn-primary" id="saveSettingsBtn">
+          <i class="fas fa-save"></i> Save Changes
+        </button>
+      </div>
+
+      <div class="settings-container">
+        <div class="settings-section">
+          <h3>Account Settings</h3>
+          <div class="settings-group">
+            <div class="form-group">
+              <label>Default Password Policy</label>
+              <select id="passwordPolicy">
+                <option value="strong">
+                  Strong (8+ chars, letters, numbers, symbols)
+                </option>
+                <option value="medium">
+                  Medium (8+ chars, letters and numbers)
+                </option>
+                <option value="basic">Basic (6+ characters)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Password Expiry</label>
+              <select id="passwordExpiry">
+                <option value="30">30 Days</option>
+                <option value="60">60 Days</option>
+                <option value="90">90 Days</option>
+                <option value="never">Never</option>
+              </select>
+            </div>
+
+            <div class="form-group checkbox-group">
+              <input type="checkbox" id="enforcePasswordHistory" checked />
+              <label for="enforcePasswordHistory"
+                >Enforce password history (prevent reuse)</label
+              >
+            </div>
+
+            <div class="form-group checkbox-group">
+              <input type="checkbox" id="enforceAccountLockout" checked />
+              <label for="enforceAccountLockout"
+                >Lock account after 5 failed attempts</label
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <h3>Email Notifications</h3>
+          <div class="settings-group">
+            <div class="form-group checkbox-group">
+              <input type="checkbox" id="notifyUserCreation" checked />
+              <label for="notifyUserCreation"
+                >Send email when new user is created</label
+              >
+            </div>
+
+            <div class="form-group checkbox-group">
+              <input type="checkbox" id="notifyPasswordReset" checked />
+              <label for="notifyPasswordReset"
+                >Send email for password resets</label
+              >
+            </div>
+
+            <div class="form-group checkbox-group">
+              <input type="checkbox" id="notifyLoginAttempts" />
+              <label for="notifyLoginAttempts"
+                >Send email for suspicious login attempts</label
+              >
+            </div>
+
+            <div class="form-group">
+              <label>System Email Address</label>
+              <input type="email" value="system@cardmanagement.com" />
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <h3>Session Settings</h3>
+          <div class="settings-group">
+            <div class="form-group">
+              <label>Session Timeout</label>
+              <select id="sessionTimeout">
+                <option value="15">15 minutes</option>
+                <option value="30">30 minutes</option>
+                <option value="60">1 hour</option>
+                <option value="120">2 hours</option>
+              </select>
+            </div>
+
+            <div class="form-group checkbox-group">
+              <input type="checkbox" id="enableRememberMe" checked />
+              <label for="enableRememberMe"
+                >Enable "Remember Me" functionality</label
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create/Edit User Modal -->
+  <div id="userModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">Create New User</h2>
+        <span class="close-modal">&times;</span>
+      </div>
+      <div class="modal-body">
+        <form id="userForm">
+          {% csrf_token %}
+          <input type="hidden" id="userId" name="user_id" />
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="username">Username*</label>
+              <input type="text" id="username" name="username" required />
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email*</label>
+              <input type="email" id="email" name="email" required />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="firstName">First Name</label>
+              <input type="text" id="firstName" name="first_name" />
+            </div>
+
+            <div class="form-group">
+              <label for="lastName">Last Name</label>
+              <input type="text" id="lastName" name="last_name" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="password">Password*</label>
+              <input type="password" id="password" name="password" />
+              <small class="password-hint"
+                >Only fill this when creating a new user or changing
+                password</small
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="confirmPassword">Confirm Password*</label>
+              <input
+                type="password"
+                id="confirmPassword"
+                name="confirm_password"
+              />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="userRole">Role</label>
+              <select id="userRole" name="role">
+                <option value="user">Staff</option>
+                <option value="staff">Manager</option>
+                <option value="admin">Administrator</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="userStatus">Status</label>
+              <select id="userStatus" name="is_active">
+                <option value="1">Active</option>
+                <option value="0">Inactive</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-primary">Save User</button>
+            <button type="button" class="btn-secondary close-modal">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Details Modal -->
+  <div id="userDetailsModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>User Details</h2>
+        <span class="close-modal">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div id="userDetails" class="user-details">
+          <div class="user-profile-header">
+            <div class="user-avatar large" id="detailAvatar">A</div>
+            <div class="user-profile-info">
+              <h3 id="detailName">Admin User</h3>
+              <p id="detailUsername">@admin</p>
+              <span id="detailRole" class="badge admin">Administrator</span>
+              <span id="detailStatus" class="status-badge active">Active</span>
+            </div>
+          </div>
+
+          <div class="user-profile-details">
+            <div class="detail-item">
+              <span class="detail-label">Email</span>
+              <span class="detail-value" id="detailEmail"
+                >admin@cardmanagement.com</span
+              >
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Last Login</span>
+              <span class="detail-value" id="detailLastLogin"
+                >September 30, 2025 at 09:45 AM</span
+              >
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Date Joined</span>
+              <span class="detail-value" id="detailDateJoined"
+                >January 15, 2025</span
+              >
+            </div>
+          </div>
+
+          <div class="user-stats">
+            <div class="stat-card">
+              <div class="stat-value" id="detailLoginCount">145</div>
+              <div class="stat-label">Logins</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="detailBillsCount">0</div>
+              <div class="stat-label">Bills Generated</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="detailInventoryCount">12</div>
+              <div class="stat-label">Inventory Updates</div>
+            </div>
+          </div>
+
+          <div class="recent-activity">
+            <h4>Recent Activity</h4>
+            <div class="mini-timeline" id="detailRecentActivity">
+              <div class="mini-activity-item">
+                <div class="mini-activity-title">Logged in to the system</div>
+                <div class="mini-activity-time">Sep 30, 2025, 09:45 AM</div>
+              </div>
+              <div class="mini-activity-item">
+                <div class="mini-activity-title">
+                  Created new user account "staff2"
+                </div>
+                <div class="mini-activity-time">Sep 28, 2025, 11:20 AM</div>
+              </div>
+              <div class="mini-activity-item">
+                <div class="mini-activity-title">Updated system settings</div>
+                <div class="mini-activity-time">Sep 25, 2025, 04:15 PM</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button class="btn-secondary close-modal">Close</button>
+            {% if user.is_superuser %}
+            <button class="btn-primary edit-user-from-detail">Edit User</button>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Simple script to make the tabs work without requiring a page reload
+  document.addEventListener("DOMContentLoaded", function () {
+    // Tab switching functionality
+    const tabButtons = document.querySelectorAll(".tab-btn");
+    const tabContents = document.querySelectorAll(".tab-content");
+
+    tabButtons.forEach((button) => {
+      button.addEventListener("click", function () {
+        const tabId = this.getAttribute("data-tab");
+
+        // Remove active class from all buttons and contents
+        tabButtons.forEach((btn) => btn.classList.remove("active"));
+        tabContents.forEach((content) => content.classList.remove("active"));
+
+        // Add active class to current button and content
+        this.classList.add("active");
+        document.getElementById(`${tabId}-tab`).classList.add("active");
+      });
+    });
+
+    // Modal functionality
+    const createUserBtn = document.getElementById("createUserBtn");
+    const userModal = document.getElementById("userModal");
+    const userDetailsModal = document.getElementById("userDetailsModal");
+    const closeButtons = document.querySelectorAll(".close-modal");
+    const viewUserButtons = document.querySelectorAll(".view-user");
+    const editUserButtons = document.querySelectorAll(".edit-user");
+
+    if (createUserBtn) {
+      createUserBtn.addEventListener("click", function () {
+        userModal.style.display = "block";
+      });
+    }
+
+    closeButtons.forEach((button) => {
+      button.addEventListener("click", function () {
+        userModal.style.display = "none";
+        userDetailsModal.style.display = "none";
+      });
+    });
+
+    viewUserButtons.forEach((button) => {
+      button.addEventListener("click", function () {
+        userDetailsModal.style.display = "block";
+      });
+    });
+
+    editUserButtons.forEach((button) => {
+      button.addEventListener("click", function () {
+        userModal.style.display = "block";
+        document.getElementById("modalTitle").textContent = "Edit User";
+      });
+    });
+
+    // Close modal when clicking outside
+    window.addEventListener("click", function (event) {
+      if (event.target === userModal) {
+        userModal.style.display = "none";
+      }
+      if (event.target === userDetailsModal) {
+        userDetailsModal.style.display = "none";
+      }
+    });
+  });
+</script>
+{% endblock %}

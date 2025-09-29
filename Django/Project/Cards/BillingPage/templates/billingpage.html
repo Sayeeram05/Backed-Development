@@ -1,0 +1,481 @@
+{% extends 'base.html' %} {% load static %} {% block head %}
+<title>Billing Dashboard | Cards Company</title>
+<link rel="stylesheet" href="{% static 'css/billingpage.css' %}" />
+<link
+  href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+/>
+{% endblock %} {% block body %}
+<div class="billing-dashboard">
+  <div class="dashboard-header">
+    <div class="header-title">
+      <h1>Billing Dashboard</h1>
+      <p>Manage and track all your invoices</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-outline">
+        <i class="fas fa-file-export"></i> Export
+      </button>
+      <a href="{% url 'invoice_page' %}" class="btn-primary"
+        ><i class="fas fa-plus"></i> New Invoice</a
+      >
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="summary-cards">
+    <div class="summary-card">
+      <div class="card-icon">
+        <i class="fas fa-file-invoice-dollar"></i>
+      </div>
+      <div class="card-content">
+        <h3>Total Billed</h3>
+        <div class="card-value">₹89,450</div>
+        <div class="card-change positive">
+          <i class="fas fa-arrow-up"></i> +8.2%
+          <span class="period">this month</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="card-icon">
+        <i class="fas fa-wallet"></i>
+      </div>
+      <div class="card-content">
+        <h3>Amount Received</h3>
+        <div class="card-value">₹72,630</div>
+        <div class="card-change positive">
+          <i class="fas fa-arrow-up"></i> +12.6%
+          <span class="period">this month</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="card-icon pending-icon">
+        <i class="fas fa-clock"></i>
+      </div>
+      <div class="card-content">
+        <h3>Outstanding</h3>
+        <div class="card-value">₹16,820</div>
+        <div class="card-change negative">
+          <i class="fas fa-arrow-up"></i> +4.3%
+          <span class="period">this month</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="card-icon overdue-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <div class="card-content">
+        <h3>Overdue</h3>
+        <div class="card-value">₹5,240</div>
+        <div class="card-change neutral">
+          <i class="fas fa-minus"></i> 0% <span class="period">this month</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Status and Trends -->
+  <div class="analytics-row">
+    <div class="chart-container">
+      <div class="chart-header">
+        <h3>Payment Trends</h3>
+        <div class="chart-actions">
+          <select id="trend-time-range">
+            <option value="weekly">Weekly</option>
+            <option value="monthly" selected>Monthly</option>
+            <option value="quarterly">Quarterly</option>
+          </select>
+        </div>
+      </div>
+      <div class="chart-body">
+        <canvas id="paymentsChart"></canvas>
+      </div>
+    </div>
+
+    <div class="status-container">
+      <div class="chart-header">
+        <h3>Invoice Status</h3>
+      </div>
+      <div class="status-chart">
+        <canvas id="statusChart"></canvas>
+      </div>
+      <div class="status-legend">
+        <div class="legend-item">
+          <span class="legend-color" style="background-color: #4caf50"></span>
+          <span class="legend-label">Paid (68%)</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color" style="background-color: #2196f3"></span>
+          <span class="legend-label">Pending (23%)</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color" style="background-color: #f44336"></span>
+          <span class="legend-label">Overdue (9%)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Invoices -->
+  <div class="invoices-section">
+    <div class="section-header">
+      <h3>Recent Invoices</h3>
+      <div class="section-filters">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Search invoices..." />
+        </div>
+        <select id="status-filter">
+          <option value="all">All Status</option>
+          <option value="paid">Paid</option>
+          <option value="pending">Pending</option>
+          <option value="overdue">Overdue</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="invoices-table">
+        <thead>
+          <tr>
+            <th>Invoice #</th>
+            <th>Customer</th>
+            <th>Date</th>
+            <th>Due Date</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>INV-2025-0014</td>
+            <td>Raj Kumar</td>
+            <td>Sep 28, 2025</td>
+            <td>Oct 12, 2025</td>
+            <td>₹2,450</td>
+            <td><span class="status-badge status-pending">Pending</span></td>
+            <td>
+              <div class="action-buttons">
+                <button class="action-btn" title="View">
+                  <i class="fas fa-eye"></i>
+                </button>
+                <button class="action-btn" title="Edit">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="action-btn" title="Print">
+                  <i class="fas fa-print"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>INV-2025-0013</td>
+            <td>Priya Sharma</td>
+            <td>Sep 25, 2025</td>
+            <td>Oct 09, 2025</td>
+            <td>₹3,860</td>
+            <td><span class="status-badge status-paid">Paid</span></td>
+            <td>
+              <div class="action-buttons">
+                <button class="action-btn" title="View">
+                  <i class="fas fa-eye"></i>
+                </button>
+                <button class="action-btn" title="Edit">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="action-btn" title="Print">
+                  <i class="fas fa-print"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>INV-2025-0012</td>
+            <td>Arun Verma</td>
+            <td>Sep 22, 2025</td>
+            <td>Oct 06, 2025</td>
+            <td>₹5,240</td>
+            <td><span class="status-badge status-overdue">Overdue</span></td>
+            <td>
+              <div class="action-buttons">
+                <button class="action-btn" title="View">
+                  <i class="fas fa-eye"></i>
+                </button>
+                <button class="action-btn" title="Edit">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="action-btn" title="Print">
+                  <i class="fas fa-print"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>INV-2025-0011</td>
+            <td>Sanjay Patel</td>
+            <td>Sep 20, 2025</td>
+            <td>Oct 04, 2025</td>
+            <td>₹1,950</td>
+            <td><span class="status-badge status-paid">Paid</span></td>
+            <td>
+              <div class="action-buttons">
+                <button class="action-btn" title="View">
+                  <i class="fas fa-eye"></i>
+                </button>
+                <button class="action-btn" title="Edit">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="action-btn" title="Print">
+                  <i class="fas fa-print"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>INV-2025-0010</td>
+            <td>Meera Singh</td>
+            <td>Sep 18, 2025</td>
+            <td>Oct 02, 2025</td>
+            <td>₹4,120</td>
+            <td><span class="status-badge status-paid">Paid</span></td>
+            <td>
+              <div class="action-buttons">
+                <button class="action-btn" title="View">
+                  <i class="fas fa-eye"></i>
+                </button>
+                <button class="action-btn" title="Edit">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="action-btn" title="Print">
+                  <i class="fas fa-print"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>INV-2025-0009</td>
+            <td>Vikram Malhotra</td>
+            <td>Sep 15, 2025</td>
+            <td>Sep 29, 2025</td>
+            <td>₹2,780</td>
+            <td><span class="status-badge status-paid">Paid</span></td>
+            <td>
+              <div class="action-buttons">
+                <button class="action-btn" title="View">
+                  <i class="fas fa-eye"></i>
+                </button>
+                <button class="action-btn" title="Edit">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="action-btn" title="Print">
+                  <i class="fas fa-print"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination">
+      <button class="page-btn"><i class="fas fa-chevron-left"></i></button>
+      <button class="page-btn active">1</button>
+      <button class="page-btn">2</button>
+      <button class="page-btn">3</button>
+      <span class="page-separator">...</span>
+      <button class="page-btn">8</button>
+      <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+    </div>
+  </div>
+
+  <!-- Payment Info Section -->
+  <div class="payment-info-section">
+    <div class="payment-card payment-methods">
+      <h3>Payment Methods</h3>
+      <div class="payment-methods-chart">
+        <canvas id="paymentMethodsChart"></canvas>
+      </div>
+      <div class="payment-methods-list">
+        <div class="payment-method-item">
+          <div class="method-icon"><i class="fas fa-money-bill-wave"></i></div>
+          <div class="method-name">Cash</div>
+          <div class="method-amount">₹38,450</div>
+        </div>
+        <div class="payment-method-item">
+          <div class="method-icon"><i class="fas fa-credit-card"></i></div>
+          <div class="method-name">Card</div>
+          <div class="method-amount">₹21,860</div>
+        </div>
+        <div class="payment-method-item">
+          <div class="method-icon"><i class="fas fa-mobile-alt"></i></div>
+          <div class="method-name">UPI</div>
+          <div class="method-amount">₹12,320</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="payment-card top-customers">
+      <h3>Top Customers</h3>
+      <ul class="customer-list">
+        <li class="customer-item">
+          <div class="customer-info">
+            <div class="customer-name">Raj Kumar</div>
+            <div class="customer-details">5 Invoices</div>
+          </div>
+          <div class="customer-spent">₹12,450</div>
+        </li>
+        <li class="customer-item">
+          <div class="customer-info">
+            <div class="customer-name">Priya Sharma</div>
+            <div class="customer-details">4 Invoices</div>
+          </div>
+          <div class="customer-spent">₹9,850</div>
+        </li>
+        <li class="customer-item">
+          <div class="customer-info">
+            <div class="customer-name">Arun Verma</div>
+            <div class="customer-details">3 Invoices</div>
+          </div>
+          <div class="customer-spent">₹8,240</div>
+        </li>
+        <li class="customer-item">
+          <div class="customer-info">
+            <div class="customer-name">Sanjay Patel</div>
+            <div class="customer-details">3 Invoices</div>
+          </div>
+          <div class="customer-spent">₹7,920</div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Payment Trends Chart
+    var paymentsCtx = document.getElementById("paymentsChart").getContext("2d");
+    var paymentsChart = new Chart(paymentsCtx, {
+      type: "line",
+      data: {
+        labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"],
+        datasets: [
+          {
+            label: "Amount Billed",
+            data: [
+              25000, 30000, 28000, 32000, 35000, 34000, 38000, 42000, 45000,
+            ],
+            borderColor: "#2196F3",
+            backgroundColor: "rgba(33, 150, 243, 0.1)",
+            borderWidth: 2,
+            pointBackgroundColor: "#2196F3",
+            tension: 0.4,
+            fill: true,
+          },
+          {
+            label: "Amount Collected",
+            data: [
+              24000, 28000, 26000, 30000, 32000, 30000, 34000, 36000, 38000,
+            ],
+            borderColor: "#4CAF50",
+            backgroundColor: "rgba(76, 175, 80, 0.1)",
+            borderWidth: 2,
+            pointBackgroundColor: "#4CAF50",
+            tension: 0.4,
+            fill: true,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: "top",
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: {
+              display: true,
+              drawBorder: false,
+            },
+          },
+          x: {
+            grid: {
+              display: false,
+            },
+          },
+        },
+      },
+    });
+
+    // Invoice Status Chart (Doughnut)
+    var statusCtx = document.getElementById("statusChart").getContext("2d");
+    var statusChart = new Chart(statusCtx, {
+      type: "doughnut",
+      data: {
+        labels: ["Paid", "Pending", "Overdue"],
+        datasets: [
+          {
+            data: [68, 23, 9],
+            backgroundColor: ["#4CAF50", "#2196F3", "#F44336"],
+            borderColor: "#ffffff",
+            borderWidth: 2,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: "70%",
+        plugins: {
+          legend: {
+            display: false,
+          },
+        },
+      },
+    });
+
+    // Payment Methods Chart (Pie)
+    var methodsCtx = document
+      .getElementById("paymentMethodsChart")
+      .getContext("2d");
+    var methodsChart = new Chart(methodsCtx, {
+      type: "pie",
+      data: {
+        labels: ["Cash", "Card", "UPI"],
+        datasets: [
+          {
+            data: [53, 30, 17],
+            backgroundColor: ["#FF9A3C", "#9C27B0", "#03A9F4"],
+            borderColor: "#ffffff",
+            borderWidth: 2,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: "bottom",
+          },
+        },
+      },
+    });
+  });
+</script>
+{% endblock %}

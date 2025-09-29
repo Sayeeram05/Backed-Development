@@ -1,0 +1,347 @@
+{% extends 'base.html' %} {% load static %} {% block head %}
+<title>Invoice | Cards Company</title>
+<link rel="stylesheet" href="{% static 'css/invoicepage.css' %}" />
+{% endblock %} {% block body %}
+<div class="container">
+  <header class="page-header">
+    <div class="header-content">
+      <h1>Generate New Invoice</h1>
+      <div class="invoice-actions">
+        <button id="save-invoice" class="btn-primary">
+          <i class="fas fa-save"></i> Save Invoice
+        </button>
+        <button id="print-invoice" class="btn-primary">
+          <i class="fas fa-print"></i> Print Invoice
+        </button>
+        <button id="clear-invoice" class="btn-tertiary">
+          <i class="fas fa-trash"></i> Clear
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="invoice-pdf-container">
+    <!-- Invoice Header with Logo and Number -->
+    <section class="invoice-header-section">
+      <div class="invoice-header-left">
+        <div class="company-header">
+          <img
+            src="{% static 'assets/logo.png' %}"
+            alt="Logo"
+            class="invoice-logo-img"
+          />
+          <div class="company-header-text">
+            <div class="invoice-company-name">Cards Company Pvt Ltd</div>
+            <div class="invoice-company-tagline">
+              Premium Greeting Cards & Gift Bags
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="invoice-header-right">
+        <div class="invoice-number-box">
+          <div class="invoice-title">INVOICE</div>
+          <table class="invoice-meta-table">
+            <tr>
+              <td class="meta-label">Invoice #:</td>
+              <td class="meta-value" id="invoice-number">INV-2025-0001</td>
+            </tr>
+            <tr>
+              <td class="meta-label">Date:</td>
+              <td class="meta-value">{% now "F d, Y" %}</td>
+            </tr>
+            <tr>
+              <td class="meta-label">Delivery Date:</td>
+              <td class="meta-value">
+                <input type="date" class="meta-date" id="delivery-date" />
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Company and Customer Information -->
+    <section class="info-section">
+      <div class="info-column company-info">
+        <h2 class="section-title">Company Information</h2>
+        <table class="info-table">
+          <tr>
+            <td class="info-label">Company Name:</td>
+            <td class="info-value">Cards Company Pvt Ltd</td>
+          </tr>
+          <tr>
+            <td class="info-label">Address:</td>
+            <td class="info-value">123, MG Road, T Nagar</td>
+          </tr>
+          <tr>
+            <td class="info-label">District/City:</td>
+            <td class="info-value">Chennai</td>
+          </tr>
+          <tr>
+            <td class="info-label">State:</td>
+            <td class="info-value">Tamil Nadu</td>
+          </tr>
+          <tr>
+            <td class="info-label">Phone:</td>
+            <td class="info-value">+91 98765 43210</td>
+          </tr>
+          <tr>
+            <td class="info-label">Alt. Phone:</td>
+            <td class="info-value">+91 91234 56789</td>
+          </tr>
+          <tr>
+            <td class="info-label">Email:</td>
+            <td class="info-value">info@cardscompany.in</td>
+          </tr>
+          <tr>
+            <td class="info-label">GSTIN:</td>
+            <td class="info-value">33AAAAA0000A1Z5</td>
+          </tr>
+          <tr>
+            <td class="info-label">PAN:</td>
+            <td class="info-value">AAAAA0000A</td>
+          </tr>
+          <tr>
+            <td class="info-label">Tax Rate:</td>
+            <td class="info-value">18%</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="info-column customer-info">
+        <h2 class="section-title">Customer Information</h2>
+        <table class="info-table">
+          <tr>
+            <td class="info-label">Name:</td>
+            <td>
+              <input
+                type="text"
+                class="info-input"
+                id="customer-name"
+                placeholder="Enter customer name"
+              />
+            </td>
+          </tr>
+          <tr>
+            <td class="info-label">Phone:</td>
+            <td>
+              <input
+                type="text"
+                class="info-input"
+                id="customer-phone"
+                placeholder="Enter phone number"
+              />
+            </td>
+          </tr>
+          <tr>
+            <td class="info-label">Email:</td>
+            <td>
+              <input
+                type="email"
+                class="info-input"
+                id="customer-email"
+                placeholder="Enter email address"
+              />
+            </td>
+          </tr>
+          <tr>
+            <td class="info-label">Address:</td>
+            <td>
+              <textarea
+                class="info-input"
+                id="customer-address"
+                placeholder="Enter delivery address"
+                rows="3"
+              ></textarea>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- Item Selection -->
+    <section class="item-selection-section">
+      <h2 class="section-title">Add Items</h2>
+      <div class="item-selection-form">
+        <div class="form-group">
+          <label for="item-type">Item Type</label>
+          <select id="item-type" class="form-control">
+            <option value="">Select Type</option>
+            <option value="card">Card</option>
+            <option value="bag">Gift Bag</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="item-code">Item Code</label>
+          <select id="item-code" class="form-control">
+            <option value="">Select Item</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="item-quantity">Quantity</label>
+          <input
+            type="number"
+            id="item-quantity"
+            class="form-control"
+            min="1"
+            value="1"
+          />
+        </div>
+        <div class="form-group">
+          <label for="item-price">Unit Price (₹)</label>
+          <input
+            type="number"
+            id="item-price"
+            class="form-control"
+            min="0"
+            step="0.01"
+            placeholder="Manual price"
+          />
+        </div>
+        <div class="form-group">
+          <label class="invisible">Add</label>
+          <button id="add-item" class="btn-primary form-control">
+            Add Item
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Items Table -->
+    <section class="items-table-section">
+      <h2 class="section-title">Invoice Items</h2>
+      <div class="table-responsive">
+        <table class="items-table">
+          <thead>
+            <tr>
+              <th width="15%">Item Code</th>
+              <th width="30%">Description</th>
+              <th width="15%">Type</th>
+              <th width="10%">Unit Price</th>
+              <th width="10%">Quantity</th>
+              <th width="15%">Amount</th>
+              <th width="5%">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="invoice-items">
+            <!-- Items will be added dynamically via JavaScript -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Two-column layout for Notes and Summary -->
+    <section class="notes-summary-section">
+      <div class="notes-payment-column">
+        <div class="notes-box">
+          <h2 class="section-title">Notes</h2>
+          <textarea
+            id="invoice-notes"
+            class="form-control notes-textarea"
+            placeholder="Add any special instructions or notes..."
+          ></textarea>
+        </div>
+
+        <div class="payment-method-box">
+          <h2 class="section-title">Payment Method</h2>
+          <div class="payment-methods">
+            <div class="payment-method">
+              <input
+                type="radio"
+                id="payment-cash"
+                name="payment-method"
+                value="cash"
+                checked
+              />
+              <label for="payment-cash">Cash</label>
+            </div>
+            <div class="payment-method">
+              <input
+                type="radio"
+                id="payment-upi"
+                name="payment-method"
+                value="upi"
+              />
+              <label for="payment-upi">UPI</label>
+            </div>
+            <div class="payment-method">
+              <input
+                type="radio"
+                id="payment-card"
+                name="payment-method"
+                value="card"
+              />
+              <label for="payment-card">Card</label>
+            </div>
+            <div class="payment-method">
+              <input
+                type="radio"
+                id="payment-cheque"
+                name="payment-method"
+                value="cheque"
+              />
+              <label for="payment-cheque">Cheque</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="summary-column">
+        <h2 class="section-title">Invoice Summary</h2>
+        <table class="summary-table">
+          <tr>
+            <td class="summary-label">Subtotal:</td>
+            <td class="summary-value" id="subtotal">₹0.00</td>
+          </tr>
+          <tr>
+            <td class="summary-label">Tax (18%):</td>
+            <td class="summary-value" id="tax">₹0.00</td>
+          </tr>
+          <tr class="total-row">
+            <td class="summary-label">Total:</td>
+            <td class="summary-value" id="total">₹0.00</td>
+          </tr>
+          <tr>
+            <td class="summary-label">Advance Payment:</td>
+            <td class="advance-value">
+              <span>₹</span>
+              <input
+                type="number"
+                id="advance-payment"
+                min="0"
+                step="0.01"
+                value="0"
+              />
+            </td>
+          </tr>
+          <tr>
+            <td class="summary-label">Balance Due:</td>
+            <td class="summary-value" id="remaining">₹0.00</td>
+          </tr>
+        </table>
+
+        <div class="payment-status-container">
+          <div id="payment-status" class="payment-status">UNPAID</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Invoice Footer -->
+    <footer class="invoice-footer">
+      <div class="thank-you">Thank you for your business!</div>
+      <div class="contact-info">
+        For any inquiries, please contact: info@cardscompany.in | +91 98765
+        43210
+      </div>
+      <div class="terms">
+        Terms & Conditions: Payment is due within 30 days. Late payments are
+        subject to a 1.5% monthly fee.
+      </div>
+    </footer>
+  </div>
+</div>
+
+<script src="{% static 'js/invoicepage.js' %}"></script>
+{% endblock %}
