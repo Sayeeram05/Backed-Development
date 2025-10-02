@@ -67,12 +67,40 @@ body {
   transition: border 0.2s, box-shadow 0.2s;
 }
 
+
 .update-form input:focus {
   border-color: #1a73e8;
   box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.15);
   outline: none;
   background: #e8f0fe;
 }
+
+
+.update-form textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #dadce0;
+  border-radius: 5px;
+  font-size: 16px;
+  background: #f1f3f4;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+
+.update-form textarea:focus {
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.15);
+  outline: none;
+  background: #e8f0fe;
+}
+
+#company_address {
+	width: 100%;
+	min-width: 320px;
+  height: 75px;
+}
+
+
 
 .update-btn {
   width: 100%;
@@ -108,10 +136,6 @@ body {
   margin-top: 0;
 }
 
-#company_address {
-	width: 100%;
-	min-width: 320px;
-}
 
 @media (max-width: 900px) {
   .update-container {
