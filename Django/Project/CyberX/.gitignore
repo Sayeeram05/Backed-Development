@@ -1,0 +1,4 @@
+/env/
+/Services/Phishing-detection/Dataset/
+/Services/Phishing-detection/phishing_model_full.pth
+/Services/Phishing-detection/phishing_model.pth
