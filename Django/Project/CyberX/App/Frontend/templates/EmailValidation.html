@@ -1,396 +1,914 @@
-{% extends 'base.html' %}
-{% load static %}
+{% extends 'base.html' %} {% load static %} {% block title %}Email Validation -
+CyberX Security Platform{% endblock %} {% block extra_css %}
+<style>
+  /* ===== EMAIL VALIDATION PAGE STYLES ===== */
 
-{% block title %}Email Validation - CyberX{% endblock %}
+  /* Hero Section */
+  .hero-section {
+    padding: 60px 0 40px;
+    text-align: center;
+    position: relative;
+  }
 
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/email-validation.css' %}">
-{% endblock %}
+  .hero-section .glitch {
+    font-size: 2.8rem;
+    margin-bottom: 15px;
+  }
 
-{% block content %}
-<!-- Hero Section -->
-<section id="email-validation" class="hero-section">
-    <div class="container">
-        <h1 class="glitch" data-text="EMAIL VALIDATION">EMAIL VALIDATION</h1>
-        <p class="hero-subtitle">Smart Email Verification & Quality Control</p>
-        <p class="hero-description">
-            Quickly verify whether an email address is valid, safe, and able to receive messages. 
-            Prevent fake or incorrect email entries, reduce communication failures, and improve data quality 
-            with our simple, user-friendly interface that delivers clear and reliable validation results.
-        </p>
-        <div class="hero-stats">
-            <div class="stat">
-                <div class="stat-number">99.9%</div>
-                <div class="stat-label">Data Quality</div>
-            </div>
-            <div class="stat">
-                <div class="stat-number">Instant</div>
-                <div class="stat-label">Verification</div>
-            </div>
-            <div class="stat">
-                <div class="stat-number">Trusted</div>
-                <div class="stat-label">Results</div>
-            </div>
-        </div>
+  .hero-subtitle {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .version-badge {
+    display: inline-block;
+    background: linear-gradient(
+      45deg,
+      var(--primary-color),
+      var(--accent-blue)
+    );
+    color: var(--dark-bg);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-left: 15px;
+    vertical-align: middle;
+  }
+
+  /* Stats Row */
+  .stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+  }
+
+  .stat-item {
+    text-align: center;
+  }
+
+  .stat-number {
+    font-family: "Orbitron", monospace;
+    font-size: 2rem;
+    color: var(--primary-color);
+    font-weight: 700;
+    display: block;
+  }
+
+  .stat-label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+  }
+
+  /* Validation Form Section */
+  .validation-section {
+    padding: 40px 0;
+  }
+
+  .validation-card {
+    max-width: 650px;
+    margin: 0 auto;
+    background: rgba(26, 26, 46, 0.8);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 255, 136, 0.2);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  }
+
+  .form-header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .form-header h2 {
+    font-family: "Orbitron", monospace;
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+  }
+
+  .form-header p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+  }
+
+  .input-group {
+    position: relative;
+    margin-bottom: 25px;
+  }
+
+  .input-group label {
+    display: block;
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+  }
+
+  .input-group .input-icon {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--primary-color);
+    font-size: 1.1rem;
+    margin-top: 15px;
+  }
+
+  .input-group input {
+    width: 100%;
+    padding: 16px 20px 16px 50px;
+    border: 2px solid rgba(0, 255, 136, 0.2);
+    border-radius: 12px;
+    background: rgba(15, 15, 35, 0.6);
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .input-group input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+    background: rgba(15, 15, 35, 0.9);
+  }
+
+  .input-group input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+  }
+
+  .btn-validate {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(
+      45deg,
+      var(--primary-color),
+      var(--accent-blue)
+    );
+    color: var(--dark-bg);
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .btn-validate:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(0, 255, 136, 0.4);
+  }
+
+  .btn-validate:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* Loading State */
+  .loading-indicator {
+    display: none;
+    text-align: center;
+    padding: 30px;
+  }
+
+  .loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid rgba(0, 255, 136, 0.1);
+    border-top: 3px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 15px;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  .loading-text {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+  }
+
+  /* Results Section */
+  .results-section {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 20px;
+  }
+
+  .result-card {
+    background: rgba(26, 26, 46, 0.8);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 255, 136, 0.2);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Result Header */
+  .result-header {
+    padding: 25px 30px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .result-header.success {
+    background: linear-gradient(
+      135deg,
+      rgba(0, 255, 136, 0.15),
+      rgba(0, 212, 255, 0.1)
+    );
+  }
+  .result-header.warning {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 193, 7, 0.15),
+      rgba(255, 152, 0, 0.1)
+    );
+  }
+  .result-header.danger {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 71, 87, 0.15),
+      rgba(220, 53, 69, 0.1)
+    );
+  }
+
+  .result-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+  }
+
+  .result-icon.success {
+    background: rgba(0, 255, 136, 0.2);
+    color: var(--primary-color);
+  }
+  .result-icon.warning {
+    background: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+  }
+  .result-icon.danger {
+    background: rgba(255, 71, 87, 0.2);
+    color: var(--accent-red);
+  }
+
+  .result-title {
+    flex: 1;
+  }
+
+  .result-title h3 {
+    font-family: "Orbitron", monospace;
+    font-size: 1.3rem;
+    margin-bottom: 5px;
+  }
+
+  .result-title.success h3 {
+    color: var(--primary-color);
+  }
+  .result-title.warning h3 {
+    color: #ffc107;
+  }
+  .result-title.danger h3 {
+    color: var(--accent-red);
+  }
+
+  .result-title p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+  }
+
+  .processing-time {
+    font-family: "Orbitron", monospace;
+    font-size: 0.85rem;
+    color: var(--accent-blue);
+    background: rgba(0, 212, 255, 0.1);
+    padding: 8px 15px;
+    border-radius: 20px;
+  }
+
+  /* Result Body */
+  .result-body {
+    padding: 30px;
+  }
+
+  /* Detail Grid */
+  .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-bottom: 25px;
+  }
+
+  @media (max-width: 600px) {
+    .detail-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .detail-item {
+    background: rgba(15, 15, 35, 0.5);
+    padding: 15px 20px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .detail-label {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    margin-bottom: 5px;
+  }
+
+  .detail-value {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .detail-value .check {
+    color: var(--primary-color);
+  }
+  .detail-value .cross {
+    color: var(--accent-red);
+  }
+  .detail-value .warn {
+    color: #ffc107;
+  }
+
+  /* Section Cards */
+  .section-card {
+    background: rgba(15, 15, 35, 0.5);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    color: var(--accent-blue);
+    font-weight: 600;
+  }
+
+  .section-header i {
+    font-size: 1.1rem;
+  }
+
+  /* Validation Steps */
+  .validation-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .step-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 15px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    border-left: 3px solid transparent;
+  }
+
+  .step-item.passed {
+    border-left-color: var(--primary-color);
+  }
+  .step-item.failed {
+    border-left-color: var(--accent-red);
+  }
+  .step-item.warning {
+    border-left-color: #ffc107;
+  }
+
+  .step-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+  }
+
+  .step-icon.passed {
+    background: rgba(0, 255, 136, 0.2);
+    color: var(--primary-color);
+  }
+  .step-icon.failed {
+    background: rgba(255, 71, 87, 0.2);
+    color: var(--accent-red);
+  }
+  .step-icon.warning {
+    background: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+  }
+
+  .step-content {
+    flex: 1;
+  }
+
+  .step-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 3px;
+  }
+
+  .step-detail {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+  }
+
+  /* Risk Factors */
+  .risk-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .risk-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .risk-item:last-child {
+    border-bottom: none;
+  }
+
+  .risk-item i {
+    color: #ffc107;
+    margin-top: 3px;
+  }
+
+  .risk-item span {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+  }
+
+  /* MX Records */
+  .mx-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .mx-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 15px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+  }
+
+  .mx-priority {
+    background: var(--primary-color);
+    color: var(--dark-bg);
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  .mx-server {
+    color: var(--text-primary);
+    font-family: "Courier New", monospace;
+    font-size: 0.9rem;
+  }
+
+  /* Features Section */
+  .features-section {
+    padding: 60px 0;
+    background: rgba(15, 15, 35, 0.3);
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 900px) {
+    .features-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 600px) {
+    .features-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .feature-card {
+    background: rgba(26, 26, 46, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 255, 136, 0.1);
+    border-radius: 16px;
+    padding: 30px;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  .feature-card:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 255, 136, 0.15);
+  }
+
+  .feature-icon {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(
+      135deg,
+      rgba(0, 255, 136, 0.1),
+      rgba(0, 212, 255, 0.1)
+    );
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+  }
+
+  .feature-icon i {
+    font-size: 1.8rem;
+    color: var(--primary-color);
+  }
+
+  .feature-card h3 {
+    font-family: "Orbitron", monospace;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+  }
+
+  .feature-card p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="container">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <h1 class="glitch" data-text="EMAIL VALIDATION">
+      EMAIL VALIDATION
+      <span class="version-badge">v2.0</span>
+    </h1>
+    <p class="hero-subtitle">
+      Advanced email validation with comprehensive security analysis, temporary
+      email detection, and real-time DNS verification.
+    </p>
+    <div class="stats-row">
+      <div class="stat-item">
+        <span class="stat-number">200+</span>
+        <span class="stat-label">Temp Domains</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">5</span>
+        <span class="stat-label">Validation Layers</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">99%</span>
+        <span class="stat-label">Accuracy</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">&lt;5s</span>
+        <span class="stat-label">Response</span>
+      </div>
     </div>
-</section>
+  </section>
 
-<!-- Email Validation Tool Section -->
-<section class="validation-section">
-    <div class="container">
-        <h2 class="section-title">Email Security Validator</h2>
-        
-        <!-- Display results if available -->
-        {% if result %}
-        <div class="alert alert-{{ result.status_color|default:'info' }}" style="margin-bottom: 20px; padding: 15px; border-radius: 8px; border-left: 4px solid;">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <i class="{{ result.status_icon }}"></i>
-                <div>
-                    <strong>{{ result.title }}</strong>
-                    <p style="margin: 5px 0 0 0; font-size: 14px;">{{ result.explanation }}</p>
-                    {% if result.processing_time_ms %}<small style="color: #666;">Processing time: {{ result.processing_time_ms }}ms</small>{% endif %}
-                </div>
-            </div>
+  <!-- Validation Form -->
+  <section class="validation-section">
+    <div class="validation-card">
+      <div class="form-header">
+        <h2><i class="fas fa-shield-alt"></i> Email Security Validator</h2>
+        <p>Enter an email address to perform comprehensive security analysis</p>
+      </div>
+
+      <form
+        method="post"
+        action="{% url 'emailvalidation:index' %}"
+        id="emailValidationForm"
+      >
+        {% csrf_token %}
+        <div class="input-group">
+          <label for="email">Email Address</label>
+          <i class="fas fa-envelope input-icon"></i>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="example@domain.com"
+            required
+            autocomplete="email"
+          />
+        </div>
+
+        <button type="submit" class="btn-validate" id="submitBtn">
+          <i class="fas fa-search"></i>
+          <span>Validate Email</span>
+        </button>
+      </form>
+
+      <div class="loading-indicator" id="loadingIndicator">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Analyzing email security...</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Results Section -->
+  {% if result %}
+  <section class="results-section">
+    <div class="result-card">
+      <!-- Result Header -->
+      <div class="result-header {{ result.status_color }}">
+        <div class="result-icon {{ result.status_color }}">
+          <i class="{{ result.status_icon }}"></i>
+        </div>
+        <div class="result-title {{ result.status_color }}">
+          <h3>{{ result.title }}</h3>
+          <p>{{ result.explanation }}</p>
+        </div>
+        {% if result.processing_time_ms %}
+        <div class="processing-time">
+          <i class="fas fa-bolt"></i> {{ result.processing_time_ms|floatformat:0
+          }}ms
         </div>
         {% endif %}
-        
-        <!-- Email Input Card -->
-        <form method="post" action="{% url 'emailvalidation:validate_api' %}" id="emailValidationForm" class="validation-form">
-            {% csrf_token %}
-            <div class="validation-card card" id="emailSecurityValidator">
-                <div class="input-section">
-                    <div class="input-container">
-                        <div class="input-icon">
-                            <i class="fas fa-envelope"></i>
-                        </div>
-                        <input type="email" name="email" id="emailInput" class="email-input" 
-                               placeholder="Enter email address (example@domain.com)" 
-                               autocomplete="email" spellcheck="false" required>
-                        <button type="button" class="clear-input" id="clearInput">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    <div class="helper-text" id="helperText">
-                        Enter an email address to perform comprehensive validation
-                    </div>
-                </div>
-                
-                <!-- Action Button -->
-                <div class="action-section">
-                    <button type="submit" class="btn validate-btn" id="validateBtn">
-                        <span class="btn-text">
-                            <i class="fas fa-shield-alt"></i>
-                            Validate Email
-                        </span>
-                        <div class="btn-spinner" style="display: none;">
-                            <i class="fas fa-spinner fa-spin"></i>
-                            Analyzing...
-                        </div>
-                    </button>
-                </div>
-            </div>
-        </form>
+      </div>
 
-        <!-- Validation Status -->
-        <div class="status-section" id="statusSection" style="display: none;">
-            <div class="status-card card">
-                <div class="loading-indicator">
-                    <div class="pulse-ring"></div>
-                    <div class="pulse-ring delay-1"></div>
-                    <div class="pulse-ring delay-2"></div>
-                </div>
-                <div class="status-messages" id="statusMessages">
-                    <p class="status-message">Initializing security scan...</p>
-                </div>
+      <!-- Result Body -->
+      <div class="result-body">
+        <!-- Quick Details -->
+        <div class="detail-grid">
+          <div class="detail-item">
+            <div class="detail-label">Email Address</div>
+            <div class="detail-value">{{ result.email }}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Domain</div>
+            <div class="detail-value">{{ result.domain|default:"N/A" }}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Valid Format</div>
+            <div class="detail-value">
+              {% if result.is_valid %}
+              <i class="fas fa-check-circle check"></i> Yes {% else %}
+              <i class="fas fa-times-circle cross"></i> No {% endif %}
             </div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Can Receive Mail</div>
+            <div class="detail-value">
+              {% if result.is_deliverable %}
+              <i class="fas fa-check-circle check"></i> Yes {% else %}
+              <i class="fas fa-times-circle cross"></i> No {% endif %}
+            </div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Temporary Email</div>
+            <div class="detail-value">
+              {% if result.is_temporary %}
+              <i class="fas fa-exclamation-triangle warn"></i> Yes {% else %}
+              <i class="fas fa-check-circle check"></i> No {% endif %}
+            </div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Confidence Score</div>
+            <div class="detail-value">
+              <i class="fas fa-chart-line check"></i> {{ result.confidence_score
+              }}%
+            </div>
+          </div>
         </div>
 
-        <!-- Results Section -->
-        {% if result %}
-        <div class="results-section" id="resultsSection" style="display: block;">
-            <!-- Result Summary -->
-            <div class="result-summary card" id="resultSummary">
-                <div class="result-header">
-                    <div class="result-icon" id="resultIcon">
-                        <i class="{{ result.status_icon }}"></i>
-                    </div>
-                    <div class="result-content">
-                        <h3 class="result-title" id="resultTitle">{{ result.title }}</h3>
-                        <p class="result-explanation" id="resultExplanation">
-                            {{ result.explanation }}
-                        </p>
-                        {% if result.normalized_email and result.normalized_email != result.email %}
-                        <p style="margin-top: 10px; color: #666; font-size: 14px;">
-                            <strong>Normalized:</strong> {{ result.normalized_email }}
-                        </p>
-                        {% endif %}
-                        {% if result.domain %}
-                        <p style="margin-top: 5px; color: #666; font-size: 14px;">
-                            <strong>Domain:</strong> {{ result.domain }}
-                        </p>
-                        {% endif %}
-                    </div>
+        <!-- Validation Steps -->
+        {% if result.validation_steps %}
+        <div class="section-card">
+          <div class="section-header">
+            <i class="fas fa-tasks"></i>
+            <span>Validation Process</span>
+          </div>
+          <div class="validation-steps">
+            {% if result.validation_steps.format %}
+            <div
+              class="step-item {% if result.validation_steps.format.status == 'valid' %}passed{% else %}failed{% endif %}"
+            >
+              <div
+                class="step-icon {% if result.validation_steps.format.status == 'valid' %}passed{% else %}failed{% endif %}"
+              >
+                <i
+                  class="fas {% if result.validation_steps.format.status == 'valid' %}fa-check{% else %}fa-times{% endif %}"
+                ></i>
+              </div>
+              <div class="step-content">
+                <div class="step-name">Format Validation</div>
+                <div class="step-detail">
+                  {{ result.validation_steps.format.message }}
                 </div>
-                
-                <!-- Confidence Meter -->
-                <div class="confidence-meter">
-                    <div class="confidence-label">
-                        <span>Confidence Level</span>
-                        <span class="confidence-value" id="confidenceValue">{{ result.confidence }}%</span>
-                    </div>
-                    <div class="confidence-bar">
-                        <div class="confidence-fill" id="confidenceFill" style="width: {{ result.confidence|default:0 }}%;"></div>
-                    </div>
-                </div>
+              </div>
             </div>
-
-            <!-- Detailed Security Checks -->
-            <div class="security-checks card" id="securityChecks">
-                <h4 class="checks-title">
-                    <i class="fas fa-list-check"></i>
-                    Security Analysis Results
-                </h4>
-                <div class="checks-grid">
-                    <div class="check-item">
-                        <div class="check-label">
-                            <i class="{{ result.checks.format.icon }}"></i>
-                            Format Validation
-                        </div>
-                        <div class="check-result" id="formatCheck">
-                            <span class="badge {{ result.checks.format.status }}">{{ result.checks.format.text }}</span>
-                        </div>
-                    </div>
-                    
-                    <div class="check-item">
-                        <div class="check-label">
-                            <i class="{{ result.checks.domain.icon }}"></i>
-                            Domain Status
-                        </div>
-                        <div class="check-result" id="domainCheck">
-                            <span class="badge {{ result.checks.domain.status }}">{{ result.checks.domain.text }}</span>
-                        </div>
-                    </div>
-                    
-                    <div class="check-item">
-                        <div class="check-label">
-                            <i class="{{ result.checks.mail_server.icon }}"></i>
-                            Mail Server
-                        </div>
-                        <div class="check-result" id="mailServerCheck">
-                            <span class="badge {{ result.checks.mail_server.status }}">{{ result.checks.mail_server.text }}</span>
-                        </div>
-                    </div>
-                    
-                    <div class="check-item">
-                        <div class="check-label">
-                            <i class="{{ result.checks.deliverability.icon }}"></i>
-                            Deliverability
-                        </div>
-                        <div class="check-result" id="deliverabilityCheck">
-                            <span class="badge {{ result.checks.deliverability.status }}">{{ result.checks.deliverability.text }}</span>
-                        </div>
-                    </div>
-                    
-                    <div class="check-item">
-                        <div class="check-label">
-                            <i class="{{ result.checks.disposable.icon }}"></i>
-                            Disposable Check
-                        </div>
-                        <div class="check-result" id="disposableCheck">
-                            <span class="badge {{ result.checks.disposable.status }}">{{ result.checks.disposable.text }}</span>
-                        </div>
-                    </div>
-                    
-                    <div class="check-item">
-                        <div class="check-label">
-                            <i class="{{ result.checks.risk.icon }}"></i>
-                            Risk Assessment
-                        </div>
-                        <div class="check-result" id="riskCheck">
-                            <span class="badge {{ result.checks.risk.status }}">{{ result.checks.risk.text }}</span>
-                        </div>
-                    </div>
+            {% endif %} {% if result.validation_steps.library %}
+            <div
+              class="step-item {% if result.validation_steps.library.status == 'valid' %}passed{% else %}failed{% endif %}"
+            >
+              <div
+                class="step-icon {% if result.validation_steps.library.status == 'valid' %}passed{% else %}failed{% endif %}"
+              >
+                <i
+                  class="fas {% if result.validation_steps.library.status == 'valid' %}fa-check{% else %}fa-times{% endif %}"
+                ></i>
+              </div>
+              <div class="step-content">
+                <div class="step-name">Library Validation</div>
+                <div class="step-detail">
+                  {{ result.validation_steps.library.message }}
                 </div>
-                
-                <!-- Detailed Validation Steps -->
-                {% if result.validation_steps %}
-                <div class="validation-details" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
-                    <h5 style="margin-bottom: 15px; color: #333;">
-                        <i class="fas fa-microscope"></i>
-                        Detailed Analysis Results
-                    </h5>
-                    
-                    <div class="detail-grid">
-                        <!-- Regex Check Details -->
-                        <div class="detail-item">
-                            <h6><i class="fas fa-code"></i> Regex Validation</h6>
-                            <p><strong>Status:</strong> {{ result.validation_steps.regex_check.status|capfirst }}</p>
-                            <p><strong>Message:</strong> {{ result.validation_steps.regex_check.message }}</p>
-                            <small>{{ result.validation_steps.regex_check.technical_info }}</small>
-                        </div>
-                        
-                        <!-- Library Check Details -->
-                        <div class="detail-item">
-                            <h6><i class="fas fa-book"></i> Library Validation</h6>
-                            <p><strong>Status:</strong> {{ result.validation_steps.library_check.status|capfirst }}</p>
-                            <p><strong>Message:</strong> {{ result.validation_steps.library_check.message }}</p>
-                            {% if result.validation_steps.library_check.local_part %}
-                            <p><strong>Local Part:</strong> {{ result.validation_steps.library_check.local_part }}</p>
-                            {% endif %}
-                            <small>{{ result.validation_steps.library_check.technical_info }}</small>
-                        </div>
-                        
-                        <!-- Domain Existence Check Details -->
-                        <div class="detail-item">
-                            <h6><i class="fas fa-globe"></i> Domain Verification</h6>
-                            <p><strong>Status:</strong> {{ result.validation_steps.domain_check.status|capfirst }}</p>
-                            <p><strong>Message:</strong> {{ result.validation_steps.domain_check.message }}</p>
-                            {% if result.validation_steps.domain_check.a_records %}
-                            <div class="a-records">
-                                <strong>IP Addresses:</strong>
-                                <ul style="margin: 5px 0 0 20px; font-size: 12px;">
-                                    {% for ip in result.validation_steps.domain_check.a_records %}
-                                    <li>{{ ip }}</li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                            {% endif %}
-                            <small>{{ result.validation_steps.domain_check.technical_info }}</small>
-                        </div>
-                        
-                        <!-- MX Check Details -->
-                        <div class="detail-item">
-                            <h6><i class="fas fa-envelope-open"></i> Mail Server Check</h6>
-                            <p><strong>Status:</strong> {{ result.validation_steps.mx_check.status|capfirst }}</p>
-                            <p><strong>Message:</strong> {{ result.validation_steps.mx_check.message }}</p>
-                            {% if result.validation_steps.mx_check.mx_records %}
-                            <div class="mx-records">
-                                <strong>Mail Servers:</strong>
-                                <ul style="margin: 5px 0 0 20px; font-size: 12px;">
-                                    {% for mx in result.validation_steps.mx_check.mx_records %}
-                                    <li>{{ mx.exchange }} (Priority: {{ mx.preference }} - {{ mx.priority }})</li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                            {% endif %}
-                            <small>{{ result.validation_steps.mx_check.technical_info }}</small>
-                        </div>
-                        
-                        <!-- Disposable Check Details -->
-                        <div class="detail-item">
-                            <h6><i class="fas fa-shield-alt"></i> Security Check</h6>
-                            <p><strong>Status:</strong> {{ result.validation_steps.disposable_check.status|capfirst }}</p>
-                            <p><strong>Message:</strong> {{ result.validation_steps.disposable_check.message }}</p>
-                            <small>{{ result.validation_steps.disposable_check.technical_info }}</small>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
+              </div>
             </div>
-
-            <!-- Safety Score -->
-            <div class="safety-score card" id="safetyScore">
-                <div class="score-header">
-                    <h4>
-                        <i class="fas fa-shield-check"></i>
-                        Safety Score
-                    </h4>
-                    <div class="score-value" id="safetyValue">
-                        <span class="score-number">{{ result.safety_score }}</span>
-                        <span class="score-max">/100</span>
-                    </div>
+            {% endif %} {% if result.validation_steps.temporary %}
+            <div
+              class="step-item {% if result.validation_steps.temporary.is_temporary %}warning{% else %}passed{% endif %}"
+            >
+              <div
+                class="step-icon {% if result.validation_steps.temporary.is_temporary %}warning{% else %}passed{% endif %}"
+              >
+                <i
+                  class="fas {% if result.validation_steps.temporary.is_temporary %}fa-exclamation{% else %}fa-check{% endif %}"
+                ></i>
+              </div>
+              <div class="step-content">
+                <div class="step-name">Temporary Domain Check</div>
+                <div class="step-detail">
+                  {{ result.validation_steps.temporary.message }}
                 </div>
-                <div class="score-bar">
-                    <div class="score-fill" id="scoreFill" style="width: {{ result.safety_score }}%;"></div>
-                </div>
-                <p class="score-description" id="scoreDescription">
-                    {{ result.recommendation }}
-                </p>
-                
-                {% if result.risk_factors %}
-                <div class="risk-factors" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
-                    <h6 style="margin-bottom: 10px; color: #d63384;">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        Identified Risk Factors:
-                    </h6>
-                    <ul style="margin: 0; padding-left: 20px; color: #666; font-size: 14px;">
-                        {% for factor in result.risk_factors %}
-                        <li>{{ factor }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-                {% endif %}
-
+              </div>
             </div>
+            {% endif %} {% if result.validation_steps.mx %}
+            <div
+              class="step-item {% if result.validation_steps.mx.has_mx %}passed{% elif result.validation_steps.mx.has_mx == False %}failed{% else %}warning{% endif %}"
+            >
+              <div
+                class="step-icon {% if result.validation_steps.mx.has_mx %}passed{% elif result.validation_steps.mx.has_mx == False %}failed{% else %}warning{% endif %}"
+              >
+                <i
+                  class="fas {% if result.validation_steps.mx.has_mx %}fa-check{% elif result.validation_steps.mx.has_mx == False %}fa-times{% else %}fa-question{% endif %}"
+                ></i>
+              </div>
+              <div class="step-content">
+                <div class="step-name">MX Record Check</div>
+                <div class="step-detail">
+                  {{ result.validation_steps.mx.message }}
+                </div>
+              </div>
+            </div>
+            {% endif %}
+          </div>
         </div>
-        {% else %}
-        <div class="results-section" id="resultsSection" style="display: none;">
-            <!-- Results will be shown here after validation -->
+        {% endif %} {% if result.domain_info.mx_records %}
+        <div class="section-card">
+          <div class="section-header">
+            <i class="fas fa-server"></i>
+            <span>Mail Servers (MX Records)</span>
+          </div>
+          <div class="mx-list">
+            {% for mx in result.domain_info.mx_records %}
+            <div class="mx-item">
+              <span class="mx-priority">Priority {{ mx.priority }}</span>
+              <span class="mx-server">{{ mx.exchange }}</span>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %} {% if result.risk_factors %}
+        <div
+          class="section-card"
+          style="border: 1px solid rgba(255, 193, 7, 0.3)"
+        >
+          <div class="section-header" style="color: #ffc107">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>Risk Factors</span>
+          </div>
+          <ul class="risk-list">
+            {% for factor in result.risk_factors %}
+            <li class="risk-item">
+              <i class="fas fa-exclamation-circle"></i>
+              <span>{{ factor }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %} {% if result.recommendation %}
+        <div
+          class="section-card"
+          style="border: 1px solid rgba(0, 212, 255, 0.3)"
+        >
+          <div class="section-header" style="color: var(--accent-blue)">
+            <i class="fas fa-lightbulb"></i>
+            <span>Recommendation</span>
+          </div>
+          <p style="color: var(--text-secondary); line-height: 1.6">
+            {{ result.recommendation }}
+          </p>
         </div>
         {% endif %}
-
-        <!-- Recent Validations -->
-        <div class="recent-validations" id="recentValidations" style="display: none;">
-            <div class="card">
-                <div class="recent-header">
-                    <h4>
-                        <i class="fas fa-history"></i>
-                        Recent Validations
-                    </h4>
-                    <button type="button" class="btn btn-small" id="clearHistoryBtn">
-                        <i class="fas fa-trash-alt"></i>
-                        Clear History
-                    </button>
-                </div>
-                <div class="recent-list" id="recentList">
-                    <!-- Recent validation items will be populated by JavaScript -->
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
-</section>
+  </section>
+  {% endif %}
 
-<!-- Features Section -->
-<section class="features-section">
+  <!-- Features Section -->
+  <section class="features-section">
     <div class="container">
-        <h2 class="section-title">Validation Features</h2>
-        <div class="features-grid">
-            <div class="feature-card card">
-                <div class="feature-icon">
-                    <i class="fas fa-search"></i>
-                </div>
-                <h3>Format Analysis</h3>
-                <p>Advanced regex and RFC-compliant email format validation with internationalization support.</p>
-            </div>
-            
-            <div class="feature-card card">
-                <div class="feature-icon">
-                    <i class="fas fa-dns"></i>
-                </div>
-                <h3>DNS Verification</h3>
-                <p>Real-time MX record lookup and domain validation to ensure email deliverability.</p>
-            </div>
-            
-            <div class="feature-card card">
-                <div class="feature-icon">
-                    <i class="fas fa-shield-virus"></i>
-                </div>
-                <h3>Threat Detection</h3>
-                <p>Identifies disposable emails, suspicious patterns, and potential security threats.</p>
-            </div>
-            
-            <div class="feature-card card">
-                <div class="feature-icon">
-                    <i class="fas fa-chart-line"></i>
-                </div>
-                <h3>Risk Scoring</h3>
-                <p>Comprehensive risk assessment with confidence levels and safety recommendations.</p>
-            </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-layer-group"></i>
+          </div>
+          <h3>5-Layer Validation</h3>
+          <p>
+            Comprehensive validation including format check, library validation,
+            DNS lookup, and behavioral analysis.
+          </p>
         </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-clock"></i>
+          </div>
+          <h3>Temp Mail Detection</h3>
+          <p>
+            Detects 200+ temporary and disposable email services to protect
+            against fraudulent registrations.
+          </p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-network-wired"></i>
+          </div>
+          <h3>DNS Verification</h3>
+          <p>
+            Real-time MX record lookup and domain verification to ensure email
+            deliverability.
+          </p>
+        </div>
+      </div>
     </div>
-</section>
-{% endblock %}
+  </section>
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+  document
+    .getElementById("emailValidationForm")
+    .addEventListener("submit", function (e) {
+      const loadingIndicator = document.getElementById("loadingIndicator");
+      const submitBtn = document.getElementById("submitBtn");
 
-{% block extra_js %}
-<script src="{% static 'js/email-validation.js' %}"></script>
+      loadingIndicator.style.display = "block";
+      submitBtn.disabled = true;
+      submitBtn.innerHTML =
+        '<i class="fas fa-spinner fa-spin"></i> <span>Validating...</span>';
+    });
+</script>
 {% endblock %}

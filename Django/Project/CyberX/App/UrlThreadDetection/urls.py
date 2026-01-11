@@ -5,5 +5,5 @@ app_name = 'urlthreatdetection'
 
 urlpatterns = [
     path('', views.url_threat_detection_view, name='index'),
-    path('api/analyze/', views.analyze_url_api, name='analyze_api'),
+    path('analyze/', views.analyze_url_api, name='analyze_url'),
 ]

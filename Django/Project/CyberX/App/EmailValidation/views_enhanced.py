@@ -15,67 +15,76 @@ import socket
 from email_validator import validate_email, EmailNotValidError
 import dns.resolver
 
-# Comprehensive and continuously updated temporary email domain list
+# Comprehensive temporary email domain list
 TEMPORARY_EMAIL_DOMAINS = {
-    # Most popular temporary email services (high priority)
+    # Popular temporary email services
     '10minutemail.com', '10minutemail.net', '10minutemail.org',
-    'mailinator.com', 'guerrillamail.com', 'guerrillamail.org', 'guerrillamail.net',
-    'temp-mail.org', 'tempmail.net', 'throwaway.email', 'tempail.com',
+    'mailinator.com', 'guerrillamail.com', 'guerrillamail.org',
+    'temp-mail.org', 'tempmail.net', 'throwaway.email',
     'maildrop.cc', 'yopmail.com', 'yopmail.fr', 'yopmail.net',
-    'sharklasers.com', 'guerrillamail.de', 'guerrillamail.biz',
-    'getairmail.com', 'airmail.cc', 'guerrillamail.info', 'guerrillamailblock.com',
+    'sharklasers.com', 'guerrillamail.net', 'guerrillamail.de',
+    'getairmail.com', 'airmail.cc', 'guerrillamail.biz',
+    'guerrillamail.info', 'guerrillamailblock.com',
     
-    # Additional temporary providers (medium priority)
-    'tempemail.com', 'temporaryemail.net', 'emailondeck.com', 'mytrashmail.com',
-    'trashmail.com', 'disposable-email.ml', 'burnermail.io', 'mohmal.com',
-    'getnada.com', 'fakemail.net', 'temp-mail.ru', 'dispostable.com',
-    'fakeinbox.com', 'harakirimail.com', 'mintemail.com', 'temp-mail.io',
-    'tempinbox.com', 'throwawaymail.com', 'binmail.net', 'mailcatch.com',
-    'mailexpire.com', 'mailforspam.com', 'mailnesia.com', 'spamgourmet.com',
-    '20minutemail.com', '20email.eu', '33mail.com', 'anonbox.net',
-    
-    # Newer and evolving services (requires pattern matching)
-    'mail.tm', 'tempmail.email', 'moakt.com', 'incognitomail.org',
-    'guerrillamail.to', '10mail.org', 'emailfake.com', 'mailtemp.info',
-    'tempmailo.com', 'emaildrop.io', 'throwaway.email', 'trashmail.ws',
-    
-    # Domain variations and international services
-    'tempmail24.com', 'temp-mail.email', 'fakeemailgenerator.com',
-    'mailsac.com', '10minemail.com', 'tempemailgen.com', 'mail7.io',
-    'inboxkitten.com', 'tempmail.org', 'fake-mail.ml', 'burner.kiwi',
-    
-    # Recently discovered domains (Jan 2026)
-    'tmail.ws', 'smailpro.com', 'tempmail.dev', 'disposablemail.com',
-    'ephemeral.email', 'quickmail.email', 'instantmail.fr', 'tempbox.xyz'
+    # Other temporary providers
+    'tempail.com', 'tempemail.com', 'temporaryemail.net',
+    'emailondeck.com', 'mytrashmail.com', 'trashmail.com',
+    'disposable-email.ml', 'burnermail.io', 'mohmal.com',
+    'getnada.com', 'fakemail.net', 'temp-mail.ru',
+    'dispostable.com', 'fakeinbox.com', 'harakirimail.com',
+    'mintemail.com', 'temp-mail.io', 'tempinbox.com',
+    'throwawaymail.com', 'binmail.net', 'mailcatch.com',
+    'mailexpire.com', 'mailforspam.com', 'mailnesia.com',
+    'spamgourmet.com', 'spamgourmet.net', 'spamgourmet.org',
+    '20minutemail.com', '20email.eu', '33mail.com',
+    'anonbox.net', 'bccto.me', 'byom.de', 'crazymailing.com',
+    'deadaddress.com', 'despam.it', 'devnullmail.com',
+    'e4ward.com', 'emailinfive.com', 'emailsensei.com',
+    'emailto.de', 'emz.net', 'fakemailz.com', 'fastmail.fm',
+    'filzmail.com', 'getonemail.com', 'great-host.in',
+    'hidemyass.com', 'incognitomail.org', 'jetable.org',
+    'kasmail.com', 'keepmymail.com', 'klzlk.com', 'kurzepost.de',
+    'lhsdv.com', 'lookugly.com', 'lopl.co.cc', 'lr78.com',
+    'maileater.com', 'mailexpire.com', 'mailforspam.com',
+    'mailfreeonline.com', 'mailnesia.com', 'mailscrap.com',
+    'mailzilla.org', 'mbx.cc', 'mt2009.com', 'mx0.wwwnew.eu',
+    'mytempemail.com', 'neverbox.com', 'no-spam.ws',
+    'nobulk.com', 'noclickemail.com', 'nogmailspam.info',
+    'notmailinator.com', 'nowmymail.com', 'objectmail.com',
+    'obobbo.com', 'onewaymail.com', 'owlpic.com', 'pooae.com',
+    'prtnx.com', 'rmqkr.net', 's0ny.net', 'safe-mail.net',
+    'selfdestructingmail.com', 'sendspamhere.com', 'skeefmail.com',
+    'snakemail.com', 'sofort-mail.de', 'sogetthis.com',
+    'soodonims.com', 'spam4.me', 'spamail.de', 'spambog.com',
+    'spambog.de', 'spambog.ru', 'spamfree24.com', 'spamfree24.de',
+    'spamfree24.eu', 'spamfree24.net', 'spamfree24.org',
+    'spamherald.com', 'spamhole.com', 'spamify.com', 'spaminator.de',
+    'spamkill.info', 'spaml.com', 'spaml.de', 'spammotel.com',
+    'spamobox.com', 'spamspot.com', 'spamstack.net', 'speed.1s.fr',
+    'supergreatmail.com', 'supermailer.jp', 'superrito.com',
+    'tagyourself.com', 'teewars.org', 'tempalias.com',
+    'tempe-mail.com', 'tempemail.biz', 'tempemail.com',
+    'tempinbox.co.uk', 'tempinbox.com', 'tempmail.eu',
+    'tempmail2.com', 'tempmaildemo.com', 'tempsky.com',
+    'thanksnospam.info', 'thankyou2010.com', 'thisisnotmyrealemail.com',
+    'thrma.com', 'tilien.com', 'tipsmail.com', 'toiea.com',
+    'turual.com', 'twinmail.de', 'tyldd.com', 'uroid.com',
+    'venompen.com', 'veryrealemail.com', 'wh4f.org',
+    'whatiaas.com', 'willhackforfood.biz', 'willselldrugs.com',
+    'xoxy.net', 'yogamaven.com', 'yuurok.com', 'zehnminutenmail.de',
+    'zoemail.org', 'zoemail.net', 'zzzmail.com'
 }
 
-# Advanced pattern matching for temporary email detection
-TEMPORARY_EMAIL_PATTERNS = [
-    # Pattern for numbered temp mail services
-    r'^temp\d*mail\d*\.(com|org|net|email)$',
-    r'^\d+m(in|inute)mail\.(com|org|net)$',
-    r'^disposable.*\.(ml|tk|ga|cf|gq)$',
-    r'^temp.*\.(ml|tk|ga|cf|gq)$',
-    r'^fake.*mail.*\.(com|org|net|ml|tk)$',
-    r'^trash.*mail.*\.(com|org|net|ws)$',
-    r'^guerrilla.*mail.*\.(com|org|net|de|biz|info)$',
-    r'.*tempmail.*\.(com|org|net|email|dev|xyz)$',
-    r'.*throwaway.*\.(com|org|net|email)$',
-    r'.*burner.*\.(com|org|net|email|io|kiwi)$',
-    r'.*disposable.*\.(com|org|net|email|ml)$',
-    r'.*ephemeral.*\.(com|org|net|email)$',
-    r'.*instant.*mail.*\.(com|org|net|fr)$',
-    r'.*quick.*mail.*\.(com|org|net|email)$'
-]
-
-# Suspicious TLDs often used by temporary email services
-SUSPICIOUS_TLDS = {'.tk', '.ml', '.ga', '.cf', '.gq', '.pw', '.cc', '.top', '.click'}
-
-# Keywords that indicate temporary/disposable email services
-TEMP_EMAIL_KEYWORDS = [
-    'temp', 'temporary', 'disposable', 'throwaway', 'burner', 'fake',
-    'trash', 'spam', 'guerrilla', 'guerilla', 'anonymous', 'anon',
-    'ephemeral', 'instant', 'quick', 'fast', 'minute', 'hour', 'daily'
+# Additional suspicious patterns
+SUSPICIOUS_PATTERNS = [
+    r'.*temp.*mail.*',
+    r'.*fake.*mail.*',
+    r'.*trash.*mail.*',
+    r'.*spam.*mail.*',
+    r'.*disposable.*',
+    r'.*throw.*away.*',
+    r'.*burn.*mail.*',
+    r'.*dump.*mail.*'
 ]
 
 def is_valid_email_regex(email: str) -> tuple:
@@ -145,102 +154,42 @@ def is_valid_email_library(email: str) -> tuple:
         return False, details, None
 
 def is_temporary_email(domain: str) -> dict:
-    """
-    Advanced temporary email domain detection with multiple validation layers
-    Enhanced accuracy with pattern matching, keyword analysis, and TLD checking
-    """
+    """Enhanced temporary email domain detection."""
     domain = domain.lower().strip()
     
-    # Layer 1: Direct domain match (highest confidence)
+    # Direct match check
     if domain in TEMPORARY_EMAIL_DOMAINS:
         return {
             'is_temporary': True,
-            'reason': 'known_temporary_domain',
-            'confidence': 98,
-            'detection_method': 'direct_match',
-            'message': f'Domain "{domain}" is a confirmed temporary email provider',
-            'risk_level': 'high'
+            'reason': 'direct_match',
+            'confidence': 95,
+            'message': f'Domain "{domain}" is a known temporary email provider'
         }
     
-    # Layer 2: Pattern matching for domain structures
-    for pattern in TEMPORARY_EMAIL_PATTERNS:
+    # Pattern matching for suspicious domains
+    for pattern in SUSPICIOUS_PATTERNS:
         if re.match(pattern, domain):
             return {
                 'is_temporary': True,
-                'reason': 'matches_temporary_pattern',
-                'confidence': 85,
-                'detection_method': 'pattern_matching',
-                'message': f'Domain "{domain}" follows temporary email naming patterns',
-                'risk_level': 'high'
+                'reason': 'pattern_match',
+                'confidence': 80,
+                'message': f'Domain "{domain}" matches temporary email pattern'
             }
     
-    # Layer 3: Keyword analysis in domain name
-    domain_parts = domain.replace('.', ' ').replace('-', ' ').split()
-    temp_keywords_found = []
-    for part in domain_parts:
-        for keyword in TEMP_EMAIL_KEYWORDS:
-            if keyword in part.lower():
-                temp_keywords_found.append(keyword)
-    
-    if temp_keywords_found:
-        return {
-            'is_temporary': True,
-            'reason': 'contains_temporary_keywords',
-            'confidence': 75,
-            'detection_method': 'keyword_analysis',
-            'message': f'Domain "{domain}" contains temporary email keywords: {", ".join(temp_keywords_found)}',
-            'risk_level': 'medium'
-        }
-    
-    # Layer 4: Suspicious TLD check
-    domain_tld = '.' + domain.split('.')[-1] if '.' in domain else ''
-    if domain_tld in SUSPICIOUS_TLDS:
+    # Check for numeric-only TLD or suspicious patterns
+    if domain.endswith('.tk') or domain.endswith('.ml') or domain.endswith('.ga'):
         return {
             'is_temporary': True,
             'reason': 'suspicious_tld',
-            'confidence': 60,
-            'detection_method': 'tld_analysis',
-            'message': f'Domain "{domain}" uses TLD "{domain_tld}" commonly associated with temporary services',
-            'risk_level': 'medium'
+            'confidence': 70,
+            'message': f'Domain "{domain}" uses a TLD commonly associated with temporary services'
         }
     
-    # Layer 5: Additional heuristic checks
-    suspicion_score = 0
-    warnings = []
-    
-    # Check for very short domain names (often temp services)
-    if len(domain.split('.')[0]) <= 3:
-        suspicion_score += 20
-        warnings.append("unusually short domain name")
-    
-    # Check for excessive numbers in domain
-    if len([c for c in domain if c.isdigit()]) > 2:
-        suspicion_score += 15
-        warnings.append("contains multiple numbers")
-    
-    # Check for uncommon domain extensions
-    if domain.endswith(('.ml', '.tk', '.ga', '.cf', '.gq')):
-        suspicion_score += 25
-        warnings.append("uses free domain extension")
-    
-    if suspicion_score >= 40:
-        return {
-            'is_temporary': True,
-            'reason': 'heuristic_analysis',
-            'confidence': min(60 + suspicion_score, 85),
-            'detection_method': 'behavioral_analysis',
-            'message': f'Domain "{domain}" shows characteristics of temporary services: {", ".join(warnings)}',
-            'risk_level': 'medium'
-        }
-    
-    # Domain appears legitimate
     return {
         'is_temporary': False,
-        'reason': 'legitimate_domain',
-        'confidence': max(90 - suspicion_score, 70),
-        'detection_method': 'comprehensive_analysis',
-        'message': f'Domain "{domain}" appears to be a legitimate email provider',
-        'risk_level': 'low'
+        'reason': 'not_detected',
+        'confidence': 85,
+        'message': f'Domain "{domain}" does not appear to be a temporary email provider'
     }
 
 def has_mx_record(domain: str) -> tuple:
@@ -429,103 +378,67 @@ def validate_email_comprehensive(email: str) -> dict:
 @require_http_methods(["GET", "POST"])
 def email_validation_view(request):
     """Enhanced email validation view with improved UI and features"""
-    import logging
-    logger = logging.getLogger('EmailValidation')
-    
-    result = None
-    
-    logger.info(f"Email validation request - Method: {request.method}")
+    if request.method == 'GET':
+        return render(request, 'EmailValidation.html')
     
     if request.method == 'POST':
         try:
-            # Handle both AJAX and form submissions
             if request.content_type == 'application/json':
                 data = json.loads(request.body)
                 email = data.get('email', '').strip()
-                logger.info(f"JSON request with email: {email}")
             else:
                 email = request.POST.get('email', '').strip()
-                logger.info(f"Form submission with email: {email}")
             
-            if email:
-                logger.info(f"Starting validation for email: {email}")
-                # Perform comprehensive validation
-                validation_results = validate_email_comprehensive(email)
-                logger.info(f"Validation completed - Valid: {validation_results['is_valid']}, Temporary: {validation_results['is_temporary']}")
+            if not email:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'No email address provided',
+                    'message': 'Please enter an email address to validate'
+                })
+            
+            # Perform comprehensive validation
+            validation_results = validate_email_comprehensive(email)
+            
+            # Prepare response
+            response = {
+                'success': True,
+                'email': validation_results['email'],
+                'normalized_email': validation_results.get('normalized_email'),
+                'is_valid': validation_results['is_valid'],
+                'is_deliverable': validation_results['is_deliverable'],
+                'is_temporary': validation_results['is_temporary'],
+                'confidence_score': validation_results['confidence_score'],
+                'warnings': validation_results['warnings'],
+                'errors': validation_results['errors'],
+                'processing_time_ms': validation_results['processing_time_ms'],
+                'domain': validation_results.get('domain'),
                 
-                # Prepare result for template context
-                result = {
-                    'email': validation_results['email'],
-                    'normalized_email': validation_results.get('normalized_email'),
-                    'is_valid': validation_results['is_valid'],
-                    'is_deliverable': validation_results['is_deliverable'],
-                    'is_temporary': validation_results['is_temporary'],
-                    'confidence_score': validation_results['confidence_score'],
-                    'warnings': validation_results['warnings'],
-                    'errors': validation_results['errors'],
-                    'processing_time_ms': validation_results['processing_time_ms'],
-                    'domain': validation_results.get('domain'),
-                    
-                    # UI-friendly fields
-                    'title': get_validation_title(validation_results),
-                    'explanation': get_validation_message(validation_results),
-                    'status_color': get_status_color(validation_results),
-                    'status_icon': get_status_icon(validation_results),
-                    'recommendation': get_recommendation(validation_results),
-                    
-                    # Additional details for comprehensive display
-                    'validation_steps': validation_results['details'],
-                    'domain_info': validation_results['details'].get('mx'),
-                    'dns_warning': None,
-                    'risk_factors': []
-                }
+                # UI-friendly fields
+                'status': 'valid' if validation_results['is_valid'] and validation_results['is_deliverable'] and not validation_results['is_temporary'] else 'warning' if validation_results['is_valid'] else 'invalid',
+                'title': get_validation_title(validation_results),
+                'message': get_validation_message(validation_results),
+                'status_color': get_status_color(validation_results),
+                'status_icon': get_status_icon(validation_results),
+                'recommendation': get_recommendation(validation_results),
                 
-                # Add risk factors
-                if validation_results['is_temporary']:
-                    result['risk_factors'].append("Uses temporary/disposable email service")
-                if not validation_results['is_deliverable']:
-                    result['risk_factors'].append("Domain cannot receive emails")
-                if validation_results['warnings']:
-                    result['risk_factors'].extend(validation_results['warnings'])
-                if validation_results['errors']:
-                    result['risk_factors'].extend(validation_results['errors'])
-                
-                # Add DNS warning if domain issues
-                mx_details = validation_results['details'].get('mx', {})
-                if mx_details.get('status') in ['domain_not_found', 'timeout', 'dns_error']:
-                    result['dns_warning'] = mx_details.get('message', 'Domain has DNS issues')
-                
-                logger.info(f"Result prepared - Title: {result['title']}, Status: {result['status_color']}")
-                
-                # Handle AJAX requests
-                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                    logger.info("Returning AJAX response")
-                    return JsonResponse({
-                        'success': True,
-                        'result': result
-                    })
-            else:
-                logger.warning("No email provided in request")
+                # Detailed results for advanced users
+                'details': validation_results['details']
+            }
+            
+            return JsonResponse(response)
             
         except json.JSONDecodeError:
-            logger.error("JSON decode error in request")
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({
-                    'success': False,
-                    'error': 'Invalid JSON data',
-                    'message': 'Please check your request format'
-                })
+            return JsonResponse({
+                'success': False,
+                'error': 'Invalid JSON data',
+                'message': 'Please check your request format'
+            })
         except Exception as e:
-            logger.error(f"Validation error: {str(e)}")
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({
-                    'success': False,
-                    'error': str(e),
-                    'message': 'An error occurred during validation'
-                })
-    
-    logger.info(f"Rendering template with result: {'Yes' if result else 'No'}")
-    return render(request, 'EmailValidation.html', {'result': result})
+            return JsonResponse({
+                'success': False,
+                'error': str(e),
+                'message': 'An error occurred during validation'
+            })
 
 def get_validation_title(results):
     """Generate appropriate title based on validation results"""
@@ -589,67 +502,3 @@ def get_recommendation(results):
         return "Exercise caution - this email may have deliverability issues."
     else:
         return "This email address appears safe to use for communication."
-
-@csrf_exempt  
-@require_http_methods(["POST"])
-def validate_email_api(request):
-    """
-    API endpoint for email validation 
-    Enhanced with comprehensive temporary email detection
-    """
-    try:
-        if request.content_type == 'application/json':
-            data = json.loads(request.body)
-            email = data.get('email', '').strip()
-        else:
-            email = request.POST.get('email', '').strip()
-        
-        if not email:
-            return JsonResponse({
-                'success': False,
-                'error': 'No email address provided',
-                'message': 'Please enter an email address to validate'
-            }, status=400)
-        
-        # Perform comprehensive validation
-        validation_results = validate_email_comprehensive(email)
-        
-        # Prepare enhanced response
-        response = {
-            'success': True,
-            'email': validation_results['email'],
-            'normalized_email': validation_results.get('normalized_email'),
-            'is_valid': validation_results['is_valid'],
-            'is_deliverable': validation_results['is_deliverable'],
-            'is_temporary': validation_results['is_temporary'],
-            'confidence': validation_results['confidence_score'],
-            'warnings': validation_results['warnings'],
-            'errors': validation_results['errors'],
-            'processing_time_ms': validation_results['processing_time_ms'],
-            'domain': validation_results.get('domain'),
-            
-            # UI-friendly fields for template rendering
-            'title': get_validation_title(validation_results),
-            'explanation': get_validation_message(validation_results),
-            'status_color': get_status_color(validation_results),
-            'status_icon': get_status_icon(validation_results),
-            'recommendation': get_recommendation(validation_results),
-            
-            # Enhanced temporary email detection details
-            'temp_detection': validation_results.get('details', {}).get('temporary', {}),
-            'dns_info': validation_results.get('details', {}).get('dns', {}),
-            'domain_info': {
-                'domain': validation_results.get('domain'),
-                'mx_records': validation_results.get('details', {}).get('dns', {}).get('has_mx', False),
-                'reputation': 'trusted' if not validation_results['is_temporary'] else 'temporary'
-            }
-        }
-        
-        return render(request, 'EmailValidation.html', {'result': response})
-        
-    except Exception as e:
-        return JsonResponse({
-            'success': False,
-            'error': str(e),
-            'message': 'An error occurred during validation'
-        }, status=500)
