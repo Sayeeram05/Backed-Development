@@ -1,0 +1,410 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}URL Threat Detection - CyberX{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/email-validation.css' %}">
+<style>
+/* URL Threat Detection Specific Styles */
+.threat-icon {
+    font-size: 3rem;
+    margin-bottom: 20px;
+}
+
+.threat-status.benign {
+    color: var(--primary-color);
+}
+
+.threat-status.defacement {
+    color: #ff9500;
+}
+
+.threat-status.phishing {
+    color: var(--accent-red);
+}
+
+.threat-status.malware {
+    color: #ff0033;
+}
+
+.model-result {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 10px;
+}
+
+.model-result.valid {
+    border-left: 4px solid var(--primary-color);
+}
+
+.model-result.threat {
+    border-left: 4px solid var(--accent-red);
+}
+
+.risk-score {
+    position: relative;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.risk-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.5s ease;
+}
+
+.risk-fill.low {
+    background: linear-gradient(90deg, var(--primary-color), #00cc88);
+}
+
+.risk-fill.medium {
+    background: linear-gradient(90deg, #ff9500, #ffaa00);
+}
+
+.risk-fill.high {
+    background: linear-gradient(90deg, var(--accent-red), #ff3366);
+}
+
+.url-display {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    word-break: break-all;
+    font-family: 'Courier New', monospace;
+    color: var(--accent-blue);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section id="url-threat-detection" class="hero-section">
+    <div class="container">
+        <h1 class="glitch" data-text="URL THREAT DETECTION">URL THREAT DETECTION</h1>
+        <p class="hero-subtitle">AI-Powered Malicious URL Scanner</p>
+        <p class="hero-description">
+            Protect yourself from malicious websites with our advanced AI detection system. 
+            Analyze URLs for phishing, malware, defacement, and other security threats using 
+            multiple machine learning models trained on thousands of malicious URLs.
+        </p>
+        <div class="hero-stats">
+            <div class="stat">
+                <div class="stat-number">91%</div>
+                <div class="stat-label">Accuracy</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">3</div>
+                <div class="stat-label">AI Models</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">Real-time</div>
+                <div class="stat-label">Analysis</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- URL Analysis Tool Section -->
+<section class="validation-section">
+    <div class="container">
+        <h2 class="section-title">URL Security Scanner</h2>
+        
+        <!-- Display results if available -->
+        {% if result %}
+        <div class="alert alert-{{ result.status_color|default:'info' }}" style="margin-bottom: 20px; padding: 15px; border-radius: 8px; border-left: 4px solid;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="{{ result.status_icon }}"></i>
+                <div>
+                    <strong>{{ result.title }}</strong>
+                    <p style="margin: 5px 0 0 0; font-size: 14px;">{{ result.explanation }}</p>
+                    {% if result.processing_time_ms %}<small style="color: #666;">Processing time: {{ result.processing_time_ms }}ms</small>{% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- URL Input Card -->
+        <form method="post" action="{% url 'urlthreatdetection:analyze_api' %}" id="urlAnalysisForm" class="validation-form">
+            {% csrf_token %}
+            <div class="validation-card card" id="urlSecurityScanner">
+                <div class="input-section">
+                    <div class="input-container">
+                        <div class="input-icon">
+                            <i class="fas fa-link"></i>
+                        </div>
+                        <input type="url" name="url" id="urlInput" class="email-input" 
+                               placeholder="Enter URL to analyze (example: https://suspicious-site.com)" 
+                               autocomplete="url" spellcheck="false" required>
+                        <button type="button" class="clear-input" id="clearInput">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="helper-text" id="helperText">
+                        Enter a URL to perform comprehensive threat analysis
+                    </div>
+                </div>
+                
+                <!-- Action Button -->
+                <div class="action-section">
+                    <button type="submit" class="btn validate-btn" id="analyzeBtn">
+                        <div class="btn-content">
+                            <span class="btn-text">
+                                <i class="fas fa-search"></i>
+                                Analyze URL
+                            </span>
+                            <div class="btn-spinner">
+                                <div class="spinner"></div>
+                                <span>Analyzing...</span>
+                            </div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Results Section -->
+        {% if result %}
+        <div class="results-section" id="resultsSection" style="display: block;">
+            <!-- Result Summary -->
+            <div class="result-summary card" id="resultSummary">
+                <div class="result-header">
+                    <div class="result-icon threat-status {{ result.threat_type|lower }}" id="resultIcon">
+                        <i class="{{ result.status_icon }}"></i>
+                    </div>
+                    <div class="result-content">
+                        <h3 class="result-title" id="resultTitle">{{ result.title }}</h3>
+                        <div class="url-display">
+                            <strong>URL:</strong> {{ result.url }}
+                        </div>
+                        <p class="result-explanation" id="resultExplanation">
+                            {{ result.explanation }}
+                        </p>
+                        <div style="margin-top: 15px;">
+                            <strong>Threat Type:</strong> 
+                            <span class="threat-status {{ result.threat_type|lower }}">{{ result.threat_type }}</span>
+                        </div>
+                        {% if result.risk_score %}
+                        <div style="margin-top: 15px;">
+                            <strong>Risk Score:</strong> {{ result.risk_score }}/100
+                            <div class="risk-score" style="margin-top: 5px;">
+                                <div class="risk-fill {% if result.risk_score < 30 %}low{% elif result.risk_score < 70 %}medium{% else %}high{% endif %}" 
+                                     style="width: {{ result.risk_score }}%;"></div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Processing Stats -->
+                {% if result.processing_time_ms %}
+                <div class="processing-stats">
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value">{{ result.processing_time_ms }}ms</div>
+                            <div class="stat-label">Processing Time</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">{{ result.features_analyzed }}</div>
+                            <div class="stat-label">Features Analyzed</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">{{ result.models_used }}</div>
+                            <div class="stat-label">AI Models Used</div>
+                        </div>
+                        {% if result.ensemble_confidence %}
+                        <div class="stat-item">
+                            <div class="stat-value">{{ result.ensemble_confidence|floatformat:1 }}%</div>
+                            <div class="stat-label">Model Agreement</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Model Results -->
+            {% if result.model_results %}
+            <div class="detailed-results card">
+                <div class="card-header">
+                    <h3><i class="fas fa-brain"></i> AI Model Results</h3>
+                    <p>Individual predictions from our machine learning models</p>
+                </div>
+                <div class="results-grid">
+                    {% for model in result.model_results %}
+                    <div class="model-result {{ model.status }}">
+                        <div class="model-header">
+                            <h4><i class="{{ model.icon }}"></i> {{ model.model }}</h4>
+                            <span class="model-confidence">{{ model.confidence|floatformat:1 }}%</span>
+                        </div>
+                        <div class="model-prediction">
+                            <strong>Prediction:</strong> <span class="threat-status {{ model.result|lower }}">{{ model.result }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Recommendations -->
+            <div class="recommendations card">
+                <div class="card-header">
+                    <h3><i class="fas fa-shield-alt"></i> Security Recommendation</h3>
+                </div>
+                <div class="recommendation-content">
+                    {% if result.is_malicious %}
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>
+                            <strong>⚠️ Security Warning</strong>
+                            <p>{{ result.recommendation }}</p>
+                            <ul style="margin-top: 10px;">
+                                <li>Do not visit this URL</li>
+                                <li>Block this domain in your firewall</li>
+                                <li>Report to security team if received via email</li>
+                                <li>Consider running antivirus scan if already visited</li>
+                            </ul>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>✅ Safe to Proceed</strong>
+                            <p>{{ result.recommendation }}</p>
+                            <ul style="margin-top: 10px;">
+                                <li>URL appears to be legitimate</li>
+                                <li>No malicious patterns detected</li>
+                                <li>Safe to visit with standard precautions</li>
+                                <li>Always verify SSL certificates</li>
+                            </ul>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="results-section" id="resultsSection" style="display: none;">
+            <!-- Results will be shown here after analysis -->
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+    <div class="container">
+        <h2 class="section-title">Advanced Threat Detection</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3>AI-Powered Analysis</h3>
+                <p>Three machine learning models work together to detect threats with 91% accuracy</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-skull-crossbones"></i>
+                </div>
+                <h3>Multiple Threat Types</h3>
+                <p>Detects phishing, malware, defacement, and other malicious website categories</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-tachometer-alt"></i>
+                </div>
+                <h3>Real-Time Scanning</h3>
+                <p>Instant URL analysis with processing times under 1 second for immediate results</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/email-validation.js' %}"></script>
+<script>
+// Adapt the email validation UI for URL analysis
+document.addEventListener('DOMContentLoaded', function() {
+    // Replace email-specific elements with URL-specific ones
+    const emailInput = document.getElementById('urlInput');
+    const clearInput = document.getElementById('clearInput');
+    const helperText = document.getElementById('helperText');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const analysisForm = document.getElementById('urlAnalysisForm');
+    
+    if (emailInput && helperText) {
+        emailInput.addEventListener('input', function(e) {
+            const url = e.target.value.trim();
+            const inputContainer = emailInput.parentElement;
+            
+            if (!url) {
+                inputContainer.classList.remove('valid', 'invalid', 'active');
+                helperText.textContent = 'Enter a URL to perform comprehensive threat analysis';
+                helperText.className = 'helper-text';
+                if (clearInput) clearInput.style.opacity = '0';
+            } else {
+                inputContainer.classList.add('active');
+                helperText.textContent = 'Ready for analysis';
+                helperText.className = 'helper-text success';
+                if (clearInput) clearInput.style.opacity = '1';
+            }
+        });
+    }
+    
+    if (clearInput) {
+        clearInput.addEventListener('click', function() {
+            emailInput.value = '';
+            emailInput.focus();
+            
+            const inputContainer = emailInput.parentElement;
+            inputContainer.classList.remove('valid', 'invalid', 'active');
+            helperText.textContent = 'Enter a URL to perform comprehensive threat analysis';
+            helperText.className = 'helper-text';
+            clearInput.style.opacity = '0';
+        });
+    }
+    
+    if (analysisForm) {
+        analysisForm.addEventListener('submit', function(e) {
+            // Show loading animation
+            if (analyzeBtn) {
+                const btnText = analyzeBtn.querySelector('.btn-text');
+                const btnSpinner = analyzeBtn.querySelector('.btn-spinner');
+                
+                if (btnText && btnSpinner) {
+                    btnText.style.display = 'none';
+                    btnSpinner.style.display = 'flex';
+                    analyzeBtn.disabled = true;
+                }
+            }
+        });
+    }
+    
+    // Check if results are present and scroll to URL Security Scanner
+    const hasResults = document.querySelector('.alert') || document.querySelector('.results-section[style*="block"]');
+    
+    if (hasResults) {
+        setTimeout(() => {
+            const urlScanner = document.getElementById('urlSecurityScanner');
+            if (urlScanner) {
+                urlScanner.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
+        }, 300);
+    }
+});
+</script>
+{% endblock %}

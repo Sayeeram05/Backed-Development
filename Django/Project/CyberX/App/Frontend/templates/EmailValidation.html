@@ -1,0 +1,396 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Email Validation - CyberX{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/email-validation.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section id="email-validation" class="hero-section">
+    <div class="container">
+        <h1 class="glitch" data-text="EMAIL VALIDATION">EMAIL VALIDATION</h1>
+        <p class="hero-subtitle">Smart Email Verification & Quality Control</p>
+        <p class="hero-description">
+            Quickly verify whether an email address is valid, safe, and able to receive messages. 
+            Prevent fake or incorrect email entries, reduce communication failures, and improve data quality 
+            with our simple, user-friendly interface that delivers clear and reliable validation results.
+        </p>
+        <div class="hero-stats">
+            <div class="stat">
+                <div class="stat-number">99.9%</div>
+                <div class="stat-label">Data Quality</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">Instant</div>
+                <div class="stat-label">Verification</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">Trusted</div>
+                <div class="stat-label">Results</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Email Validation Tool Section -->
+<section class="validation-section">
+    <div class="container">
+        <h2 class="section-title">Email Security Validator</h2>
+        
+        <!-- Display results if available -->
+        {% if result %}
+        <div class="alert alert-{{ result.status_color|default:'info' }}" style="margin-bottom: 20px; padding: 15px; border-radius: 8px; border-left: 4px solid;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="{{ result.status_icon }}"></i>
+                <div>
+                    <strong>{{ result.title }}</strong>
+                    <p style="margin: 5px 0 0 0; font-size: 14px;">{{ result.explanation }}</p>
+                    {% if result.processing_time_ms %}<small style="color: #666;">Processing time: {{ result.processing_time_ms }}ms</small>{% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Email Input Card -->
+        <form method="post" action="{% url 'emailvalidation:validate_api' %}" id="emailValidationForm" class="validation-form">
+            {% csrf_token %}
+            <div class="validation-card card" id="emailSecurityValidator">
+                <div class="input-section">
+                    <div class="input-container">
+                        <div class="input-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <input type="email" name="email" id="emailInput" class="email-input" 
+                               placeholder="Enter email address (example@domain.com)" 
+                               autocomplete="email" spellcheck="false" required>
+                        <button type="button" class="clear-input" id="clearInput">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="helper-text" id="helperText">
+                        Enter an email address to perform comprehensive validation
+                    </div>
+                </div>
+                
+                <!-- Action Button -->
+                <div class="action-section">
+                    <button type="submit" class="btn validate-btn" id="validateBtn">
+                        <span class="btn-text">
+                            <i class="fas fa-shield-alt"></i>
+                            Validate Email
+                        </span>
+                        <div class="btn-spinner" style="display: none;">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            Analyzing...
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Validation Status -->
+        <div class="status-section" id="statusSection" style="display: none;">
+            <div class="status-card card">
+                <div class="loading-indicator">
+                    <div class="pulse-ring"></div>
+                    <div class="pulse-ring delay-1"></div>
+                    <div class="pulse-ring delay-2"></div>
+                </div>
+                <div class="status-messages" id="statusMessages">
+                    <p class="status-message">Initializing security scan...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        {% if result %}
+        <div class="results-section" id="resultsSection" style="display: block;">
+            <!-- Result Summary -->
+            <div class="result-summary card" id="resultSummary">
+                <div class="result-header">
+                    <div class="result-icon" id="resultIcon">
+                        <i class="{{ result.status_icon }}"></i>
+                    </div>
+                    <div class="result-content">
+                        <h3 class="result-title" id="resultTitle">{{ result.title }}</h3>
+                        <p class="result-explanation" id="resultExplanation">
+                            {{ result.explanation }}
+                        </p>
+                        {% if result.normalized_email and result.normalized_email != result.email %}
+                        <p style="margin-top: 10px; color: #666; font-size: 14px;">
+                            <strong>Normalized:</strong> {{ result.normalized_email }}
+                        </p>
+                        {% endif %}
+                        {% if result.domain %}
+                        <p style="margin-top: 5px; color: #666; font-size: 14px;">
+                            <strong>Domain:</strong> {{ result.domain }}
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Confidence Meter -->
+                <div class="confidence-meter">
+                    <div class="confidence-label">
+                        <span>Confidence Level</span>
+                        <span class="confidence-value" id="confidenceValue">{{ result.confidence }}%</span>
+                    </div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" id="confidenceFill" style="width: {{ result.confidence|default:0 }}%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Security Checks -->
+            <div class="security-checks card" id="securityChecks">
+                <h4 class="checks-title">
+                    <i class="fas fa-list-check"></i>
+                    Security Analysis Results
+                </h4>
+                <div class="checks-grid">
+                    <div class="check-item">
+                        <div class="check-label">
+                            <i class="{{ result.checks.format.icon }}"></i>
+                            Format Validation
+                        </div>
+                        <div class="check-result" id="formatCheck">
+                            <span class="badge {{ result.checks.format.status }}">{{ result.checks.format.text }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="check-item">
+                        <div class="check-label">
+                            <i class="{{ result.checks.domain.icon }}"></i>
+                            Domain Status
+                        </div>
+                        <div class="check-result" id="domainCheck">
+                            <span class="badge {{ result.checks.domain.status }}">{{ result.checks.domain.text }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="check-item">
+                        <div class="check-label">
+                            <i class="{{ result.checks.mail_server.icon }}"></i>
+                            Mail Server
+                        </div>
+                        <div class="check-result" id="mailServerCheck">
+                            <span class="badge {{ result.checks.mail_server.status }}">{{ result.checks.mail_server.text }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="check-item">
+                        <div class="check-label">
+                            <i class="{{ result.checks.deliverability.icon }}"></i>
+                            Deliverability
+                        </div>
+                        <div class="check-result" id="deliverabilityCheck">
+                            <span class="badge {{ result.checks.deliverability.status }}">{{ result.checks.deliverability.text }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="check-item">
+                        <div class="check-label">
+                            <i class="{{ result.checks.disposable.icon }}"></i>
+                            Disposable Check
+                        </div>
+                        <div class="check-result" id="disposableCheck">
+                            <span class="badge {{ result.checks.disposable.status }}">{{ result.checks.disposable.text }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="check-item">
+                        <div class="check-label">
+                            <i class="{{ result.checks.risk.icon }}"></i>
+                            Risk Assessment
+                        </div>
+                        <div class="check-result" id="riskCheck">
+                            <span class="badge {{ result.checks.risk.status }}">{{ result.checks.risk.text }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Detailed Validation Steps -->
+                {% if result.validation_steps %}
+                <div class="validation-details" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
+                    <h5 style="margin-bottom: 15px; color: #333;">
+                        <i class="fas fa-microscope"></i>
+                        Detailed Analysis Results
+                    </h5>
+                    
+                    <div class="detail-grid">
+                        <!-- Regex Check Details -->
+                        <div class="detail-item">
+                            <h6><i class="fas fa-code"></i> Regex Validation</h6>
+                            <p><strong>Status:</strong> {{ result.validation_steps.regex_check.status|capfirst }}</p>
+                            <p><strong>Message:</strong> {{ result.validation_steps.regex_check.message }}</p>
+                            <small>{{ result.validation_steps.regex_check.technical_info }}</small>
+                        </div>
+                        
+                        <!-- Library Check Details -->
+                        <div class="detail-item">
+                            <h6><i class="fas fa-book"></i> Library Validation</h6>
+                            <p><strong>Status:</strong> {{ result.validation_steps.library_check.status|capfirst }}</p>
+                            <p><strong>Message:</strong> {{ result.validation_steps.library_check.message }}</p>
+                            {% if result.validation_steps.library_check.local_part %}
+                            <p><strong>Local Part:</strong> {{ result.validation_steps.library_check.local_part }}</p>
+                            {% endif %}
+                            <small>{{ result.validation_steps.library_check.technical_info }}</small>
+                        </div>
+                        
+                        <!-- Domain Existence Check Details -->
+                        <div class="detail-item">
+                            <h6><i class="fas fa-globe"></i> Domain Verification</h6>
+                            <p><strong>Status:</strong> {{ result.validation_steps.domain_check.status|capfirst }}</p>
+                            <p><strong>Message:</strong> {{ result.validation_steps.domain_check.message }}</p>
+                            {% if result.validation_steps.domain_check.a_records %}
+                            <div class="a-records">
+                                <strong>IP Addresses:</strong>
+                                <ul style="margin: 5px 0 0 20px; font-size: 12px;">
+                                    {% for ip in result.validation_steps.domain_check.a_records %}
+                                    <li>{{ ip }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                            <small>{{ result.validation_steps.domain_check.technical_info }}</small>
+                        </div>
+                        
+                        <!-- MX Check Details -->
+                        <div class="detail-item">
+                            <h6><i class="fas fa-envelope-open"></i> Mail Server Check</h6>
+                            <p><strong>Status:</strong> {{ result.validation_steps.mx_check.status|capfirst }}</p>
+                            <p><strong>Message:</strong> {{ result.validation_steps.mx_check.message }}</p>
+                            {% if result.validation_steps.mx_check.mx_records %}
+                            <div class="mx-records">
+                                <strong>Mail Servers:</strong>
+                                <ul style="margin: 5px 0 0 20px; font-size: 12px;">
+                                    {% for mx in result.validation_steps.mx_check.mx_records %}
+                                    <li>{{ mx.exchange }} (Priority: {{ mx.preference }} - {{ mx.priority }})</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                            <small>{{ result.validation_steps.mx_check.technical_info }}</small>
+                        </div>
+                        
+                        <!-- Disposable Check Details -->
+                        <div class="detail-item">
+                            <h6><i class="fas fa-shield-alt"></i> Security Check</h6>
+                            <p><strong>Status:</strong> {{ result.validation_steps.disposable_check.status|capfirst }}</p>
+                            <p><strong>Message:</strong> {{ result.validation_steps.disposable_check.message }}</p>
+                            <small>{{ result.validation_steps.disposable_check.technical_info }}</small>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Safety Score -->
+            <div class="safety-score card" id="safetyScore">
+                <div class="score-header">
+                    <h4>
+                        <i class="fas fa-shield-check"></i>
+                        Safety Score
+                    </h4>
+                    <div class="score-value" id="safetyValue">
+                        <span class="score-number">{{ result.safety_score }}</span>
+                        <span class="score-max">/100</span>
+                    </div>
+                </div>
+                <div class="score-bar">
+                    <div class="score-fill" id="scoreFill" style="width: {{ result.safety_score }}%;"></div>
+                </div>
+                <p class="score-description" id="scoreDescription">
+                    {{ result.recommendation }}
+                </p>
+                
+                {% if result.risk_factors %}
+                <div class="risk-factors" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
+                    <h6 style="margin-bottom: 10px; color: #d63384;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Identified Risk Factors:
+                    </h6>
+                    <ul style="margin: 0; padding-left: 20px; color: #666; font-size: 14px;">
+                        {% for factor in result.risk_factors %}
+                        <li>{{ factor }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+            </div>
+        </div>
+        {% else %}
+        <div class="results-section" id="resultsSection" style="display: none;">
+            <!-- Results will be shown here after validation -->
+        </div>
+        {% endif %}
+
+        <!-- Recent Validations -->
+        <div class="recent-validations" id="recentValidations" style="display: none;">
+            <div class="card">
+                <div class="recent-header">
+                    <h4>
+                        <i class="fas fa-history"></i>
+                        Recent Validations
+                    </h4>
+                    <button type="button" class="btn btn-small" id="clearHistoryBtn">
+                        <i class="fas fa-trash-alt"></i>
+                        Clear History
+                    </button>
+                </div>
+                <div class="recent-list" id="recentList">
+                    <!-- Recent validation items will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+    <div class="container">
+        <h2 class="section-title">Validation Features</h2>
+        <div class="features-grid">
+            <div class="feature-card card">
+                <div class="feature-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3>Format Analysis</h3>
+                <p>Advanced regex and RFC-compliant email format validation with internationalization support.</p>
+            </div>
+            
+            <div class="feature-card card">
+                <div class="feature-icon">
+                    <i class="fas fa-dns"></i>
+                </div>
+                <h3>DNS Verification</h3>
+                <p>Real-time MX record lookup and domain validation to ensure email deliverability.</p>
+            </div>
+            
+            <div class="feature-card card">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-virus"></i>
+                </div>
+                <h3>Threat Detection</h3>
+                <p>Identifies disposable emails, suspicious patterns, and potential security threats.</p>
+            </div>
+            
+            <div class="feature-card card">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>Risk Scoring</h3>
+                <p>Comprehensive risk assessment with confidence levels and safety recommendations.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/email-validation.js' %}"></script>
+{% endblock %}
