@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'Home',
     'EmailValidation',
     'UrlThreadDetection',
+    "PhisingDetection",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
