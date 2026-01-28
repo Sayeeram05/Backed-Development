@@ -891,10 +891,9 @@
             <div class="detail-label">Protocol</div>
             <div class="detail-value">
               {% if result.features.uses_https %}
-              <i class="fas fa-lock check"></i> {{ result.scheme }}
-              {% else %}
-              <i class="fas fa-unlock cross"></i> {{ result.scheme }}
-              {% endif %}
+              <i class="fas fa-lock check"></i> {{ result.scheme }} {% else %}
+              <i class="fas fa-unlock cross"></i> {{ result.scheme }} {% endif
+              %}
             </div>
           </div>
           <div class="detail-item">
@@ -911,20 +910,16 @@
             <div class="detail-label">Uses IP Address</div>
             <div class="detail-value">
               {% if result.features.uses_ip %}
-              <i class="fas fa-times-circle cross"></i> Yes
-              {% else %}
-              <i class="fas fa-check-circle check"></i> No
-              {% endif %}
+              <i class="fas fa-times-circle cross"></i> Yes {% else %}
+              <i class="fas fa-check-circle check"></i> No {% endif %}
             </div>
           </div>
           <div class="detail-item">
             <div class="detail-label">Shortening Service</div>
             <div class="detail-value">
               {% if result.features.is_shortening_service %}
-              <i class="fas fa-exclamation-triangle warn"></i> Yes
-              {% else %}
-              <i class="fas fa-check-circle check"></i> No
-              {% endif %}
+              <i class="fas fa-exclamation-triangle warn"></i> Yes {% else %}
+              <i class="fas fa-check-circle check"></i> No {% endif %}
             </div>
           </div>
         </div>

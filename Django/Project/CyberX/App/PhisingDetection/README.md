@@ -9,11 +9,13 @@ CyberX Phishing Detection is an advanced real-time URL analysis system powered b
 ## 🎯 Problem Statement
 
 Phishing attacks remain one of the most prevalent cyber threats:
+
 - **91%** of cyber attacks start with phishing
 - **$17,700** average cost per minute of phishing attack
 - **Billions** of phishing emails sent daily worldwide
 
 Our solution provides:
+
 1. **Deep Learning Model**: PyTorch neural network trained on real data
 2. **87 Features**: Comprehensive URL and content analysis
 3. **Real-time Detection**: Instant threat assessment
@@ -40,82 +42,86 @@ Our solution provides:
 ### Feature Engineering (87 Features)
 
 #### 1. URL-Based Features (12)
+
 Features extracted directly from the URL string:
 
-| Feature | Description | Phishing Indicator |
-|---------|-------------|-------------------|
-| `length_url` | Total URL length | Very long URLs (>75 chars) |
-| `length_hostname` | Hostname length | Long hostnames suspicious |
-| `ip` | Uses IP address | Direct IP = high risk |
-| `nb_dots` | Count of dots | Many dots = suspicious |
-| `nb_hyphens` | Count of hyphens | Multiple hyphens suspicious |
-| `nb_at` | Count of @ symbols | @ in URL = credential theft |
-| `nb_qm` | Question marks | Complex queries suspicious |
-| `nb_and` | Count of & | Many parameters = suspicious |
-| `nb_eq` | Count of = | Multiple assignments suspicious |
-| `nb_underscore` | Underscores | Common in phishing domains |
-| `nb_tilde` | Tilde characters | Often in hidden pages |
-| `nb_percent` | Percent signs | URL encoding = obfuscation |
+| Feature           | Description        | Phishing Indicator              |
+| ----------------- | ------------------ | ------------------------------- |
+| `length_url`      | Total URL length   | Very long URLs (>75 chars)      |
+| `length_hostname` | Hostname length    | Long hostnames suspicious       |
+| `ip`              | Uses IP address    | Direct IP = high risk           |
+| `nb_dots`         | Count of dots      | Many dots = suspicious          |
+| `nb_hyphens`      | Count of hyphens   | Multiple hyphens suspicious     |
+| `nb_at`           | Count of @ symbols | @ in URL = credential theft     |
+| `nb_qm`           | Question marks     | Complex queries suspicious      |
+| `nb_and`          | Count of &         | Many parameters = suspicious    |
+| `nb_eq`           | Count of =         | Multiple assignments suspicious |
+| `nb_underscore`   | Underscores        | Common in phishing domains      |
+| `nb_tilde`        | Tilde characters   | Often in hidden pages           |
+| `nb_percent`      | Percent signs      | URL encoding = obfuscation      |
 
 #### 2. Domain-Based Features (15)
+
 Domain intelligence and structure analysis:
 
-| Feature | Description | Phishing Indicator |
-|---------|-------------|-------------------|
-| `nb_subdomains` | Subdomain count | Many subdomains suspicious |
-| `prefix_suffix` | Has dash separator | paypal-secure suspicious |
-| `random_domain` | Random-looking domain | Random chars = generated |
-| `shortening_service` | URL shortener | Hides true destination |
-| `punycode` | Internationalized domain | Homograph attacks |
-| `domain_in_brand` | Brand in domain | Brand impersonation |
-| `brand_in_subdomain` | Brand in subdomain | Credential theft attempt |
-| `brand_in_path` | Brand in path | URL impersonation |
-| `suspecious_tld` | Suspicious TLD | .tk, .ml, .ga are risky |
-| `statistical_report` | In known reports | Previously reported |
-| `nb_www` | Multiple www | www-secure-www suspicious |
-| `ratio_digits_url` | Digit ratio | Many numbers suspicious |
-| `ratio_digits_host` | Digits in host | 123abc.com suspicious |
-| `tld_in_path` | TLD in path | .com in path suspicious |
-| `tld_in_subdomain` | TLD in subdomain | com.example.com suspicious |
+| Feature              | Description              | Phishing Indicator         |
+| -------------------- | ------------------------ | -------------------------- |
+| `nb_subdomains`      | Subdomain count          | Many subdomains suspicious |
+| `prefix_suffix`      | Has dash separator       | paypal-secure suspicious   |
+| `random_domain`      | Random-looking domain    | Random chars = generated   |
+| `shortening_service` | URL shortener            | Hides true destination     |
+| `punycode`           | Internationalized domain | Homograph attacks          |
+| `domain_in_brand`    | Brand in domain          | Brand impersonation        |
+| `brand_in_subdomain` | Brand in subdomain       | Credential theft attempt   |
+| `brand_in_path`      | Brand in path            | URL impersonation          |
+| `suspecious_tld`     | Suspicious TLD           | .tk, .ml, .ga are risky    |
+| `statistical_report` | In known reports         | Previously reported        |
+| `nb_www`             | Multiple www             | www-secure-www suspicious  |
+| `ratio_digits_url`   | Digit ratio              | Many numbers suspicious    |
+| `ratio_digits_host`  | Digits in host           | 123abc.com suspicious      |
+| `tld_in_path`        | TLD in path              | .com in path suspicious    |
+| `tld_in_subdomain`   | TLD in subdomain         | com.example.com suspicious |
 
 #### 3. HTML Content Features (17)
+
 Website content analysis (when page is fetched):
 
-| Feature | Description | Phishing Indicator |
-|---------|-------------|-------------------|
-| `nb_hyperlinks` | Link count | Few links suspicious |
-| `ratio_intHyperlinks` | Internal link ratio | Low ratio suspicious |
-| `ratio_extHyperlinks` | External link ratio | High external suspicious |
-| `nb_extCSS` | External CSS count | Loading from elsewhere |
-| `ratio_intRedirection` | Internal redirects | Legitimate use redirects |
-| `ratio_extRedirection` | External redirects | Redirect to evil site |
-| `ratio_intErrors` | Internal errors | Broken links indicate fake |
-| `ratio_extErrors` | External errors | External broken links |
-| `login_form` | Has login form | Primary phishing target |
-| `external_favicon` | External favicon | Impersonating another site |
-| `links_in_tags` | Links in meta/script | Hidden redirects |
-| `submit_email` | Form to email | Direct data exfiltration |
-| `ratio_intMedia` | Internal media | Real sites host media |
-| `ratio_extMedia` | External media | Phishers hotlink media |
-| `sfh` | Server Form Handler | Where form data goes |
-| `iframe` | Uses iframes | Can load malicious content |
-| `popup_window` | Creates popups | Aggressive behavior |
+| Feature                | Description          | Phishing Indicator         |
+| ---------------------- | -------------------- | -------------------------- |
+| `nb_hyperlinks`        | Link count           | Few links suspicious       |
+| `ratio_intHyperlinks`  | Internal link ratio  | Low ratio suspicious       |
+| `ratio_extHyperlinks`  | External link ratio  | High external suspicious   |
+| `nb_extCSS`            | External CSS count   | Loading from elsewhere     |
+| `ratio_intRedirection` | Internal redirects   | Legitimate use redirects   |
+| `ratio_extRedirection` | External redirects   | Redirect to evil site      |
+| `ratio_intErrors`      | Internal errors      | Broken links indicate fake |
+| `ratio_extErrors`      | External errors      | External broken links      |
+| `login_form`           | Has login form       | Primary phishing target    |
+| `external_favicon`     | External favicon     | Impersonating another site |
+| `links_in_tags`        | Links in meta/script | Hidden redirects           |
+| `submit_email`         | Form to email        | Direct data exfiltration   |
+| `ratio_intMedia`       | Internal media       | Real sites host media      |
+| `ratio_extMedia`       | External media       | Phishers hotlink media     |
+| `sfh`                  | Server Form Handler  | Where form data goes       |
+| `iframe`               | Uses iframes         | Can load malicious content |
+| `popup_window`         | Creates popups       | Aggressive behavior        |
 
 #### 4. Security & External Features (43)
+
 WHOIS, DNS, and external service features:
 
-| Feature | Description | Phishing Indicator |
-|---------|-------------|-------------------|
-| `https_token` | Uses HTTPS | No HTTPS = risky |
-| `phish_hints` | Phishing keywords | Contains "secure", "verify" |
-| `domain_in_title` | Domain matches title | Mismatch suspicious |
-| `domain_with_copyright` | Has copyright | Legitimate indicator |
-| `whois_registered_domain` | WHOIS registered | Unregistered suspicious |
-| `domain_registration_length` | Registration period | Short = suspicious |
-| `domain_age` | Age in days | <30 days very suspicious |
-| `web_traffic` | Traffic rank | No traffic suspicious |
-| `dns_record` | Has DNS records | No records = fake |
-| `google_index` | In Google index | Not indexed suspicious |
+| Feature                      | Description          | Phishing Indicator          |
+| ---------------------------- | -------------------- | --------------------------- |
+| `https_token`                | Uses HTTPS           | No HTTPS = risky            |
+| `phish_hints`                | Phishing keywords    | Contains "secure", "verify" |
+| `domain_in_title`            | Domain matches title | Mismatch suspicious         |
+| `domain_with_copyright`      | Has copyright        | Legitimate indicator        |
+| `whois_registered_domain`    | WHOIS registered     | Unregistered suspicious     |
+| `domain_registration_length` | Registration period  | Short = suspicious          |
+| `domain_age`                 | Age in days          | <30 days very suspicious    |
+| `web_traffic`                | Traffic rank         | No traffic suspicious       |
+| `dns_record`                 | Has DNS records      | No records = fake           |
+| `google_index`               | In Google index      | Not indexed suspicious      |
 
 ### Neural Network Architecture
 
@@ -167,7 +173,7 @@ class PhishingModel(nn.Module):
         self.layer_1 = nn.Linear(n_input_dim, 300)
         self.layer_2 = nn.Linear(300, 100)
         self.layer_out = nn.Linear(100, 1)
-        
+
         self.relu = nn.ReLU()
         self.sigmoid = nn.Sigmoid()
         self.dropout = nn.Dropout(p=0.1)
@@ -191,13 +197,13 @@ joblib.dump(scaler, 'phishing_scaler.joblib')
 
 ### Model Performance
 
-| Metric | Value |
-|--------|-------|
-| **Accuracy** | ~95% |
-| **Precision** | ~94% |
-| **Recall** | ~96% |
-| **F1-Score** | ~95% |
-| **Training Time** | ~5 minutes |
+| Metric             | Value         |
+| ------------------ | ------------- |
+| **Accuracy**       | ~95%          |
+| **Precision**      | ~94%          |
+| **Recall**         | ~96%          |
+| **F1-Score**       | ~95%          |
+| **Training Time**  | ~5 minutes    |
 | **Inference Time** | <10ms per URL |
 
 ---
@@ -314,31 +320,33 @@ Services/Phishing-detection/
 **Method**: POST
 
 **Request**:
+
 ```json
 {
-    "url": "https://example.com"
+  "url": "https://example.com"
 }
 ```
 
 **Response**:
+
 ```json
 {
-    "success": true,
-    "url": "https://example.com",
-    "domain": "example.com",
-    "is_phishing": false,
-    "is_trusted": false,
-    "confidence": 89.5,
-    "risk_score": 10,
-    "risk_factors": [],
-    "security_indicators": [
-        "HTTPS encryption enabled",
-        "Valid DNS record found",
-        "Domain is registered",
-        "Established domain (9125 days old)"
-    ],
-    "processing_time_ms": 245.67,
-    "model_used": true
+  "success": true,
+  "url": "https://example.com",
+  "domain": "example.com",
+  "is_phishing": false,
+  "is_trusted": false,
+  "confidence": 89.5,
+  "risk_score": 10,
+  "risk_factors": [],
+  "security_indicators": [
+    "HTTPS encryption enabled",
+    "Valid DNS record found",
+    "Domain is registered",
+    "Established domain (9125 days old)"
+  ],
+  "processing_time_ms": 245.67,
+  "model_used": true
 }
 ```
 
@@ -347,6 +355,7 @@ Services/Phishing-detection/
 ## 📊 Detection Examples
 
 ### Safe URL (Trusted Domain)
+
 ```
 URL: https://commons.wikimedia.org/wiki/Main_Page
 ├── Status: ✅ URL APPEARS SAFE
@@ -362,6 +371,7 @@ URL: https://commons.wikimedia.org/wiki/Main_Page
 ```
 
 ### Phishing URL
+
 ```
 URL: http://secure-paypa1-login.xyz/verify
 ├── Status: 🔴 HIGH RISK - LIKELY PHISHING
@@ -377,6 +387,7 @@ URL: http://secure-paypa1-login.xyz/verify
 ```
 
 ### Suspicious URL
+
 ```
 URL: http://192.168.1.1/admin/login.php
 ├── Status: ⚠️ POTENTIAL RISK DETECTED
@@ -403,28 +414,30 @@ TRUSTED_DOMAINS = {
     # Tech Giants
     'google.com', 'microsoft.com', 'apple.com', 'amazon.com',
     'facebook.com', 'twitter.com', 'linkedin.com', 'github.com',
-    
+
     # Wikimedia Foundation
     'wikipedia.org', 'wikimedia.org', 'wiktionary.org',
     'wikibooks.org', 'wikisource.org', 'mediawiki.org',
-    
+
     # Government/Education (TLD-based)
     'gov', 'edu', 'mil',
-    
+
     # Major Services
     'youtube.com', 'netflix.com', 'spotify.com', 'reddit.com',
     'dropbox.com', 'slack.com', 'zoom.us', 'adobe.com',
-    
+
     # Cloud Providers
     'aws.amazon.com', 'azure.microsoft.com', 'cloud.google.com',
-    
+
     # News & Media
     'bbc.com', 'cnn.com', 'nytimes.com', 'reuters.com',
 }
 ```
 
 ### Subdomain Recognition
+
 The system also recognizes subdomains of trusted domains:
+
 - `mail.google.com` → Trusted (subdomain of google.com)
 - `docs.microsoft.com` → Trusted (subdomain of microsoft.com)
 - `en.wikipedia.org` → Trusted (subdomain of wikipedia.org)
@@ -470,6 +483,7 @@ urlpatterns = [
 ## 🧪 Testing
 
 ### Test Legitimate URLs
+
 ```python
 legitimate_urls = [
     "https://www.google.com",
@@ -481,6 +495,7 @@ legitimate_urls = [
 ```
 
 ### Test Phishing URLs
+
 ```python
 phishing_urls = [
     "http://secure-paypa1.xyz/login",

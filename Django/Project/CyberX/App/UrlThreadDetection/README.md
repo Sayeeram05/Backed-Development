@@ -9,12 +9,14 @@ The CyberX URL Threat Detection module is an AI-powered malicious URL detection 
 ## 🎯 Problem Statement
 
 Malicious URLs are a primary vector for cyber attacks:
+
 - **Phishing**: Fake websites stealing credentials
 - **Malware**: Sites distributing viruses and trojans
 - **Defacement**: Compromised websites
 - **Scams**: Fraudulent sites targeting users
 
 Our solution provides:
+
 1. **Real-time Analysis**: Instant URL threat assessment
 2. **Machine Learning**: Ensemble of 3 trained models
 3. **35+ Features**: Comprehensive URL analysis
@@ -50,46 +52,50 @@ Our solution provides:
 ### Feature Engineering (35+ Features)
 
 #### URL Structure Features
-| Feature | Description | Type |
-|---------|-------------|------|
-| `url_length` | Total URL character count | Numeric |
-| `domain_length` | Domain name length | Numeric |
-| `path_length` | URL path length | Numeric |
-| `path_depth` | Number of path segments | Numeric |
-| `query_length` | Query string length | Numeric |
-| `fragment_length` | Fragment length | Numeric |
-| `num_subdomains` | Count of subdomains | Numeric |
+
+| Feature           | Description               | Type    |
+| ----------------- | ------------------------- | ------- |
+| `url_length`      | Total URL character count | Numeric |
+| `domain_length`   | Domain name length        | Numeric |
+| `path_length`     | URL path length           | Numeric |
+| `path_depth`      | Number of path segments   | Numeric |
+| `query_length`    | Query string length       | Numeric |
+| `fragment_length` | Fragment length           | Numeric |
+| `num_subdomains`  | Count of subdomains       | Numeric |
 
 #### Character Analysis
-| Feature | Description | Type |
-|---------|-------------|------|
-| `num_dots` | Count of dots in URL | Numeric |
-| `num_hyphens` | Count of hyphens | Numeric |
-| `num_underscores` | Count of underscores | Numeric |
-| `num_slashes` | Count of forward slashes | Numeric |
-| `num_special_chars` | Special character count | Numeric |
-| `num_digits` | Count of numeric characters | Numeric |
-| `digit_ratio` | Ratio of digits to total length | Numeric |
-| `letter_ratio` | Ratio of letters to total length | Numeric |
+
+| Feature             | Description                      | Type    |
+| ------------------- | -------------------------------- | ------- |
+| `num_dots`          | Count of dots in URL             | Numeric |
+| `num_hyphens`       | Count of hyphens                 | Numeric |
+| `num_underscores`   | Count of underscores             | Numeric |
+| `num_slashes`       | Count of forward slashes         | Numeric |
+| `num_special_chars` | Special character count          | Numeric |
+| `num_digits`        | Count of numeric characters      | Numeric |
+| `digit_ratio`       | Ratio of digits to total length  | Numeric |
+| `letter_ratio`      | Ratio of letters to total length | Numeric |
 
 #### Domain Intelligence
-| Feature | Description | Type |
-|---------|-------------|------|
-| `has_ip_address` | URL contains IP instead of domain | Binary |
-| `is_https` | Uses HTTPS protocol | Binary |
-| `suspicious_tld` | Has high-risk TLD | Binary |
-| `is_url_shortener` | Known URL shortener | Binary |
-| `domain_entropy` | Randomness of domain name | Numeric |
-| `has_port` | Non-standard port specified | Binary |
+
+| Feature            | Description                       | Type    |
+| ------------------ | --------------------------------- | ------- |
+| `has_ip_address`   | URL contains IP instead of domain | Binary  |
+| `is_https`         | Uses HTTPS protocol               | Binary  |
+| `suspicious_tld`   | Has high-risk TLD                 | Binary  |
+| `is_url_shortener` | Known URL shortener               | Binary  |
+| `domain_entropy`   | Randomness of domain name         | Numeric |
+| `has_port`         | Non-standard port specified       | Binary  |
 
 #### Content Indicators
-| Feature | Description | Type |
-|---------|-------------|------|
-| `has_login_keyword` | Contains login/signin/account | Binary |
-| `has_secure_keyword` | Contains secure/verify/update | Binary |
-| `has_brand_keyword` | Contains known brand names | Binary |
-| `suspicious_word_count` | Count of phishing keywords | Numeric |
-| `has_obfuscation` | URL encoding/obfuscation | Binary |
+
+| Feature                 | Description                   | Type    |
+| ----------------------- | ----------------------------- | ------- |
+| `has_login_keyword`     | Contains login/signin/account | Binary  |
+| `has_secure_keyword`    | Contains secure/verify/update | Binary  |
+| `has_brand_keyword`     | Contains known brand names    | Binary  |
+| `suspicious_word_count` | Count of phishing keywords    | Numeric |
+| `has_obfuscation`       | URL encoding/obfuscation      | Binary  |
 
 ### Model Architecture
 
@@ -165,12 +171,12 @@ for name, model in models.items():
 
 ### Model Performance
 
-| Model | Accuracy | Precision | Recall | F1-Score |
-|-------|----------|-----------|--------|----------|
-| Decision Tree | 93.2% | 92.8% | 93.5% | 93.1% |
-| Random Forest | 96.1% | 95.9% | 96.3% | 96.1% |
-| Extra Trees | 95.8% | 95.5% | 96.0% | 95.7% |
-| **Ensemble** | **96.5%** | **96.2%** | **96.8%** | **96.5%** |
+| Model         | Accuracy  | Precision | Recall    | F1-Score  |
+| ------------- | --------- | --------- | --------- | --------- |
+| Decision Tree | 93.2%     | 92.8%     | 93.5%     | 93.1%     |
+| Random Forest | 96.1%     | 95.9%     | 96.3%     | 96.1%     |
+| Extra Trees   | 95.8%     | 95.5%     | 96.0%     | 95.7%     |
+| **Ensemble**  | **96.5%** | **96.2%** | **96.8%** | **96.5%** |
 
 ---
 
@@ -273,52 +279,53 @@ Services/URL threat scanning/
 **Method**: POST
 
 **Request**:
+
 ```json
 {
-    "url": "https://example.com/login"
+  "url": "https://example.com/login"
 }
 ```
 
 **Response**:
+
 ```json
 {
-    "success": true,
-    "url": "https://example.com/login",
-    "domain": "example.com",
-    "is_malicious": false,
-    "threat_level": "safe",
-    "threat_score": 12,
-    "confidence": 94.5,
-    "threat_type": "benign",
-    "threat_indicators": [],
-    "model_predictions": {
-        "decision_tree": "benign",
-        "random_forest": "benign",
-        "extra_trees": "benign"
-    },
-    "features_analyzed": 35,
-    "processing_time_ms": 45.2,
-    "recommendations": [
-        "URL appears safe for browsing"
-    ]
+  "success": true,
+  "url": "https://example.com/login",
+  "domain": "example.com",
+  "is_malicious": false,
+  "threat_level": "safe",
+  "threat_score": 12,
+  "confidence": 94.5,
+  "threat_type": "benign",
+  "threat_indicators": [],
+  "model_predictions": {
+    "decision_tree": "benign",
+    "random_forest": "benign",
+    "extra_trees": "benign"
+  },
+  "features_analyzed": 35,
+  "processing_time_ms": 45.2,
+  "recommendations": ["URL appears safe for browsing"]
 }
 ```
 
 ### Threat Classification
 
-| Type | Code | Description |
-|------|------|-------------|
-| Benign | 0 | Safe, legitimate URL |
-| Defacement | 1 | Website defacement/hack |
-| Phishing | 2 | Credential theft site |
-| Malware | 3 | Malware distribution |
-| Spam | 4 | Spam/advertising site |
+| Type       | Code | Description             |
+| ---------- | ---- | ----------------------- |
+| Benign     | 0    | Safe, legitimate URL    |
+| Defacement | 1    | Website defacement/hack |
+| Phishing   | 2    | Credential theft site   |
+| Malware    | 3    | Malware distribution    |
+| Spam       | 4    | Spam/advertising site   |
 
 ---
 
 ## 📊 Detection Examples
 
 ### Safe URL Analysis
+
 ```
 URL: https://www.google.com
 ├── Threat Level: ✅ SAFE
@@ -330,6 +337,7 @@ URL: https://www.google.com
 ```
 
 ### Phishing URL Analysis
+
 ```
 URL: http://secure-paypa1-verify.com/login
 ├── Threat Level: 🔴 MALICIOUS (Phishing)
@@ -345,6 +353,7 @@ URL: http://secure-paypa1-verify.com/login
 ```
 
 ### Suspicious URL Analysis
+
 ```
 URL: http://192.168.1.1/admin/setup
 ├── Threat Level: ⚠️ SUSPICIOUS
@@ -384,6 +393,7 @@ INSTALLED_APPS = [
 ### Model Paths
 
 Models are loaded from:
+
 ```
 Services/URL threat scanning/models/
 ├── Decision_Tree_Classifier_URL_Threat_Detection.joblib
@@ -398,12 +408,14 @@ Services/URL threat scanning/models/
 ### Blacklist/Whitelist
 
 **Trusted Domains (500+)**:
+
 - Major tech companies
 - Government domains
 - Educational institutions
 - Known safe services
 
 **Known Malicious Patterns**:
+
 - URL shortener abuse patterns
 - Brand impersonation patterns
 - Known malware distribution domains
@@ -411,6 +423,7 @@ Services/URL threat scanning/models/
 ### Rate Limiting
 
 Recommended production configuration:
+
 ```python
 RATELIMIT_URL_ANALYSIS = '100/hour'  # Per user
 RATELIMIT_API = '1000/hour'          # Per API key

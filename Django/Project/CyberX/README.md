@@ -33,11 +33,11 @@
 
 CyberX is a comprehensive cybersecurity platform that combines multiple AI/ML models to provide real-time threat detection and validation services. Built with Django 6.0 and powered by machine learning, it offers three core security modules:
 
-| Module | Description | Technology | Accuracy |
-|--------|-------------|------------|----------|
-| 🔗 **URL Threat Detection** | Malicious URL identification | Ensemble ML (3 models) | 95%+ |
-| 🎣 **Phishing Detection** | Phishing website analysis | PyTorch Neural Network | 95%+ |
-| 📧 **Email Validation** | Email verification & temp detection | Pattern + DNS Analysis | 99%+ |
+| Module                      | Description                         | Technology             | Accuracy |
+| --------------------------- | ----------------------------------- | ---------------------- | -------- |
+| 🔗 **URL Threat Detection** | Malicious URL identification        | Ensemble ML (3 models) | 95%+     |
+| 🎣 **Phishing Detection**   | Phishing website analysis           | PyTorch Neural Network | 95%+     |
+| 📧 **Email Validation**     | Email verification & temp detection | Pattern + DNS Analysis | 99%+     |
 
 ### Why CyberX?
 
@@ -61,6 +61,7 @@ Analyzes URLs using an ensemble of three machine learning models:
 - **Extra Trees Classifier**: Additional ensemble diversity
 
 **Capabilities**:
+
 - Phishing site detection
 - Malware distribution identification
 - Website defacement recognition
@@ -144,15 +145,15 @@ Multi-layer email verification system:
 
 ### Technology Stack
 
-| Layer | Technology |
-|-------|------------|
-| **Backend** | Django 6.0, Python 3.8+ |
-| **ML Framework** | PyTorch, scikit-learn |
-| **Data Processing** | pandas, numpy |
-| **DNS/Email** | dnspython, email-validator |
-| **URL Analysis** | tldextract, beautifulsoup4, python-whois |
-| **Database** | SQLite (dev), PostgreSQL (prod) |
-| **Frontend** | HTML5, CSS3, JavaScript ES6+ |
+| Layer               | Technology                               |
+| ------------------- | ---------------------------------------- |
+| **Backend**         | Django 6.0, Python 3.8+                  |
+| **ML Framework**    | PyTorch, scikit-learn                    |
+| **Data Processing** | pandas, numpy                            |
+| **DNS/Email**       | dnspython, email-validator               |
+| **URL Analysis**    | tldextract, beautifulsoup4, python-whois |
+| **Database**        | SQLite (dev), PostgreSQL (prod)          |
+| **Frontend**        | HTML5, CSS3, JavaScript ES6+             |
 
 ---
 
@@ -200,6 +201,7 @@ python manage.py runserver
 ### Verify Installation
 
 After starting the server, you should see:
+
 ```
 ✅ Using enhanced production URL analyzer v3.0
 System check identified no issues (0 silenced).
@@ -213,28 +215,31 @@ Starting development server at http://127.0.0.1:8000/
 
 ### Web Interface
 
-| Module | URL | Description |
-|--------|-----|-------------|
-| **Home** | `http://127.0.0.1:8000/` | Main dashboard |
+| Module                   | URL                                         | Description              |
+| ------------------------ | ------------------------------------------- | ------------------------ |
+| **Home**                 | `http://127.0.0.1:8000/`                    | Main dashboard           |
 | **URL Threat Detection** | `http://127.0.0.1:8000/urlthreatdetection/` | Analyze URLs for threats |
-| **Phishing Detection** | `http://127.0.0.1:8000/phishingdetection/` | Check for phishing |
-| **Email Validation** | `http://127.0.0.1:8000/emailvalidation/` | Validate emails |
+| **Phishing Detection**   | `http://127.0.0.1:8000/phishingdetection/`  | Check for phishing       |
+| **Email Validation**     | `http://127.0.0.1:8000/emailvalidation/`    | Validate emails          |
 
 ### Example Workflows
 
 #### Analyzing a URL for Threats
+
 1. Go to `/urlthreatdetection/`
 2. Enter URL: `https://example.com`
 3. Click "Analyze"
 4. View threat level, confidence, and indicators
 
 #### Checking for Phishing
+
 1. Go to `/phishingdetection/`
 2. Enter suspicious URL
 3. Get instant risk assessment
 4. Review risk factors and recommendations
 
 #### Validating an Email
+
 1. Go to `/emailvalidation/`
 2. Enter email address
 3. View validation results
@@ -256,16 +261,17 @@ Content-Type: application/json
 ```
 
 **Response**:
+
 ```json
 {
-    "success": true,
-    "url": "https://example.com",
-    "is_malicious": false,
-    "threat_level": "safe",
-    "threat_score": 12,
-    "confidence": 94.5,
-    "threat_indicators": [],
-    "processing_time_ms": 45.2
+  "success": true,
+  "url": "https://example.com",
+  "is_malicious": false,
+  "threat_level": "safe",
+  "threat_score": 12,
+  "confidence": 94.5,
+  "threat_indicators": [],
+  "processing_time_ms": 45.2
 }
 ```
 
@@ -281,19 +287,17 @@ Content-Type: application/json
 ```
 
 **Response**:
+
 ```json
 {
-    "success": true,
-    "url": "https://suspicious-site.com",
-    "is_phishing": true,
-    "confidence": 92.3,
-    "risk_score": 78,
-    "risk_factors": [
-        "Suspicious TLD detected",
-        "New domain (15 days old)"
-    ],
-    "security_indicators": [],
-    "model_used": true
+  "success": true,
+  "url": "https://suspicious-site.com",
+  "is_phishing": true,
+  "confidence": 92.3,
+  "risk_score": 78,
+  "risk_factors": ["Suspicious TLD detected", "New domain (15 days old)"],
+  "security_indicators": [],
+  "model_used": true
 }
 ```
 
@@ -309,18 +313,19 @@ Content-Type: application/json
 ```
 
 **Response**:
+
 ```json
 {
-    "success": true,
-    "email": "user@example.com",
-    "is_valid": true,
-    "is_temporary": false,
-    "quality_score": 95,
-    "risk_level": "low",
-    "validation": {
-        "syntax": {"valid": true},
-        "dns": {"valid": true, "has_mx": true}
-    }
+  "success": true,
+  "email": "user@example.com",
+  "is_valid": true,
+  "is_temporary": false,
+  "quality_score": 95,
+  "risk_level": "low",
+  "validation": {
+    "syntax": { "valid": true },
+    "dns": { "valid": true, "has_mx": true }
+  }
 }
 ```
 
@@ -330,12 +335,12 @@ Content-Type: application/json
 
 ### URL Threat Detection Models
 
-| Model | Algorithm | Features | Accuracy |
-|-------|-----------|----------|----------|
-| Model 1 | Decision Tree | 35 | 93.2% |
-| Model 2 | Random Forest | 35 | 96.1% |
-| Model 3 | Extra Trees | 35 | 95.8% |
-| **Ensemble** | Weighted Voting | 35 | **96.5%** |
+| Model        | Algorithm       | Features | Accuracy  |
+| ------------ | --------------- | -------- | --------- |
+| Model 1      | Decision Tree   | 35       | 93.2%     |
+| Model 2      | Random Forest   | 35       | 96.1%     |
+| Model 3      | Extra Trees     | 35       | 95.8%     |
+| **Ensemble** | Weighted Voting | 35       | **96.5%** |
 
 ### Phishing Detection Neural Network
 
@@ -362,18 +367,18 @@ Performance:
 
 ### Feature Importance (Top 10)
 
-| Rank | Feature | Importance |
-|------|---------|------------|
-| 1 | `domain_age` | 0.085 |
-| 2 | `https_token` | 0.078 |
-| 3 | `nb_subdomains` | 0.065 |
-| 4 | `length_url` | 0.058 |
-| 5 | `dns_record` | 0.055 |
-| 6 | `shortening_service` | 0.052 |
-| 7 | `phish_hints` | 0.048 |
-| 8 | `ip` | 0.045 |
-| 9 | `suspicious_tld` | 0.042 |
-| 10 | `login_form` | 0.038 |
+| Rank | Feature              | Importance |
+| ---- | -------------------- | ---------- |
+| 1    | `domain_age`         | 0.085      |
+| 2    | `https_token`        | 0.078      |
+| 3    | `nb_subdomains`      | 0.065      |
+| 4    | `length_url`         | 0.058      |
+| 5    | `dns_record`         | 0.055      |
+| 6    | `shortening_service` | 0.052      |
+| 7    | `phish_hints`        | 0.048      |
+| 8    | `ip`                 | 0.045      |
+| 9    | `suspicious_tld`     | 0.042      |
+| 10   | `login_form`         | 0.038      |
 
 ---
 
@@ -509,7 +514,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+
     # CyberX Apps
     'Home',
     'EmailValidation',

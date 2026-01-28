@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'EmailValidation',
     'UrlThreadDetection',
     "PhisingDetection",
+    'MalwareAnalysis',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

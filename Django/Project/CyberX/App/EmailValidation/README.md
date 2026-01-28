@@ -9,12 +9,14 @@ The CyberX Email Validation module is an advanced, multi-layer email verificatio
 ## 🎯 Problem Statement
 
 Email validation is crucial for:
+
 - **User Registration**: Ensuring users provide valid, permanent email addresses
 - **Data Quality**: Maintaining clean, deliverable email lists
 - **Fraud Prevention**: Blocking disposable emails used for abuse
 - **Security**: Identifying potentially malicious email addresses
 
 Traditional email validation only checks format. Our system provides:
+
 1. **Syntax Validation**: RFC-compliant format checking
 2. **DNS Verification**: Real MX record lookup
 3. **Temporary Email Detection**: 300+ disposable domain identification
@@ -82,16 +84,19 @@ Traditional email validation only checks format. Our system provides:
 ### 1. Syntax Validation
 
 **Regex Pattern Matching**
+
 ```python
 pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
 ```
 
 **Additional Checks**:
+
 - No consecutive dots (`..`)
 - No leading/trailing dots or `@`
 - Valid local part and domain part separation
 
 **RFC 5322 Compliance**:
+
 - Uses `email-validator` library
 - Handles internationalized email addresses
 - Normalizes email format
@@ -99,6 +104,7 @@ pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
 ### 2. DNS Verification
 
 **MX Record Lookup**:
+
 ```python
 # Primary: Check MX records
 mx_records = dns.resolver.resolve(domain, 'MX')
@@ -111,12 +117,14 @@ aaaa_records = dns.resolver.resolve(domain, 'AAAA')
 ```
 
 **Warning System**:
+
 - ⚠️ No MX records but A records exist → "May have email issues"
 - ❌ No DNS records at all → "Domain doesn't exist"
 
 ### 3. Temporary Email Detection
 
 **300+ Known Temporary Domains**:
+
 ```python
 TEMPORARY_EMAIL_DOMAINS = {
     # Popular services
@@ -127,6 +135,7 @@ TEMPORARY_EMAIL_DOMAINS = {
 ```
 
 **Pattern Matching**:
+
 ```python
 TEMPORARY_EMAIL_PATTERNS = [
     r'^temp\d*mail\d*\.(com|org|net|email)$',
@@ -137,20 +146,22 @@ TEMPORARY_EMAIL_PATTERNS = [
 ```
 
 **Keyword Detection**:
+
 - Domains containing: temp, disposable, throwaway, burner, fake, trash, spam
 
 **Suspicious TLD Detection**:
+
 - High-risk TLDs: `.tk`, `.ml`, `.ga`, `.cf`, `.gq`, `.pw`, `.cc`, `.top`, `.click`
 
 ### 4. Quality Scoring
 
-| Score | Level | Description |
-|-------|-------|-------------|
-| 90-100 | Excellent | Major provider, fully verified |
-| 70-89 | Good | Valid email with minor concerns |
-| 50-69 | Medium | Some issues detected |
-| 30-49 | Poor | Significant concerns |
-| 0-29 | Bad | Likely invalid or disposable |
+| Score  | Level     | Description                     |
+| ------ | --------- | ------------------------------- |
+| 90-100 | Excellent | Major provider, fully verified  |
+| 70-89  | Good      | Valid email with minor concerns |
+| 50-69  | Medium    | Some issues detected            |
+| 30-49  | Poor      | Significant concerns            |
+| 0-29   | Bad       | Likely invalid or disposable    |
 
 ---
 
@@ -174,6 +185,7 @@ App/EmailValidation/
 ### Key Functions
 
 #### `validate_email_comprehensive(email: str) -> dict`
+
 Main validation function that orchestrates all validation layers.
 
 ```python
@@ -192,13 +204,14 @@ def validate_email_comprehensive(email: str) -> dict:
 ```
 
 #### `is_temporary_email(domain: str) -> tuple`
+
 Checks if domain is a temporary email provider.
 
 ```python
 def is_temporary_email(domain: str) -> tuple:
     """
     Returns (is_temporary: bool, reason: str)
-    
+
     Checks:
     1. Direct domain match (300+ domains)
     2. Pattern matching (regex patterns)
@@ -208,6 +221,7 @@ def is_temporary_email(domain: str) -> tuple:
 ```
 
 #### `check_dns_records(domain: str) -> dict`
+
 Performs comprehensive DNS verification.
 
 ```python
@@ -245,41 +259,43 @@ def check_dns_records(domain: str) -> dict:
 **Method**: POST
 
 **Request Body**:
+
 ```json
 {
-    "email": "user@example.com"
+  "email": "user@example.com"
 }
 ```
 
 **Response**:
+
 ```json
 {
-    "success": true,
-    "email": "user@example.com",
-    "is_valid": true,
-    "is_temporary": false,
-    "quality_score": 95,
-    "risk_level": "low",
-    "validation": {
-        "syntax": {
-            "valid": true,
-            "normalized": "user@example.com"
-        },
-        "dns": {
-            "valid": true,
-            "has_mx": true,
-            "mx_records": ["mx1.example.com", "mx2.example.com"]
-        },
-        "temporary_check": {
-            "is_temporary": false,
-            "reason": null
-        }
+  "success": true,
+  "email": "user@example.com",
+  "is_valid": true,
+  "is_temporary": false,
+  "quality_score": 95,
+  "risk_level": "low",
+  "validation": {
+    "syntax": {
+      "valid": true,
+      "normalized": "user@example.com"
     },
-    "provider": {
-        "name": "Example Mail",
-        "type": "corporate"
+    "dns": {
+      "valid": true,
+      "has_mx": true,
+      "mx_records": ["mx1.example.com", "mx2.example.com"]
     },
-    "recommendations": []
+    "temporary_check": {
+      "is_temporary": false,
+      "reason": null
+    }
+  },
+  "provider": {
+    "name": "Example Mail",
+    "type": "corporate"
+  },
+  "recommendations": []
 }
 ```
 
@@ -288,6 +304,7 @@ def check_dns_records(domain: str) -> dict:
 ## 📈 Validation Results
 
 ### Valid Email Response
+
 ```
 ✅ Email is VALID
 ├── Syntax: Valid RFC 5322 format
@@ -298,6 +315,7 @@ def check_dns_records(domain: str) -> dict:
 ```
 
 ### Temporary Email Response
+
 ```
 ⚠️ Email is TEMPORARY
 ├── Syntax: Valid format
@@ -309,6 +327,7 @@ def check_dns_records(domain: str) -> dict:
 ```
 
 ### Invalid Email Response
+
 ```
 ❌ Email is INVALID
 ├── Syntax: Invalid format (consecutive dots)
@@ -322,6 +341,7 @@ def check_dns_records(domain: str) -> dict:
 ## 🧪 Testing Examples
 
 ### Test Valid Emails
+
 ```python
 valid_emails = [
     "user@gmail.com",        # Major provider
@@ -333,6 +353,7 @@ valid_emails = [
 ```
 
 ### Test Temporary Emails
+
 ```python
 temporary_emails = [
     "test@10minutemail.com",  # Known disposable
@@ -343,6 +364,7 @@ temporary_emails = [
 ```
 
 ### Test Invalid Emails
+
 ```python
 invalid_emails = [
     "invalid",                 # No @ symbol

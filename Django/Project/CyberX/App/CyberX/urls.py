@@ -7,4 +7,5 @@ urlpatterns = [
     path('emailvalidation/', include('EmailValidation.urls')),
     path('urlthreatdetection/', include('UrlThreadDetection.urls')),
     path('phishingdetection/', include('PhisingDetection.urls')),
+    path('malwareanalysis/', include('MalwareAnalysis.urls')),
 ]
