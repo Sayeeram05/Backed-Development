@@ -86,6 +86,15 @@ DATABASES = {
     }
 }
 
+# Cache configuration (DB-backed — no Redis dependency)
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'cyberx_cache_table',
+        'TIMEOUT': 600,  # 10 minutes default
+    }
+}
+
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
@@ -185,6 +194,11 @@ LOGGING = {
             'propagate': False,
         },
         'NetworkIDS': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'MalwareAnalysis': {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': False,

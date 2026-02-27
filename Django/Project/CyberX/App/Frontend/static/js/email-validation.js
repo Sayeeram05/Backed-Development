@@ -1,178 +1,123 @@
-// Email Validation JavaScript - Animation & UI Effects Only
-class EmailValidationUI {
-    constructor() {
-        this.emailInput = document.getElementById('emailInput');
-        this.clearInput = document.getElementById('clearInput');
-        this.helperText = document.getElementById('helperText');
-        this.validateBtn = document.getElementById('validateBtn');
-        this.validationForm = document.getElementById('emailValidationForm');
-        
-        this.init();
-    }
-    
-    init() {
-        this.bindEvents();
-        this.addVisualEffects();
-    }
-    
-    bindEvents() {
-        // Email input events for UI feedback only
-        this.emailInput.addEventListener('input', (e) => this.onEmailInput(e));
-        this.emailInput.addEventListener('focus', (e) => this.onInputFocus(e));
-        this.emailInput.addEventListener('blur', (e) => this.onInputBlur(e));
-        
-        // Clear input button
-        this.clearInput.addEventListener('click', () => this.clearEmailInput());
-        
-        // Form submission animation
-        this.validationForm.addEventListener('submit', (e) => this.onFormSubmit(e));
-        
-        // Enter key animation
-        this.emailInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                this.animateButton();
-            }
-        });
-    }
-    
-    onEmailInput(e) {
-        const email = e.target.value.trim();
-        const inputContainer = this.emailInput.parentElement;
-        
-        // Simple UI feedback only - no validation logic
-        if (!email) {
-            inputContainer.classList.remove('valid', 'invalid', 'active');
-            this.helperText.textContent = 'Enter an email address to perform comprehensive validation';
-            this.helperText.className = 'helper-text';
-            this.clearInput.style.opacity = '0';
-        } else {
-            inputContainer.classList.add('active');
-            this.helperText.textContent = 'Ready for validation';
-            this.helperText.className = 'helper-text success';
-            this.clearInput.style.opacity = '1';
-        }
-        
-        // Animate input container
-        this.animateInputContainer(inputContainer);
-    }
-    
-    onInputFocus(e) {
-        const inputContainer = this.emailInput.parentElement;
-        inputContainer.classList.add('focused');
-        this.animateFocusEffect();
-    }
-    
-    onInputBlur(e) {
-        const inputContainer = this.emailInput.parentElement;
-        inputContainer.classList.remove('focused');
-    }
-    
-    onFormSubmit(e) {
-        // Show loading animation
-        this.showLoadingAnimation();
-        
-        // The form will submit normally and redirect to show results
-        // Scroll will be handled on the results page load
-        console.log('Form is being submitted with email:', this.emailInput.value);
-    }
-    
-    clearEmailInput() {
-        // Clear input with animation
-        this.emailInput.style.transform = 'scale(0.95)';
-        setTimeout(() => {
-            this.emailInput.value = '';
-            this.emailInput.style.transform = 'scale(1)';
-            this.emailInput.focus();
-            
-            // Reset UI states
-            const inputContainer = this.emailInput.parentElement;
-            inputContainer.classList.remove('valid', 'invalid', 'active');
-            this.helperText.textContent = 'Enter an email address to perform comprehensive validation';
-            this.helperText.className = 'helper-text';
-            this.clearInput.style.opacity = '0';
-        }, 100);
-    }
-    
-    showLoadingAnimation() {
-        // Simple loading animation without problematic effects
-        const btnText = this.validateBtn.querySelector('.btn-text');
-        const btnSpinner = this.validateBtn.querySelector('.btn-spinner');
-        
-        if (btnText && btnSpinner) {
-            btnText.style.display = 'none';
-            btnSpinner.style.display = 'flex';
-            this.validateBtn.disabled = true;
-        }
-    }
-    
-    addVisualEffects() {
-        // Disable any tilt/transform effects on email validation page
-        this.disableTiltEffects();
-        
-        // Add initial transition styles for suggestions dropdown
-        if (this.emailSuggestions) {
-            this.emailSuggestions.style.opacity = '0';
-            this.emailSuggestions.style.transform = 'translateY(-10px)';
-            this.emailSuggestions.style.transition = 'all 0.2s ease';
-        }
-        
-        // Initialize other visual elements
-        this.initializeVisualElements();
-    }
-    
-    disableTiltEffects() {
-        // Find all cards and disable any transform effects
-        const cards = document.querySelectorAll('.card');
-        cards.forEach(card => {
-            // Remove any existing event listeners that might cause tilt effects
-            card.style.transform = 'none';
-            card.style.transition = 'all 0.2s ease';
-            
-            // Override any hover effects that might be problematic
-            card.addEventListener('mouseenter', (e) => {
-                e.target.style.transform = 'none';
-            });
-            
-            card.addEventListener('mousemove', (e) => {
-                e.target.style.transform = 'none';
-            });
-            
-            card.addEventListener('mouseleave', (e) => {
-                e.target.style.transform = 'none';
-            });
-        });
-    }
-    
-    initializeVisualElements() {
-        // Setup any initial visual states without problematic animations
-        const inputContainer = this.emailInput.parentElement;
-        if (inputContainer) {
-            inputContainer.style.transition = 'all 0.2s ease';
-        }
-        
-        if (this.clearInput) {
-            this.clearInput.style.transition = 'all 0.2s ease';
-        }
-    }
-}
+/* ===== Email Validation v3.0 — Page JavaScript ===== */
 
-// Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    new EmailValidationUI();
-    
-    // Check if results are present and scroll to Email Security Validator
-    const hasResults = document.querySelector('.alert') || document.querySelector('.results-section[style*="block"]');
-    
-    if (hasResults) {
-        // Small delay to ensure all content is rendered
-        setTimeout(() => {
-            const emailValidator = document.getElementById('emailSecurityValidator');
-            if (emailValidator) {
-                emailValidator.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center'
-                });
-            }
-        }, 300);
+document.addEventListener("DOMContentLoaded", function () {
+  // ── Form loading state ──────────────────────────────────
+  var form = document.getElementById("emailValidationForm");
+  if (form) {
+    form.addEventListener("submit", function () {
+      var loader = document.getElementById("loadingIndicator");
+      var btn = document.getElementById("submitBtn");
+      if (loader) loader.style.display = "block";
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML =
+          '<i class="fas fa-spinner fa-spin"></i> <span>Validating\u2026</span>';
+      }
+    });
+
+    // Real-time format hint
+    var emailInput = document.getElementById("email");
+    if (emailInput) {
+      var hintEl = document.getElementById("formatHint");
+      emailInput.addEventListener("input", function () {
+        var val = emailInput.value.trim();
+        if (!hintEl || !val) {
+          if (hintEl) hintEl.style.display = "none";
+          return;
+        }
+        var pattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (val.length > 3 && val.includes("@")) {
+          hintEl.style.display = "flex";
+          if (pattern.test(val)) {
+            hintEl.className = "format-hint valid";
+            hintEl.innerHTML =
+              '<i class="fas fa-check-circle"></i> <span>Valid format</span>';
+          } else {
+            hintEl.className = "format-hint invalid";
+            hintEl.innerHTML =
+              '<i class="fas fa-info-circle"></i> <span>Check format: user@domain.com</span>';
+          }
+        } else {
+          hintEl.style.display = "none";
+        }
+      });
     }
+  }
+
+  // ── Risk-gauge arc animation ────────────────────────────
+  var arc = document.getElementById("riskArc");
+  if (arc) {
+    var score = parseFloat(arc.getAttribute("data-risk-score")) || 0;
+    var total = 236; // half-circle arc length
+    var offset = total - (score / 100) * total;
+    setTimeout(function () {
+      arc.style.strokeDashoffset = offset;
+    }, 300);
+  }
+
+  // ── Animated score counter ──────────────────────────────
+  var gaugeValue = document.querySelector(".risk-gauge-value");
+  if (gaugeValue) {
+    var targetScore = parseFloat(gaugeValue.getAttribute("data-score")) || 0;
+    var current = 0;
+    var duration = 1200;
+    var startTime = null;
+
+    function animateScore(timestamp) {
+      if (!startTime) startTime = timestamp;
+      var progress = Math.min((timestamp - startTime) / duration, 1);
+      // ease-out cubic
+      var eased = 1 - Math.pow(1 - progress, 3);
+      current = Math.round(eased * targetScore);
+      gaugeValue.textContent = current;
+      if (progress < 1) {
+        requestAnimationFrame(animateScore);
+      }
+    }
+
+    setTimeout(function () {
+      requestAnimationFrame(animateScore);
+    }, 200);
+  }
+
+  // ── Component-bar width animation (staggered) ──────────
+  var bars = document.querySelectorAll(".comp-bar-fill");
+  bars.forEach(function (bar, i) {
+    var targetWidth = bar.getAttribute("data-width");
+    if (targetWidth) {
+      bar.style.width = "0%";
+      setTimeout(function () {
+        bar.style.width = targetWidth + "%";
+      }, 400 + i * 120);
+    }
+  });
+
+  // ── Confidence ring animation ───────────────────────────
+  var rings = document.querySelectorAll(".ring-fill");
+  rings.forEach(function (ring) {
+    var pct = parseFloat(ring.getAttribute("data-percent")) || 0;
+    var circumference = 2 * Math.PI * 20; // r=20
+    var offset = circumference - (pct / 100) * circumference;
+    ring.style.strokeDasharray = circumference;
+    ring.style.strokeDashoffset = circumference;
+    setTimeout(function () {
+      ring.style.strokeDashoffset = offset;
+    }, 400);
+  });
+
+  // ── Scroll to results if present ────────────────────────
+  var resultsSection = document.querySelector(".results-section");
+  if (resultsSection) {
+    setTimeout(function () {
+      resultsSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 200);
+  }
+
+  // ── Error banner auto-scroll ────────────────────────────
+  var errorBanner = document.querySelector(".error-banner");
+  if (errorBanner && !resultsSection) {
+    setTimeout(function () {
+      errorBanner.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 200);
+  }
 });

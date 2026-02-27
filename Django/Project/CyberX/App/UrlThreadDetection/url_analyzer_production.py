@@ -15,8 +15,6 @@ from urllib.parse import urlparse, parse_qs
 from collections import Counter
 from django.conf import settings
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class URLThreatAnalyzer:
@@ -54,6 +52,9 @@ class URLThreatAnalyzer:
             'facebook.com', 'instagram.com', 'whatsapp.com', 'fb.me', 'fb.com',
             'twitter.com', 'x.com', 't.co', 'twimg.com',
             'linkedin.com', 'licdn.com',
+            
+            # AI Companies
+            'openai.com', 'chatgpt.com', 'anthropic.com', 'claude.ai',
             
             # Development & Tech Platforms
             'github.com', 'gitlab.com', 'bitbucket.org', 'sourceforge.net',
@@ -127,7 +128,7 @@ class URLThreatAnalyzer:
         }
         
         self.models = {}
-        self.threat_labels = {0: 'Benign', 1: 'Defacement', 2: 'Phishing', 3: 'Malware'}
+        self.threat_labels = {0: 'Safe', 1: 'Phishing'}
         self._load_models()
     
     def _load_models(self):
@@ -424,7 +425,7 @@ class URLThreatAnalyzer:
                 return {
                     'success': True,
                     'url': url,
-                    'threat_type': 'Benign',
+                    'threat_type': 'Safe',
                     'confidence': 95.0,
                     'ensemble_confidence': 95.0,
                     'is_malicious': False,
@@ -481,7 +482,7 @@ class URLThreatAnalyzer:
                     
                     predictions[model_name] = {
                         'prediction': pred,
-                        'threat_type': {0: 'Benign', 1: 'Defacement', 2: 'Phishing', 3: 'Malware'}[pred],
+                        'threat_type': self.threat_labels.get(pred, 'Unknown'),
                         'confidence': confidence
                     }
                     
@@ -504,7 +505,6 @@ class URLThreatAnalyzer:
                 return self._fallback_analysis(url, features, start_time)
             
             # Advanced ensemble voting with probability weighting
-            threat_labels = {0: 'Benign', 1: 'Defacement', 2: 'Phishing', 3: 'Malware'}
             
             # Weighted average of probabilities
             avg_probabilities = np.mean(all_probabilities, axis=0)
@@ -529,14 +529,14 @@ class URLThreatAnalyzer:
                 risk_factors += 1
             
             # Adjust confidence based on risk factors
-            if ensemble_pred > 0:  # If predicted as malicious
+            if ensemble_pred == 1:  # If predicted as phishing
                 ensemble_confidence = min(95, ensemble_confidence + (risk_factors * 5))
-            else:  # If predicted as benign
+            else:  # If predicted as safe
                 if risk_factors > 2:
                     ensemble_confidence = max(60, ensemble_confidence - (risk_factors * 10))
             
-            # Apply stricter threshold for malicious classification
-            if ensemble_pred > 0 and ensemble_confidence < confidence_threshold * 100:
+            # Apply stricter threshold for phishing classification
+            if ensemble_pred == 1 and ensemble_confidence < confidence_threshold * 100:
                 ensemble_pred = 0
                 ensemble_confidence = 65.0
             
@@ -561,27 +561,27 @@ class URLThreatAnalyzer:
             }
             
             # Calculate risk score
-            risk_score = min(ensemble_confidence if ensemble_pred > 0 else (100 - ensemble_confidence), 100)
+            risk_score = min(ensemble_confidence if ensemble_pred == 1 else (100 - ensemble_confidence), 100)
             
             # Prepare response
-            is_malicious = ensemble_pred > 0
-            threat_type = threat_labels[ensemble_pred].lower()
+            is_malicious = ensemble_pred == 1
+            threat_type = self.threat_labels[ensemble_pred].lower()
             
             result = {
                 'success': True,
                 'url': url,
-                'threat_type': threat_labels[ensemble_pred],
+                'threat_type': self.threat_labels[ensemble_pred],
                 'confidence': ensemble_confidence,
                 'ensemble_confidence': ensemble_confidence,
                 'agreement': agreement,
                 'individual_predictions': predictions,
-                'is_malicious': ensemble_pred > 0,
+                'is_malicious': ensemble_pred == 1,
                 'risk_factors': risk_factors,
                 'processing_time': processing_time,
                 'validation_features': validation_features,
                 'final_prediction': ensemble_pred,
                 'processing_time_ms': round(processing_time * 1000, 2),
-                'title': f"Threat Detected: {threat_labels[ensemble_pred]}" if is_malicious else "URL appears Safe",
+                'title': f"Threat Detected: {self.threat_labels[ensemble_pred]}" if is_malicious else "URL appears Safe",
                 'explanation': self._get_threat_explanation(ensemble_pred, ensemble_confidence),
                 'status_color': 'danger' if is_malicious else 'success',
                 'status_icon': self._get_status_icon(ensemble_pred),
@@ -631,7 +631,7 @@ class URLThreatAnalyzer:
             risk_score += 10
         
         is_malicious = risk_score > 50
-        threat_type = 'Phishing' if risk_score > 70 else ('Suspicious' if is_malicious else 'Benign')
+        threat_type = 'Phishing' if risk_score > 70 else ('Phishing' if is_malicious else 'Safe')
         
         validation_features = {
             'domain_whitelist': False,
@@ -681,9 +681,7 @@ class URLThreatAnalyzer:
         """Get human-readable explanation for threat level"""
         explanations = {
             0: f"Our AI models analyzed this URL and found it to be safe with {confidence:.1f}% confidence. No malicious patterns were detected.",
-            1: f"This URL shows characteristics of a defaced website with {confidence:.1f}% confidence. The content may have been compromised.",
-            2: f"This URL exhibits phishing patterns with {confidence:.1f}% confidence. It may attempt to steal your credentials or personal information.",
-            3: f"This URL shows malware characteristics with {confidence:.1f}% confidence. It may attempt to infect your device with malicious software."
+            1: f"This URL exhibits phishing patterns with {confidence:.1f}% confidence. It may attempt to steal your credentials or personal information.",
         }
         return explanations.get(prediction, "Unknown threat level detected.")
     
@@ -691,9 +689,7 @@ class URLThreatAnalyzer:
         """Get appropriate icon for threat level"""
         icons = {
             0: 'fas fa-shield-check',
-            1: 'fas fa-exclamation-triangle', 
-            2: 'fas fa-user-shield',
-            3: 'fas fa-bug'
+            1: 'fas fa-user-shield',
         }
         return icons.get(prediction, 'fas fa-question-circle')
     
@@ -701,9 +697,7 @@ class URLThreatAnalyzer:
         """Get security recommendation based on threat level"""
         recommendations = {
             0: "This URL appears to be safe. You can proceed with confidence.",
-            1: "Proceed with caution. This website's content may have been compromised or altered by attackers.",
-            2: "Do not visit this URL. It appears to be a phishing site designed to steal your credentials or personal information.",
-            3: "Block this URL immediately. It may contain malware that could infect your device and compromise your security."
+            1: "Do not visit this URL. It appears to be a phishing site designed to steal your credentials or personal information.",
         }
         return recommendations.get(prediction, "Exercise caution when visiting this URL.")
 

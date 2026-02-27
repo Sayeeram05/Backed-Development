@@ -1,57 +1,71 @@
 """
-Enhanced Email Validation System v2.0
-Advanced email validation with temporary domain detection and DNS warnings
-Improved accuracy and comprehensive validation features
+Enhanced Email Validation System v3.0
+=====================================================
+9-Layer validation with:
+  1. Format validation (regex)
+  2. Library validation (email-validator)
+  3. Blacklist check (5,100+ disposable domains)
+  4. Temporary email heuristics (patterns / keywords / TLD)
+  5. Domain age check (WHOIS via python-whois, cached 7 days)
+  6. SPF record check
+  7. DKIM check (common selectors)
+  8. DMARC policy check
+  9. MX / DNS deliverability check
+  + Weighted risk scoring engine
+  + Behavioral monitoring & anomaly detection
 """
 
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse
+from django.utils import timezone
+from django.core.cache import cache
+
 import re
+import os
 import time
 import json
-import socket
-from email_validator import validate_email, EmailNotValidError
+import logging
+import whois
 import dns.resolver
+from pathlib import Path
+from datetime import timedelta
+from collections import Counter
+from email_validator import validate_email, EmailNotValidError
 
-# Comprehensive and continuously updated temporary email domain list
-TEMPORARY_EMAIL_DOMAINS = {
-    # Most popular temporary email services (high priority)
-    '10minutemail.com', '10minutemail.net', '10minutemail.org',
-    'mailinator.com', 'guerrillamail.com', 'guerrillamail.org', 'guerrillamail.net',
-    'temp-mail.org', 'tempmail.net', 'throwaway.email', 'tempail.com',
-    'maildrop.cc', 'yopmail.com', 'yopmail.fr', 'yopmail.net',
-    'sharklasers.com', 'guerrillamail.de', 'guerrillamail.biz',
-    'getairmail.com', 'airmail.cc', 'guerrillamail.info', 'guerrillamailblock.com',
-    
-    # Additional temporary providers (medium priority)
-    'tempemail.com', 'temporaryemail.net', 'emailondeck.com', 'mytrashmail.com',
-    'trashmail.com', 'disposable-email.ml', 'burnermail.io', 'mohmal.com',
-    'getnada.com', 'fakemail.net', 'temp-mail.ru', 'dispostable.com',
-    'fakeinbox.com', 'harakirimail.com', 'mintemail.com', 'temp-mail.io',
-    'tempinbox.com', 'throwawaymail.com', 'binmail.net', 'mailcatch.com',
-    'mailexpire.com', 'mailforspam.com', 'mailnesia.com', 'spamgourmet.com',
-    '20minutemail.com', '20email.eu', '33mail.com', 'anonbox.net',
-    
-    # Newer and evolving services (requires pattern matching)
-    'mail.tm', 'tempmail.email', 'moakt.com', 'incognitomail.org',
-    'guerrillamail.to', '10mail.org', 'emailfake.com', 'mailtemp.info',
-    'tempmailo.com', 'emaildrop.io', 'throwaway.email', 'trashmail.ws',
-    
-    # Domain variations and international services
-    'tempmail24.com', 'temp-mail.email', 'fakeemailgenerator.com',
-    'mailsac.com', '10minemail.com', 'tempemailgen.com', 'mail7.io',
-    'inboxkitten.com', 'tempmail.org', 'fake-mail.ml', 'burner.kiwi',
-    
-    # Recently discovered domains (Jan 2026)
-    'tmail.ws', 'smailpro.com', 'tempmail.dev', 'disposablemail.com',
-    'ephemeral.email', 'quickmail.email', 'instantmail.fr', 'tempbox.xyz'
-}
+from .models import EmailValidationLog, DomainCache, BehavioralFlag
 
-# Advanced pattern matching for temporary email detection
+logger = logging.getLogger('EmailValidation')
+
+# ---------------------------------------------------------------------------
+#  LOAD DISPOSABLE DOMAIN BLOCKLIST  (5,100+ domains from GitHub repo)
+# ---------------------------------------------------------------------------
+_BLOCKLIST_PATH = Path(__file__).resolve().parent / 'disposable_domains.txt'
+
+
+def _load_disposable_domains() -> frozenset:
+    """Load the disposable-email-domains blocklist from the local text file."""
+    try:
+        with open(_BLOCKLIST_PATH, 'r', encoding='utf-8') as fh:
+            domains = frozenset(
+                line.strip().lower()
+                for line in fh
+                if line.strip() and not line.startswith('#')
+            )
+        logger.info(f"Loaded {len(domains)} disposable domains from blocklist")
+        return domains
+    except FileNotFoundError:
+        logger.warning("disposable_domains.txt not found — using empty set")
+        return frozenset()
+
+
+DISPOSABLE_DOMAINS: frozenset = _load_disposable_domains()
+
+# ---------------------------------------------------------------------------
+#  STATIC HEURISTIC DATA
+# ---------------------------------------------------------------------------
 TEMPORARY_EMAIL_PATTERNS = [
-    # Pattern for numbered temp mail services
     r'^temp\d*mail\d*\.(com|org|net|email)$',
     r'^\d+m(in|inute)mail\.(com|org|net)$',
     r'^disposable.*\.(ml|tk|ga|cf|gq)$',
@@ -65,591 +79,1002 @@ TEMPORARY_EMAIL_PATTERNS = [
     r'.*disposable.*\.(com|org|net|email|ml)$',
     r'.*ephemeral.*\.(com|org|net|email)$',
     r'.*instant.*mail.*\.(com|org|net|fr)$',
-    r'.*quick.*mail.*\.(com|org|net|email)$'
+    r'.*quick.*mail.*\.(com|org|net|email)$',
 ]
 
-# Suspicious TLDs often used by temporary email services
 SUSPICIOUS_TLDS = {'.tk', '.ml', '.ga', '.cf', '.gq', '.pw', '.cc', '.top', '.click'}
 
-# Keywords that indicate temporary/disposable email services
 TEMP_EMAIL_KEYWORDS = [
     'temp', 'temporary', 'disposable', 'throwaway', 'burner', 'fake',
     'trash', 'spam', 'guerrilla', 'guerilla', 'anonymous', 'anon',
-    'ephemeral', 'instant', 'quick', 'fast', 'minute', 'hour', 'daily'
+    'ephemeral', 'instant', 'quick', 'fast', 'minute', 'hour', 'daily',
 ]
 
-def is_valid_email_regex(email: str) -> tuple:
-    """Enhanced email format validation using regex."""
-    # More comprehensive regex pattern
+DKIM_SELECTORS = [
+    'default', 'google', 'selector1', 'selector2',
+    'k1', 'dkim', 'mail', 's1', 's2', 'mx', 'email',
+]
+
+# ===================================================================
+#  LAYER 1 — Format Validation (regex)
+# ===================================================================
+
+def check_format(email: str) -> dict:
+    """RFC 5322 regex format check with extra sanity rules."""
     pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+    issues = []
     is_valid = bool(re.match(pattern, email))
-    
-    additional_checks = []
-    
-    # Check for common issues
+
     if '..' in email:
         is_valid = False
-        additional_checks.append("Contains consecutive dots")
-    
-    if email.startswith('.') or email.startswith('@'):
+        issues.append("Contains consecutive dots")
+    if email.startswith(('.', '@')) or email.endswith(('.', '@')):
         is_valid = False
-        additional_checks.append("Invalid start character")
-    
-    if email.endswith('.') or email.endswith('@'):
+        issues.append("Invalid start / end character")
+    if '@' in email and len(email.split('@')[0]) < 1:
         is_valid = False
-        additional_checks.append("Invalid end character")
-    
-    # Check for minimum local part length
-    if '@' in email:
-        local_part = email.split('@')[0]
-        if len(local_part) < 1:
-            is_valid = False
-            additional_checks.append("Local part too short")
-    
-    details = {
-        'status': 'valid' if is_valid else 'invalid',
-        'message': 'Email format is valid' if is_valid else 'Invalid email format',
-        'technical_info': 'Passes enhanced RFC 5322 pattern validation' if is_valid else f"Format issues: {', '.join(additional_checks) if additional_checks else 'Basic format validation failed'}",
-        'additional_checks': additional_checks
-    }
-    return is_valid, details
+        issues.append("Local part too short")
 
-def is_valid_email_library(email: str) -> tuple:
-    """Enhanced email validation using the email-validator library."""
+    return {
+        'status': 'valid' if is_valid else 'invalid',
+        'is_valid': is_valid,
+        'message': 'Email format is valid' if is_valid else 'Invalid email format',
+        'technical_info': (
+            'Passes enhanced RFC 5322 pattern validation' if is_valid
+            else f"Format issues: {', '.join(issues) if issues else 'Basic format validation failed'}"
+        ),
+        'issues': issues,
+    }
+
+
+# ===================================================================
+#  LAYER 2 — Library Validation (email-validator)
+# ===================================================================
+
+def check_library(email: str) -> dict:
+    """Comprehensive validation using the email-validator library."""
     try:
-        valid = validate_email(
-            email, 
-            check_deliverability=False,  # We'll do our own DNS checks
-            test_environment=False
-        )
-        details = {
+        valid = validate_email(email, check_deliverability=False, test_environment=False)
+        return {
             'status': 'valid',
+            'is_valid': True,
             'message': 'Email is syntactically valid',
             'normalized_email': valid.email,
             'local_part': valid.local_part,
             'domain': valid.domain,
-            'technical_info': 'Passes comprehensive RFC compliance validation including internationalization',
-            'original_domain': email.split('@')[1].lower() if '@' in email else None
+            'technical_info': 'Passes comprehensive RFC compliance validation',
         }
-        return True, details, valid.email
-    except EmailNotValidError as e:
-        details = {
+    except EmailNotValidError as exc:
+        return {
             'status': 'invalid',
-            'message': f'Email validation failed: {str(e)}',
+            'is_valid': False,
+            'message': f'Validation failed: {exc}',
             'normalized_email': None,
             'local_part': None,
-            'domain': None,
-            'technical_info': f'Library validation error: {str(e)}',
-            'original_domain': email.split('@')[1].lower() if '@' in email and len(email.split('@')) > 1 else None
+            'domain': email.split('@')[1].lower() if '@' in email else None,
+            'technical_info': str(exc),
         }
-        return False, details, None
 
-def is_temporary_email(domain: str) -> dict:
-    """
-    Advanced temporary email domain detection with multiple validation layers
-    Enhanced accuracy with pattern matching, keyword analysis, and TLD checking
-    """
+
+# ===================================================================
+#  LAYER 3 — Blacklist Check  (5,100+ disposable domains)
+# ===================================================================
+
+def check_blacklist(domain: str) -> dict:
+    """Check domain (and parent domain) against the disposable blocklist."""
     domain = domain.lower().strip()
-    
-    # Layer 1: Direct domain match (highest confidence)
-    if domain in TEMPORARY_EMAIL_DOMAINS:
+
+    # Direct match
+    if domain in DISPOSABLE_DOMAINS:
         return {
-            'is_temporary': True,
-            'reason': 'known_temporary_domain',
-            'confidence': 98,
-            'detection_method': 'direct_match',
-            'message': f'Domain "{domain}" is a confirmed temporary email provider',
-            'risk_level': 'high'
+            'is_blacklisted': True,
+            'source': 'disposable_blocklist',
+            'confidence': 99,
+            'message': f'"{domain}" is a confirmed disposable email provider',
+            'risk_level': 'critical',
         }
-    
-    # Layer 2: Pattern matching for domain structures
-    for pattern in TEMPORARY_EMAIL_PATTERNS:
-        if re.match(pattern, domain):
+
+    # Parent-domain match (sub.netoiu.com -> netoiu.com)
+    parts = domain.split('.')
+    if len(parts) > 2:
+        parent = '.'.join(parts[-2:])
+        if parent in DISPOSABLE_DOMAINS:
             return {
-                'is_temporary': True,
-                'reason': 'matches_temporary_pattern',
-                'confidence': 85,
-                'detection_method': 'pattern_matching',
-                'message': f'Domain "{domain}" follows temporary email naming patterns',
-                'risk_level': 'high'
+                'is_blacklisted': True,
+                'source': 'disposable_blocklist_parent',
+                'confidence': 97,
+                'message': f'Parent domain "{parent}" is a confirmed disposable provider',
+                'risk_level': 'critical',
             }
-    
-    # Layer 3: Keyword analysis in domain name
-    domain_parts = domain.replace('.', ' ').replace('-', ' ').split()
-    temp_keywords_found = []
-    for part in domain_parts:
-        for keyword in TEMP_EMAIL_KEYWORDS:
-            if keyword in part.lower():
-                temp_keywords_found.append(keyword)
-    
-    if temp_keywords_found:
-        return {
-            'is_temporary': True,
-            'reason': 'contains_temporary_keywords',
-            'confidence': 75,
-            'detection_method': 'keyword_analysis',
-            'message': f'Domain "{domain}" contains temporary email keywords: {", ".join(temp_keywords_found)}',
-            'risk_level': 'medium'
-        }
-    
-    # Layer 4: Suspicious TLD check
-    domain_tld = '.' + domain.split('.')[-1] if '.' in domain else ''
-    if domain_tld in SUSPICIOUS_TLDS:
-        return {
-            'is_temporary': True,
-            'reason': 'suspicious_tld',
-            'confidence': 60,
-            'detection_method': 'tld_analysis',
-            'message': f'Domain "{domain}" uses TLD "{domain_tld}" commonly associated with temporary services',
-            'risk_level': 'medium'
-        }
-    
-    # Layer 5: Additional heuristic checks
-    suspicion_score = 0
-    warnings = []
-    
-    # Check for very short domain names (often temp services)
-    if len(domain.split('.')[0]) <= 3:
-        suspicion_score += 20
-        warnings.append("unusually short domain name")
-    
-    # Check for excessive numbers in domain
-    if len([c for c in domain if c.isdigit()]) > 2:
-        suspicion_score += 15
-        warnings.append("contains multiple numbers")
-    
-    # Check for uncommon domain extensions
-    if domain.endswith(('.ml', '.tk', '.ga', '.cf', '.gq')):
-        suspicion_score += 25
-        warnings.append("uses free domain extension")
-    
-    if suspicion_score >= 40:
-        return {
-            'is_temporary': True,
-            'reason': 'heuristic_analysis',
-            'confidence': min(60 + suspicion_score, 85),
-            'detection_method': 'behavioral_analysis',
-            'message': f'Domain "{domain}" shows characteristics of temporary services: {", ".join(warnings)}',
-            'risk_level': 'medium'
-        }
-    
-    # Domain appears legitimate
+
     return {
-        'is_temporary': False,
-        'reason': 'legitimate_domain',
-        'confidence': max(90 - suspicion_score, 70),
-        'detection_method': 'comprehensive_analysis',
-        'message': f'Domain "{domain}" appears to be a legitimate email provider',
-        'risk_level': 'low'
+        'is_blacklisted': False,
+        'source': 'not_listed',
+        'confidence': 0,
+        'message': f'"{domain}" is not in the disposable domain blocklist',
+        'risk_level': 'safe',
     }
 
-def has_mx_record(domain: str) -> tuple:
-    """Enhanced MX record checking with better error handling."""
-    try:
-        start_time = time.time()
-        
-        # Try MX record lookup
-        try:
-            mx_answers = dns.resolver.resolve(domain, 'MX')
-            response_time = round((time.time() - start_time) * 1000, 2)
-            
-            mx_records = []
-            for rdata in mx_answers:
-                mx_records.append({
-                    'priority': rdata.preference,
-                    'exchange': str(rdata.exchange).rstrip('.')
-                })
-            
-            # Sort by priority (lower is higher priority)
-            mx_records.sort(key=lambda x: x['priority'])
-            
-            details = {
-                'status': 'valid',
-                'has_mx': True,
-                'mx_count': len(mx_records),
-                'mx_records': mx_records,
-                'primary_mx': mx_records[0]['exchange'] if mx_records else None,
-                'response_time_ms': response_time,
-                'message': f'Domain has {len(mx_records)} MX record(s) and can receive email',
-                'technical_info': f'MX lookup successful in {response_time}ms'
+
+# ===================================================================
+#  LAYER 4 — Temporary Email Heuristics  (patterns / keywords / TLD)
+# ===================================================================
+
+def check_temp_heuristics(domain: str) -> dict:
+    """Pattern matching, keyword analysis, suspicious-TLD, and heuristic scoring."""
+    domain = domain.lower().strip()
+
+    # Pattern matching
+    for pat in TEMPORARY_EMAIL_PATTERNS:
+        if re.match(pat, domain):
+            return {
+                'is_temporary': True,
+                'detection_method': 'pattern_matching',
+                'confidence': 85,
+                'message': f'"{domain}" follows temporary email naming patterns',
+                'risk_level': 'high',
             }
-            return True, details
-            
-        except dns.resolver.NoAnswer:
-            # No MX records, try A record as fallback
-            try:
-                a_answers = dns.resolver.resolve(domain, 'A')
-                response_time = round((time.time() - start_time) * 1000, 2)
-                
-                details = {
-                    'status': 'fallback',
-                    'has_mx': False,
-                    'has_a_record': True,
-                    'mx_count': 0,
-                    'mx_records': [],
-                    'fallback_ips': [str(rdata) for rdata in a_answers],
-                    'response_time_ms': response_time,
-                    'message': 'No MX records found, but domain exists (fallback to A record)',
-                    'technical_info': f'No MX records, using A record fallback (RFC compliant)'
+
+    # Keyword analysis
+    domain_parts = re.split(r'[.\-]', domain)
+    found_keywords = [kw for kw in TEMP_EMAIL_KEYWORDS if any(kw in p for p in domain_parts)]
+    if found_keywords:
+        return {
+            'is_temporary': True,
+            'detection_method': 'keyword_analysis',
+            'confidence': 75,
+            'message': f'Contains temp-email keywords: {", ".join(found_keywords)}',
+            'risk_level': 'medium',
+        }
+
+    # Suspicious TLD
+    tld = '.' + domain.split('.')[-1] if '.' in domain else ''
+    if tld in SUSPICIOUS_TLDS:
+        return {
+            'is_temporary': True,
+            'detection_method': 'suspicious_tld',
+            'confidence': 60,
+            'message': f'Uses suspicious TLD "{tld}"',
+            'risk_level': 'medium',
+        }
+
+    # Heuristic scoring
+    score = 0
+    warnings = []
+    if len(domain.split('.')[0]) <= 3:
+        score += 20
+        warnings.append("very short domain name")
+    if sum(c.isdigit() for c in domain) > 3:
+        score += 15
+        warnings.append("many digits in domain")
+    if tld in {'.ml', '.tk', '.ga', '.cf', '.gq'}:
+        score += 25
+        warnings.append("free domain extension")
+
+    if score >= 40:
+        return {
+            'is_temporary': True,
+            'detection_method': 'heuristic_analysis',
+            'confidence': min(60 + score, 85),
+            'message': f'Heuristic flags: {", ".join(warnings)}',
+            'risk_level': 'medium',
+        }
+
+    return {
+        'is_temporary': False,
+        'detection_method': 'comprehensive_analysis',
+        'confidence': 0,
+        'message': f'"{domain}" shows no temporary email characteristics',
+        'risk_level': 'safe',
+    }
+
+
+# ===================================================================
+#  LAYER 5 — Domain Age Check  (WHOIS, cached 7 days)
+# ===================================================================
+
+def check_domain_age(domain: str) -> dict:
+    """WHOIS domain-age lookup with DB caching (7-day TTL)."""
+    domain = domain.lower().strip()
+
+    # Try cache first
+    try:
+        cached = DomainCache.objects.filter(domain=domain).first()
+        if cached and not cached.is_expired and cached.creation_date is not None:
+            age = cached.age_days
+            return _age_result(age, cached.creation_date, cached.registrar, source='cache')
+    except Exception:
+        pass
+
+    # Live WHOIS lookup
+    try:
+        w = whois.whois(domain)
+        creation = w.creation_date
+        if isinstance(creation, list):
+            creation = creation[0]
+        registrar = w.registrar or 'Unknown'
+
+        if creation:
+            from django.utils.timezone import make_aware, is_naive
+            import datetime
+            if isinstance(creation, datetime.datetime):
+                if is_naive(creation):
+                    creation = make_aware(creation)
+            DomainCache.objects.update_or_create(
+                domain=domain,
+                defaults={
+                    'creation_date': creation,
+                    'registrar': registrar,
+                    'whois_country': getattr(w, 'country', None),
+                },
+            )
+            age = (timezone.now() - creation).days
+            return _age_result(age, creation, registrar, source='whois')
+
+        return {
+            'age_days': None, 'creation_date': None, 'registrar': registrar,
+            'risk_level': 'unknown', 'score': 50,
+            'message': 'WHOIS data available but creation date missing',
+            'source': 'whois',
+        }
+
+    except Exception as exc:
+        logger.debug(f"WHOIS lookup failed for {domain}: {exc}")
+        return {
+            'age_days': None, 'creation_date': None, 'registrar': None,
+            'risk_level': 'unknown', 'score': 50,
+            'message': f'WHOIS lookup unavailable',
+            'source': 'error',
+        }
+
+
+def _age_result(age_days, creation_date, registrar, source='whois'):
+    if age_days is not None and age_days < 30:
+        risk, score = 'high', 90
+        msg = f'Domain is only {age_days} days old — very new'
+    elif age_days is not None and age_days < 90:
+        risk, score = 'medium', 60
+        msg = f'Domain is {age_days} days old — relatively new'
+    elif age_days is not None and age_days < 365:
+        risk, score = 'low', 25
+        msg = f'Domain is {age_days} days old — less than a year'
+    elif age_days is not None:
+        risk, score = 'safe', 5
+        years = age_days // 365
+        msg = f'Domain is ~{years} year(s) old — established'
+    else:
+        risk, score = 'unknown', 50
+        msg = 'Could not determine domain age'
+
+    return {
+        'age_days': age_days,
+        'creation_date': str(creation_date) if creation_date else None,
+        'registrar': registrar,
+        'risk_level': risk,
+        'score': score,
+        'message': msg,
+        'source': source,
+    }
+
+
+# ===================================================================
+#  LAYER 6 / 7 / 8 — SPF, DKIM, DMARC Checks
+# ===================================================================
+
+def check_spf(domain: str) -> dict:
+    """Query TXT records for SPF (v=spf1)."""
+    try:
+        answers = dns.resolver.resolve(domain, 'TXT')
+        for rdata in answers:
+            txt = rdata.to_text().strip('"')
+            if txt.lower().startswith('v=spf1'):
+                strictness = 'unknown'
+                if '-all' in txt:
+                    strictness = 'strict'
+                elif '~all' in txt:
+                    strictness = 'softfail'
+                elif '?all' in txt:
+                    strictness = 'neutral'
+                elif '+all' in txt:
+                    strictness = 'permissive'
+
+                return {
+                    'found': True,
+                    'record': txt,
+                    'strictness': strictness,
+                    'score': 0 if strictness == 'strict' else 30 if strictness == 'softfail' else 60,
+                    'message': f'SPF record found ({strictness})',
                 }
-                return True, details
-                
-            except:
-                response_time = round((time.time() - start_time) * 1000, 2)
-                details = {
-                    'status': 'no_records',
-                    'has_mx': False,
-                    'has_a_record': False,
-                    'mx_count': 0,
-                    'mx_records': [],
-                    'response_time_ms': response_time,
-                    'message': 'Domain has no MX or A records and cannot receive email',
-                    'technical_info': 'Neither MX nor A records found for domain'
+    except Exception:
+        pass
+
+    return {
+        'found': False, 'record': None, 'strictness': None, 'score': 80,
+        'message': 'No SPF record found — domain does not publish sender policy',
+    }
+
+
+def check_dkim(domain: str) -> dict:
+    """Try common DKIM selectors to see if a public key is published."""
+    for selector in DKIM_SELECTORS:
+        try:
+            qname = f'{selector}._domainkey.{domain}'
+            answers = dns.resolver.resolve(qname, 'TXT')
+            for rdata in answers:
+                txt = rdata.to_text().strip('"')
+                if 'p=' in txt:
+                    return {
+                        'found': True,
+                        'selector': selector,
+                        'score': 0,
+                        'message': f'DKIM public key found (selector: {selector})',
+                    }
+        except Exception:
+            continue
+
+    return {
+        'found': False, 'selector': None, 'score': 70,
+        'message': 'No DKIM record found for common selectors',
+    }
+
+
+def check_dmarc(domain: str) -> dict:
+    """Query _dmarc.<domain> TXT for DMARC policy."""
+    try:
+        answers = dns.resolver.resolve(f'_dmarc.{domain}', 'TXT')
+        for rdata in answers:
+            txt = rdata.to_text().strip('"')
+            if 'v=dmarc1' in txt.lower():
+                policy = 'none'
+                m = re.search(r'p\s*=\s*(reject|quarantine|none)', txt, re.I)
+                if m:
+                    policy = m.group(1).lower()
+
+                if policy == 'reject':
+                    score = 0
+                elif policy == 'quarantine':
+                    score = 30
+                else:
+                    score = 60
+
+                return {
+                    'found': True,
+                    'record': txt,
+                    'policy': policy,
+                    'score': score,
+                    'message': f'DMARC policy found: p={policy}',
                 }
-                return False, details
-                
+    except Exception:
+        pass
+
+    return {
+        'found': False, 'record': None, 'policy': None, 'score': 80,
+        'message': 'No DMARC record found',
+    }
+
+
+# ===================================================================
+#  LAYER 9 — MX / DNS Deliverability Check
+# ===================================================================
+
+def check_mx(domain: str) -> dict:
+    """MX record lookup with A-record fallback."""
+    start = time.time()
+    try:
+        mx_answers = dns.resolver.resolve(domain, 'MX')
+        elapsed = round((time.time() - start) * 1000, 2)
+
+        records = sorted(
+            [{'priority': r.preference, 'exchange': str(r.exchange).rstrip('.')} for r in mx_answers],
+            key=lambda r: r['priority'],
+        )
+        return {
+            'status': 'valid',
+            'has_mx': True,
+            'mx_count': len(records),
+            'mx_records': records,
+            'primary_mx': records[0]['exchange'] if records else None,
+            'response_time_ms': elapsed,
+            'message': f'Domain has {len(records)} MX record(s) and can receive email',
+        }
+    except dns.resolver.NoAnswer:
+        try:
+            a = dns.resolver.resolve(domain, 'A')
+            elapsed = round((time.time() - start) * 1000, 2)
+            return {
+                'status': 'fallback',
+                'has_mx': False, 'has_a_record': True,
+                'mx_count': 0, 'mx_records': [],
+                'fallback_ips': [str(r) for r in a],
+                'response_time_ms': elapsed,
+                'message': 'No MX records; domain exists via A record (RFC fallback)',
+            }
+        except Exception:
+            pass
     except dns.resolver.NXDOMAIN:
-        response_time = round((time.time() - start_time) * 1000, 2)
-        details = {
+        elapsed = round((time.time() - start) * 1000, 2)
+        return {
             'status': 'domain_not_found',
-            'has_mx': False,
-            'mx_count': 0,
-            'mx_records': [],
-            'response_time_ms': response_time,
-            'message': 'Domain does not exist',
-            'technical_info': 'DNS NXDOMAIN - domain name does not exist'
+            'has_mx': False, 'mx_count': 0, 'mx_records': [],
+            'response_time_ms': elapsed,
+            'message': 'Domain does not exist (NXDOMAIN)',
         }
-        return False, details
-        
     except dns.resolver.Timeout:
-        response_time = round((time.time() - start_time) * 1000, 2)
-        details = {
+        elapsed = round((time.time() - start) * 1000, 2)
+        return {
             'status': 'timeout',
-            'has_mx': None,
-            'mx_count': 0,
-            'mx_records': [],
-            'response_time_ms': response_time,
-            'message': 'DNS lookup timed out - domain status unknown',
-            'technical_info': 'DNS query timeout - network or DNS server issue'
+            'has_mx': None, 'mx_count': 0, 'mx_records': [],
+            'response_time_ms': elapsed,
+            'message': 'DNS lookup timed out',
         }
-        return None, details
-        
-    except Exception as e:
-        response_time = round((time.time() - start_time) * 1000, 2)
-        details = {
+    except Exception as exc:
+        elapsed = round((time.time() - start) * 1000, 2)
+        return {
             'status': 'dns_error',
-            'has_mx': None,
-            'mx_count': 0,
-            'mx_records': [],
-            'response_time_ms': response_time,
-            'message': f'DNS lookup failed: {str(e)}',
-            'technical_info': f'DNS resolution error: {str(e)}'
+            'has_mx': None, 'mx_count': 0, 'mx_records': [],
+            'response_time_ms': elapsed,
+            'message': f'DNS error: {exc}',
         }
-        return None, details
+
+    elapsed = round((time.time() - start) * 1000, 2)
+    return {
+        'status': 'no_records',
+        'has_mx': False, 'mx_count': 0, 'mx_records': [],
+        'response_time_ms': elapsed,
+        'message': 'Domain has no MX or A records — cannot receive email',
+    }
+
+
+# ===================================================================
+#  RISK SCORING ENGINE  (weighted composite 0-100)
+# ===================================================================
+
+def calculate_risk_score(checks: dict) -> dict:
+    """
+    Weighted risk score from all validation layers.
+    0 = perfectly safe / 100 = maximum risk
+
+    Weights:
+        Blacklist / temp      30%
+        Domain age            15%
+        SPF                   15%
+        DKIM                  10%
+        DMARC                 10%
+        MX deliverability     10%
+        Heuristics            10%
+    """
+    weights = {
+        'blacklist':   0.30,
+        'domain_age':  0.15,
+        'spf':         0.15,
+        'dkim':        0.10,
+        'dmarc':       0.10,
+        'mx':          0.10,
+        'heuristics':  0.10,
+    }
+
+    scores = {}
+
+    # Blacklist
+    bl = checks.get('blacklist', {})
+    scores['blacklist'] = 100 if bl.get('is_blacklisted') else 0
+
+    # Domain age
+    age = checks.get('domain_age', {})
+    scores['domain_age'] = age.get('score', 50)
+
+    # SPF / DKIM / DMARC
+    scores['spf'] = checks.get('spf', {}).get('score', 80)
+    scores['dkim'] = checks.get('dkim', {}).get('score', 70)
+    scores['dmarc'] = checks.get('dmarc', {}).get('score', 80)
+
+    # MX
+    mx = checks.get('dns', {})
+    if mx.get('has_mx') is True:
+        scores['mx'] = 0
+    elif mx.get('has_mx') is False:
+        scores['mx'] = 100
+    else:
+        scores['mx'] = 50
+
+    # Heuristics
+    heur = checks.get('heuristics', {})
+    scores['heuristics'] = heur.get('confidence', 0) if heur.get('is_temporary') else 0
+
+    # Weighted sum
+    risk = sum(scores[k] * weights[k] for k in weights)
+    risk = round(min(max(risk, 0), 100), 1)
+
+    # Classify
+    if risk >= 80:
+        level = 'critical'
+    elif risk >= 60:
+        level = 'high'
+    elif risk >= 40:
+        level = 'medium'
+    elif risk >= 20:
+        level = 'low'
+    else:
+        level = 'safe'
+
+    # Build contributing factors
+    factors = []
+    for k, v in sorted(scores.items(), key=lambda x: -x[1]):
+        if v > 20:
+            factors.append({'factor': k, 'score': v, 'weight': f"{weights[k]*100:.0f}%"})
+
+    return {
+        'risk_score': risk,
+        'risk_level': level,
+        'component_scores': scores,
+        'contributing_factors': factors,
+    }
+
+
+# ===================================================================
+#  BEHAVIORAL MONITORING
+# ===================================================================
+
+def _get_client_ip(request):
+    xff = request.META.get('HTTP_X_FORWARDED_FOR')
+    return xff.split(',')[0].strip() if xff else request.META.get('REMOTE_ADDR')
+
+
+def track_and_analyze(request, domain, result_data):
+    """
+    1. Log the validation to the DB.
+    2. Rate-limit check (cache-based, per IP, 10-min window).
+    3. Pattern detection (bulk temp-email checking, domain abuse).
+    """
+    ip = _get_client_ip(request)
+    behavioral = {
+        'ip_address': ip,
+        'queries_this_session': 0,
+        'is_rate_limited': False,
+        'behavioral_flags': [],
+        'domain_query_count': 0,
+    }
+
+    # --- 1. Log to DB ---
+    try:
+        EmailValidationLog.objects.create(
+            email=result_data.get('email', ''),
+            domain=domain or '',
+            ip_address=ip,
+            is_valid=result_data.get('is_valid', False),
+            is_temporary=result_data.get('is_temporary', False),
+            is_deliverable=result_data.get('is_deliverable', False),
+            risk_score=result_data.get('risk_score', 0),
+            risk_level=result_data.get('risk_level', 'unknown'),
+            spf_status=result_data.get('spf_status', ''),
+            dkim_status=result_data.get('dkim_status', ''),
+            dmarc_status=result_data.get('dmarc_status', ''),
+            domain_age_days=result_data.get('domain_age_days'),
+            processing_time_ms=result_data.get('processing_time_ms', 0),
+        )
+    except Exception as exc:
+        logger.warning(f"Failed to log validation: {exc}")
+
+    # --- 2. Rate-limit check (cache) ---
+    try:
+        cache_key = f'ev_rate_{ip}'
+        count = cache.get(cache_key, 0) + 1
+        cache.set(cache_key, count, 600)  # 10-min window
+        behavioral['queries_this_session'] = count
+
+        if count > 20:
+            behavioral['is_rate_limited'] = True
+            behavioral['behavioral_flags'].append('Rate limit exceeded (>20 queries in 10 min)')
+            BehavioralFlag.objects.create(
+                ip_address=ip, flag_type='rate_limit', severity='high',
+                details=f'{count} queries in 10-min window',
+            )
+    except Exception:
+        pass
+
+    # --- 3. Pattern detection ---
+    try:
+        one_hour_ago = timezone.now() - timedelta(hours=1)
+
+        # Bulk temp-email checking from same IP
+        recent_temp = EmailValidationLog.objects.filter(
+            ip_address=ip, is_temporary=True, timestamp__gte=one_hour_ago,
+        ).count()
+        if recent_temp >= 5:
+            behavioral['behavioral_flags'].append(
+                f'{recent_temp} temporary emails checked in 1 hour'
+            )
+            BehavioralFlag.objects.get_or_create(
+                ip_address=ip, flag_type='bulk_temp_check',
+                timestamp__gte=one_hour_ago,
+                defaults={
+                    'severity': 'medium',
+                    'details': f'{recent_temp} temp-email lookups in 1h',
+                },
+            )
+
+        # Domain abuse: same domain queried > 50 times overall
+        if domain:
+            domain_total = EmailValidationLog.objects.filter(domain=domain).count()
+            behavioral['domain_query_count'] = domain_total
+            if domain_total > 50:
+                behavioral['behavioral_flags'].append(
+                    f'Domain "{domain}" queried {domain_total} times total'
+                )
+    except Exception:
+        pass
+
+    return behavioral
+
+
+# ===================================================================
+#  MAIN ORCHESTRATOR
+# ===================================================================
 
 def validate_email_comprehensive(email: str) -> dict:
-    """
-    Comprehensive email validation combining all checks
-    Returns detailed validation results
-    """
+    """Run all 9 layers and compute the composite risk score."""
     start_time = time.time()
     results = {
         'email': email,
         'is_valid': False,
         'is_deliverable': False,
         'is_temporary': False,
+        'risk_score': 0,
+        'risk_level': 'unknown',
         'confidence_score': 0,
         'warnings': [],
         'errors': [],
-        'details': {}
+        'details': {},
     }
-    
-    # Step 1: Basic format validation
-    format_valid, format_details = is_valid_email_regex(email)
-    results['details']['format'] = format_details
-    
-    if not format_valid:
+
+    # ---- Layer 1: Format ----
+    fmt = check_format(email)
+    results['details']['format'] = fmt
+    if not fmt['is_valid']:
         results['errors'].append("Invalid email format")
-        results['confidence_score'] = 0
         results['processing_time_ms'] = round((time.time() - start_time) * 1000, 2)
+        risk = calculate_risk_score(results['details'])
+        results.update(risk_score=risk['risk_score'], risk_level=risk['risk_level'])
+        results['risk_details'] = risk
         return results
-    
-    # Step 2: Library validation (more thorough)
-    library_valid, library_details, normalized_email = is_valid_email_library(email)
-    results['details']['library'] = library_details
-    
-    if not library_valid:
-        results['errors'].append(library_details.get('message', 'Library validation failed'))
-        results['confidence_score'] = 20
+
+    # ---- Layer 2: Library ----
+    lib = check_library(email)
+    results['details']['library'] = lib
+    if not lib['is_valid']:
+        results['errors'].append(lib['message'])
         results['processing_time_ms'] = round((time.time() - start_time) * 1000, 2)
+        risk = calculate_risk_score(results['details'])
+        results.update(risk_score=risk['risk_score'], risk_level=risk['risk_level'])
+        results['risk_details'] = risk
         return results
-    
-    # Extract domain for further checks
-    domain = library_details.get('domain') or email.split('@')[1].lower()
+
+    domain = lib.get('domain') or email.split('@')[1].lower()
     results['domain'] = domain
-    results['normalized_email'] = normalized_email
-    
-    # Step 3: Temporary email detection
-    temp_check = is_temporary_email(domain)
-    results['details']['temporary'] = temp_check
-    results['is_temporary'] = temp_check['is_temporary']
-    
-    if temp_check['is_temporary']:
-        results['warnings'].append(f"Temporary email detected: {temp_check['message']}")
-        results['confidence_score'] = max(results['confidence_score'], 30)
-    
-    # Step 4: DNS/MX record validation
-    mx_valid, mx_details = has_mx_record(domain)
-    results['details']['dns'] = mx_details
-    
-    if mx_valid is True:
-        results['is_deliverable'] = True
-        results['confidence_score'] = max(results['confidence_score'], 85)
-    elif mx_valid is False:
-        results['errors'].append(mx_details.get('message', 'Domain cannot receive email'))
-        results['confidence_score'] = max(results['confidence_score'], 40)
-    else:  # mx_valid is None (timeout/error)
-        results['warnings'].append(mx_details.get('message', 'Could not verify domain'))
-        results['confidence_score'] = max(results['confidence_score'], 60)
-    
-    # Step 5: Final validation decision
-    results['is_valid'] = format_valid and library_valid
-    
-    # Adjust confidence based on temporary email detection
-    if results['is_temporary']:
-        results['confidence_score'] = min(results['confidence_score'], 50)
-        if temp_check['confidence'] > 90:
-            results['confidence_score'] = min(results['confidence_score'], 30)
-    
+    results['normalized_email'] = lib.get('normalized_email')
+
+    # ---- Layer 3: Blacklist ----
+    bl = check_blacklist(domain)
+    results['details']['blacklist'] = bl
+    if bl['is_blacklisted']:
+        results['is_temporary'] = True
+        results['warnings'].append(bl['message'])
+
+    # ---- Layer 4: Heuristics ----
+    heur = check_temp_heuristics(domain)
+    results['details']['heuristics'] = heur
+    if heur['is_temporary'] and not bl['is_blacklisted']:
+        results['is_temporary'] = True
+        results['warnings'].append(heur['message'])
+
+    # ---- Layer 5: Domain Age ----
+    age = check_domain_age(domain)
+    results['details']['domain_age'] = age
+
+    # ---- Layer 6: SPF ----
+    spf = check_spf(domain)
+    results['details']['spf'] = spf
+
+    # ---- Layer 7: DKIM ----
+    dkim_result = check_dkim(domain)
+    results['details']['dkim'] = dkim_result
+
+    # ---- Layer 8: DMARC ----
+    dmarc = check_dmarc(domain)
+    results['details']['dmarc'] = dmarc
+
+    # Cache auth results in DomainCache
+    try:
+        DomainCache.objects.update_or_create(
+            domain=domain,
+            defaults={
+                'spf_found': spf['found'],
+                'spf_record': spf.get('record'),
+                'spf_strictness': spf.get('strictness'),
+                'dkim_found': dkim_result['found'],
+                'dkim_selector': dkim_result.get('selector'),
+                'dmarc_found': dmarc['found'],
+                'dmarc_record': dmarc.get('record'),
+                'dmarc_policy': dmarc.get('policy'),
+            },
+        )
+    except Exception:
+        pass
+
+    # ---- Layer 9: MX ----
+    mx = check_mx(domain)
+    results['details']['dns'] = mx
+    results['is_deliverable'] = mx.get('has_mx') is True or mx.get('has_a_record', False)
+
+    if not results['is_deliverable'] and mx.get('has_mx') is False:
+        results['errors'].append(mx.get('message', 'Domain cannot receive email'))
+
+    # ---- Final decisions ----
+    results['is_valid'] = True  # passed format + library
+
+    # ---- Risk scoring ----
+    risk = calculate_risk_score(results['details'])
+    results['risk_score'] = risk['risk_score']
+    results['risk_level'] = risk['risk_level']
+    results['risk_details'] = risk
+
+    # Derive a user-friendly confidence score (inverse of risk)
+    results['confidence_score'] = round(100 - risk['risk_score'], 1)
+
     results['processing_time_ms'] = round((time.time() - start_time) * 1000, 2)
-    
     return results
+
+
+# ===================================================================
+#  UI HELPER FUNCTIONS
+# ===================================================================
+
+def get_validation_title(r):
+    if not r['is_valid']:
+        return "Invalid Email Address"
+    if r.get('risk_level') == 'critical':
+        return "Critical Risk Email"
+    if r['is_temporary']:
+        return "Temporary / Disposable Email Detected"
+    if r.get('risk_level') == 'high':
+        return "High Risk Email Address"
+    if not r['is_deliverable']:
+        return "Email May Not Be Deliverable"
+    if r['warnings']:
+        return "Valid Email with Warnings"
+    return "Valid Email Address"
+
+
+def get_validation_message(r):
+    if not r['is_valid']:
+        return f"This email address is not valid. {' '.join(r['errors'])}"
+    if r['is_temporary']:
+        return "This is a temporary/disposable email. It should not be trusted for important communications."
+    if r.get('risk_level') in ('critical', 'high'):
+        return f"This email has a risk score of {r['risk_score']}/100. Proceed with extreme caution."
+    if not r['is_deliverable']:
+        return f"This email may not be deliverable. {' '.join(r['errors'])}"
+    if r['warnings']:
+        return f"Valid email with concerns: {' '.join(r['warnings'])}"
+    return f"This email is valid and appears deliverable with {r['confidence_score']}% confidence."
+
+
+def get_status_color(r):
+    if not r['is_valid']:
+        return 'danger'
+    level = r.get('risk_level', 'safe')
+    if level in ('critical', 'high') or r['is_temporary']:
+        return 'warning'
+    if level == 'medium' or r['warnings']:
+        return 'info'
+    return 'success'
+
+
+def get_status_icon(r):
+    if not r['is_valid']:
+        return 'fas fa-times-circle'
+    if r['is_temporary']:
+        return 'fas fa-clock'
+    level = r.get('risk_level', 'safe')
+    if level in ('critical', 'high'):
+        return 'fas fa-exclamation-triangle'
+    if level == 'medium':
+        return 'fas fa-info-circle'
+    return 'fas fa-check-circle'
+
+
+def get_recommendation(r):
+    if not r['is_valid']:
+        return "Please correct the email address format and try again."
+    if r['is_temporary']:
+        return "This is a known disposable email provider. Use a permanent email for important accounts."
+    level = r.get('risk_level', 'safe')
+    if level == 'critical':
+        return "CRITICAL: This email shows multiple severe risk indicators. Do not trust it."
+    if level == 'high':
+        return "HIGH RISK: This email has concerning characteristics. Verify the sender through other means."
+    if level == 'medium':
+        return "MODERATE RISK: Some concerns detected. Exercise caution with sensitive information."
+    if not r['is_deliverable']:
+        return "The domain cannot receive emails. Verify the address or contact through alternative means."
+    if r['confidence_score'] < 70:
+        return "This email may have deliverability issues. Double-check the address."
+    return "This email address appears safe and trustworthy for communication."
+
+
+# ===================================================================
+#  DJANGO VIEWS
+# ===================================================================
 
 @csrf_exempt
 @require_http_methods(["GET", "POST"])
 def email_validation_view(request):
-    """Enhanced email validation view with improved UI and features"""
-    import logging
-    logger = logging.getLogger('EmailValidation')
-    
+    """Main page view — handles form GET and POST."""
     result = None
-    
-    logger.info(f"Email validation request - Method: {request.method}")
-    
+
     if request.method == 'POST':
         try:
-            # Handle both AJAX and form submissions
             if request.content_type == 'application/json':
                 data = json.loads(request.body)
                 email = data.get('email', '').strip()
-                logger.info(f"JSON request with email: {email}")
             else:
                 email = request.POST.get('email', '').strip()
-                logger.info(f"Form submission with email: {email}")
-            
+
             if email:
-                logger.info(f"Starting validation for email: {email}")
-                # Perform comprehensive validation
-                validation_results = validate_email_comprehensive(email)
-                logger.info(f"Validation completed - Valid: {validation_results['is_valid']}, Temporary: {validation_results['is_temporary']}")
-                
-                # Prepare result for template context
+                validation = validate_email_comprehensive(email)
+
+                # Build template context
                 result = {
-                    'email': validation_results['email'],
-                    'normalized_email': validation_results.get('normalized_email'),
-                    'is_valid': validation_results['is_valid'],
-                    'is_deliverable': validation_results['is_deliverable'],
-                    'is_temporary': validation_results['is_temporary'],
-                    'confidence_score': validation_results['confidence_score'],
-                    'warnings': validation_results['warnings'],
-                    'errors': validation_results['errors'],
-                    'processing_time_ms': validation_results['processing_time_ms'],
-                    'domain': validation_results.get('domain'),
-                    
-                    # UI-friendly fields
-                    'title': get_validation_title(validation_results),
-                    'explanation': get_validation_message(validation_results),
-                    'status_color': get_status_color(validation_results),
-                    'status_icon': get_status_icon(validation_results),
-                    'recommendation': get_recommendation(validation_results),
-                    
-                    # Additional details for comprehensive display
-                    'validation_steps': validation_results['details'],
-                    'domain_info': validation_results['details'].get('mx'),
+                    # Core
+                    'email': validation['email'],
+                    'normalized_email': validation.get('normalized_email'),
+                    'domain': validation.get('domain'),
+                    'is_valid': validation['is_valid'],
+                    'is_deliverable': validation['is_deliverable'],
+                    'is_temporary': validation['is_temporary'],
+                    'confidence_score': validation['confidence_score'],
+                    'risk_score': validation['risk_score'],
+                    'risk_level': validation['risk_level'],
+                    'warnings': validation['warnings'],
+                    'errors': validation['errors'],
+                    'processing_time_ms': validation['processing_time_ms'],
+
+                    # UI
+                    'title': get_validation_title(validation),
+                    'explanation': get_validation_message(validation),
+                    'status_color': get_status_color(validation),
+                    'status_icon': get_status_icon(validation),
+                    'recommendation': get_recommendation(validation),
+
+                    # Validation step details
+                    'validation_steps': validation['details'],
+
+                    # Domain info (MX records)
+                    'domain_info': validation['details'].get('dns', {}),
+
+                    # Auth checks
+                    'spf_check': validation['details'].get('spf', {}),
+                    'dkim_check': validation['details'].get('dkim', {}),
+                    'dmarc_check': validation['details'].get('dmarc', {}),
+
+                    # Domain age
+                    'domain_age_info': validation['details'].get('domain_age', {}),
+
+                    # Blacklist
+                    'blacklist_check': validation['details'].get('blacklist', {}),
+
+                    # Risk details
+                    'risk_details': validation.get('risk_details', {}),
+
+                    # Risk factors list for template
+                    'risk_factors': [],
+
+                    # DNS warning
                     'dns_warning': None,
-                    'risk_factors': []
                 }
-                
-                # Add risk factors
-                if validation_results['is_temporary']:
-                    result['risk_factors'].append("Uses temporary/disposable email service")
-                if not validation_results['is_deliverable']:
+
+                # Populate risk factors
+                if validation['is_temporary']:
+                    result['risk_factors'].append("Uses temporary / disposable email service")
+                if not validation['is_deliverable']:
                     result['risk_factors'].append("Domain cannot receive emails")
-                if validation_results['warnings']:
-                    result['risk_factors'].extend(validation_results['warnings'])
-                if validation_results['errors']:
-                    result['risk_factors'].extend(validation_results['errors'])
-                
-                # Add DNS warning if domain issues
-                mx_details = validation_results['details'].get('mx', {})
-                if mx_details.get('status') in ['domain_not_found', 'timeout', 'dns_error']:
-                    result['dns_warning'] = mx_details.get('message', 'Domain has DNS issues')
-                
-                logger.info(f"Result prepared - Title: {result['title']}, Status: {result['status_color']}")
-                
-                # Handle AJAX requests
+
+                age_info = validation['details'].get('domain_age', {})
+                if age_info.get('risk_level') in ('high', 'medium'):
+                    result['risk_factors'].append(age_info.get('message', 'Domain is very new'))
+
+                spf_info = validation['details'].get('spf', {})
+                if not spf_info.get('found'):
+                    result['risk_factors'].append("No SPF record published")
+
+                dkim_info = validation['details'].get('dkim', {})
+                if not dkim_info.get('found'):
+                    result['risk_factors'].append("No DKIM record found")
+
+                dmarc_info = validation['details'].get('dmarc', {})
+                if not dmarc_info.get('found'):
+                    result['risk_factors'].append("No DMARC policy configured")
+
+                if validation['warnings']:
+                    result['risk_factors'].extend(validation['warnings'])
+
+                dns_info = validation['details'].get('dns', {})
+                if dns_info.get('status') in ('domain_not_found', 'timeout', 'dns_error'):
+                    result['dns_warning'] = dns_info.get('message')
+
+                # Behavioral monitoring
+                behavioral = track_and_analyze(request, validation.get('domain'), {
+                    'email': validation['email'],
+                    'is_valid': validation['is_valid'],
+                    'is_temporary': validation['is_temporary'],
+                    'is_deliverable': validation['is_deliverable'],
+                    'risk_score': validation['risk_score'],
+                    'risk_level': validation['risk_level'],
+                    'spf_status': 'found' if spf_info.get('found') else 'missing',
+                    'dkim_status': 'found' if dkim_info.get('found') else 'missing',
+                    'dmarc_status': dmarc_info.get('policy') or 'missing',
+                    'domain_age_days': age_info.get('age_days'),
+                    'processing_time_ms': validation['processing_time_ms'],
+                })
+                result['behavioral_info'] = behavioral
+
+                if behavioral.get('behavioral_flags'):
+                    result['risk_factors'].extend(behavioral['behavioral_flags'])
+
+                # AJAX
                 if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                    logger.info("Returning AJAX response")
-                    return JsonResponse({
-                        'success': True,
-                        'result': result
-                    })
-            else:
-                logger.warning("No email provided in request")
-            
+                    return JsonResponse({'success': True, 'result': result})
+
         except json.JSONDecodeError:
-            logger.error("JSON decode error in request")
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({
-                    'success': False,
-                    'error': 'Invalid JSON data',
-                    'message': 'Please check your request format'
-                })
-        except Exception as e:
-            logger.error(f"Validation error: {str(e)}")
+                return JsonResponse({'success': False, 'error': 'Invalid JSON'})
+        except Exception as exc:
+            logger.error(f"Validation error: {exc}", exc_info=True)
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({
-                    'success': False,
-                    'error': str(e),
-                    'message': 'An error occurred during validation'
-                })
-    
-    logger.info(f"Rendering template with result: {'Yes' if result else 'No'}")
+                return JsonResponse({'success': False, 'error': str(exc)})
+
     return render(request, 'EmailValidation.html', {'result': result})
 
-def get_validation_title(results):
-    """Generate appropriate title based on validation results"""
-    if not results['is_valid']:
-        return "Invalid Email Address"
-    elif results['is_temporary']:
-        return "Temporary Email Detected"
-    elif not results['is_deliverable']:
-        return "Email May Not Be Deliverable"
-    elif results['warnings']:
-        return "Valid Email with Warnings"
-    else:
-        return "Valid Email Address"
 
-def get_validation_message(results):
-    """Generate detailed message based on validation results"""
-    if not results['is_valid']:
-        return f"This email address is not valid. {' '.join(results['errors'])}"
-    elif results['is_temporary']:
-        return f"This appears to be a temporary email address. While valid, it may not be suitable for long-term communication."
-    elif not results['is_deliverable']:
-        return f"This email address is valid but may not be deliverable. {' '.join(results['errors'])}"
-    elif results['warnings']:
-        return f"This email address is valid but has some concerns: {' '.join(results['warnings'])}"
-    else:
-        return f"This email address is valid and appears to be deliverable with {results['confidence_score']}% confidence."
-
-def get_status_color(results):
-    """Get appropriate Bootstrap color class"""
-    if not results['is_valid']:
-        return 'danger'
-    elif results['is_temporary'] or not results['is_deliverable']:
-        return 'warning'
-    elif results['warnings']:
-        return 'info'
-    else:
-        return 'success'
-
-def get_status_icon(results):
-    """Get appropriate FontAwesome icon"""
-    if not results['is_valid']:
-        return 'fas fa-times-circle'
-    elif results['is_temporary']:
-        return 'fas fa-clock'
-    elif not results['is_deliverable']:
-        return 'fas fa-exclamation-triangle'
-    elif results['warnings']:
-        return 'fas fa-info-circle'
-    else:
-        return 'fas fa-check-circle'
-
-def get_recommendation(results):
-    """Generate security/usage recommendation"""
-    if not results['is_valid']:
-        return "Please correct the email address format and try again."
-    elif results['is_temporary']:
-        return "Consider using a permanent email address for important accounts and communications."
-    elif not results['is_deliverable']:
-        return "Verify the domain name and try again, or contact the recipient through alternative means."
-    elif results['confidence_score'] < 70:
-        return "Exercise caution - this email may have deliverability issues."
-    else:
-        return "This email address appears safe to use for communication."
-
-@csrf_exempt  
+@csrf_exempt
 @require_http_methods(["POST"])
 def validate_email_api(request):
-    """
-    API endpoint for email validation 
-    Enhanced with comprehensive temporary email detection
-    """
+    """REST API endpoint — always returns JSON."""
     try:
         if request.content_type == 'application/json':
             data = json.loads(request.body)
             email = data.get('email', '').strip()
         else:
             email = request.POST.get('email', '').strip()
-        
+
         if not email:
-            return JsonResponse({
-                'success': False,
-                'error': 'No email address provided',
-                'message': 'Please enter an email address to validate'
-            }, status=400)
-        
-        # Perform comprehensive validation
-        validation_results = validate_email_comprehensive(email)
-        
-        # Prepare enhanced response
-        response = {
-            'success': True,
-            'email': validation_results['email'],
-            'normalized_email': validation_results.get('normalized_email'),
-            'is_valid': validation_results['is_valid'],
-            'is_deliverable': validation_results['is_deliverable'],
-            'is_temporary': validation_results['is_temporary'],
-            'confidence': validation_results['confidence_score'],
-            'warnings': validation_results['warnings'],
-            'errors': validation_results['errors'],
-            'processing_time_ms': validation_results['processing_time_ms'],
-            'domain': validation_results.get('domain'),
-            
-            # UI-friendly fields for template rendering
-            'title': get_validation_title(validation_results),
-            'explanation': get_validation_message(validation_results),
-            'status_color': get_status_color(validation_results),
-            'status_icon': get_status_icon(validation_results),
-            'recommendation': get_recommendation(validation_results),
-            
-            # Enhanced temporary email detection details
-            'temp_detection': validation_results.get('details', {}).get('temporary', {}),
-            'dns_info': validation_results.get('details', {}).get('dns', {}),
-            'domain_info': {
-                'domain': validation_results.get('domain'),
-                'mx_records': validation_results.get('details', {}).get('dns', {}).get('has_mx', False),
-                'reputation': 'trusted' if not validation_results['is_temporary'] else 'temporary'
-            }
-        }
-        
-        return render(request, 'EmailValidation.html', {'result': response})
-        
-    except Exception as e:
+            return JsonResponse({'success': False, 'error': 'No email provided'}, status=400)
+
+        validation = validate_email_comprehensive(email)
+
         return JsonResponse({
-            'success': False,
-            'error': str(e),
-            'message': 'An error occurred during validation'
-        }, status=500)
+            'success': True,
+            'email': validation['email'],
+            'is_valid': validation['is_valid'],
+            'is_deliverable': validation['is_deliverable'],
+            'is_temporary': validation['is_temporary'],
+            'risk_score': validation['risk_score'],
+            'risk_level': validation['risk_level'],
+            'confidence_score': validation['confidence_score'],
+            'processing_time_ms': validation['processing_time_ms'],
+            'domain': validation.get('domain'),
+            'warnings': validation['warnings'],
+            'errors': validation['errors'],
+            'details': {
+                'blacklist': validation['details'].get('blacklist', {}),
+                'domain_age': validation['details'].get('domain_age', {}),
+                'spf': validation['details'].get('spf', {}),
+                'dkim': validation['details'].get('dkim', {}),
+                'dmarc': validation['details'].get('dmarc', {}),
+                'dns': validation['details'].get('dns', {}),
+            },
+            'risk_details': validation.get('risk_details', {}),
+        })
+
+    except Exception as exc:
+        return JsonResponse({'success': False, 'error': str(exc)}, status=500)
