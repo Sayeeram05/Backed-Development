@@ -1,602 +1,433 @@
-# 🛡️ CyberX - Advanced Cybersecurity Platform
-
-<p align="center">
-  <img src="https://img.shields.io/badge/Python-3.8%2B-blue.svg" alt="Python">
-  <img src="https://img.shields.io/badge/Django-6.0-green.svg" alt="Django">
-  <img src="https://img.shields.io/badge/PyTorch-2.0%2B-red.svg" alt="PyTorch">
-  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License">
-  <img src="https://img.shields.io/badge/Accuracy-95%25%2B-brightgreen.svg" alt="Accuracy">
+﻿<p align="center">
+  <img src="https://img.shields.io/badge/Django-6.0-green?style=for-the-badge&logo=django" />
+  <img src="https://img.shields.io/badge/Python-3.10+-blue?style=for-the-badge&logo=python" />
+  <img src="https://img.shields.io/badge/PyTorch-2.0+-orange?style=for-the-badge&logo=pytorch" />
+  <img src="https://img.shields.io/badge/scikit--learn-1.4+-yellow?style=for-the-badge&logo=scikit-learn" />
 </p>
 
-<p align="center">
-  <b>AI-powered cybersecurity platform for URL threat detection, phishing analysis, and email validation</b>
-</p>
+# CyberX - AI-Powered Cybersecurity Platform
+
+CyberX is a full-stack Django web application that bundles **five independent security modules** into a single dashboard. Each module uses machine-learning or rule-based analysis to detect threats in real time.
+
+| Module | Technique | Key Metric |
+|--------|-----------|------------|
+| **Email Validation** | Regex + DNS MX + temp-mail DB | 200+ disposable-domain list |
+| **URL Threat Detection** | 3-model ML ensemble (DT, RF, ET) | 95%+ accuracy |
+| **Phishing Detection** | PyTorch deep-learning MLP | 98% detection rate (87 features) |
+| **Malware Analysis** | Signature + Heuristic + ML (RF, GB) | 100% ML accuracy |
+| **Network IDS** | Ensemble (RF + XGBoost) on flow features | 98%+ accuracy, 7 attack classes |
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
-1. [Overview](#-overview)
-2. [Features](#-features)
-3. [Architecture](#-architecture)
-4. [Installation](#-installation)
-5. [Usage](#-usage)
-6. [API Reference](#-api-reference)
-7. [Machine Learning](#-machine-learning)
-8. [Project Structure](#-project-structure)
-9. [Configuration](#-configuration)
-10. [Contributing](#-contributing)
-
----
-
-## 🚀 Overview
-
-CyberX is a comprehensive cybersecurity platform that combines multiple AI/ML models to provide real-time threat detection and validation services. Built with Django 6.0 and powered by machine learning, it offers three core security modules:
-
-| Module                      | Description                         | Technology             | Accuracy |
-| --------------------------- | ----------------------------------- | ---------------------- | -------- |
-| 🔗 **URL Threat Detection** | Malicious URL identification        | Ensemble ML (3 models) | 95%+     |
-| 🎣 **Phishing Detection**   | Phishing website analysis           | PyTorch Neural Network | 95%+     |
-| 📧 **Email Validation**     | Email verification & temp detection | Pattern + DNS Analysis | 99%+     |
-
-### Why CyberX?
-
-- **Real-time Analysis**: Instant threat assessment in milliseconds
-- **Multi-layer Security**: Three independent security modules working together
-- **AI-Powered**: State-of-the-art machine learning models
-- **Production Ready**: Built for scalability and reliability
-- **Beautiful UI**: Modern, responsive web interface
-- **REST APIs**: Easy integration with existing systems
+1. [Prerequisites](#prerequisites)
+2. [Project Structure](#project-structure)
+3. [Step-by-Step Setup](#step-by-step-setup)
+   - [1. Clone the Repository](#1-clone-the-repository)
+   - [2. Create a Virtual Environment](#2-create-a-virtual-environment)
+   - [3. Install Dependencies](#3-install-dependencies)
+   - [4. Train / Obtain ML Models](#4-train--obtain-ml-models)
+   - [5. Apply Migrations](#5-apply-migrations)
+   - [6. Run the Development Server](#6-run-the-development-server)
+4. [Module Details](#module-details)
+   - [Email Validation](#email-validation)
+   - [URL Threat Detection](#url-threat-detection)
+   - [Phishing Detection](#phishing-detection)
+   - [Malware Analysis](#malware-analysis)
+   - [Network IDS](#network-ids)
+5. [API Endpoints](#api-endpoints)
+6. [Configuration](#configuration)
+7. [Troubleshooting](#troubleshooting)
+8. [Contributing](#contributing)
+9. [License](#license)
 
 ---
 
-## ✨ Features
+## Prerequisites
 
-### 🔗 URL Threat Detection
+| Requirement | Version | Notes |
+|-------------|---------|-------|
+| **Python** | 3.10 or higher | [python.org/downloads](https://www.python.org/downloads/) |
+| **pip** | Latest | Ships with Python |
+| **Git** | Any recent | [git-scm.com](https://git-scm.com/) |
+| **Npcap** *(Windows, optional)* | Latest | Required **only** for the Network IDS live-capture feature. [npcap.com](https://npcap.com/) - install with *"WinPcap API-compatible Mode"* checked |
+| **Jupyter Notebook** *(optional)* | Any | Only needed if you want to retrain the ML models yourself |
 
-Analyzes URLs using an ensemble of three machine learning models:
-
-- **Decision Tree Classifier**: Fast pattern-based detection
-- **Random Forest Classifier**: Robust multi-tree voting
-- **Extra Trees Classifier**: Additional ensemble diversity
-
-**Capabilities**:
-
-- Phishing site detection
-- Malware distribution identification
-- Website defacement recognition
-- 35+ URL features analyzed
-- Ensemble voting for accuracy
-
-### 🎣 Phishing Detection
-
-Deep learning-powered phishing analysis using PyTorch:
-
-- **87 Feature Analysis**: Comprehensive URL examination
-- **Neural Network**: 3-layer deep learning model
-- **Trusted Domain Recognition**: Zero false positives for major sites
-- **Real-time WHOIS**: Domain age and registration checking
-- **DNS Validation**: Live DNS record verification
-
-### 📧 Email Validation
-
-Multi-layer email verification system:
-
-- **300+ Temporary Domains**: Comprehensive disposable email database
-- **DNS/MX Verification**: Real-time mail server checking
-- **RFC 5322 Compliance**: Standards-based syntax validation
-- **Quality Scoring**: 0-100 email quality assessment
-- **Pattern Detection**: Advanced regex for evolving services
+> **Windows users:** If you plan to use the live Network IDS capture, run your terminal (or VS Code) **as Administrator** so Scapy can access network interfaces.
 
 ---
 
-## 🏗️ Architecture
-
-### System Overview
-
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                           CyberX Platform                                │
-├─────────────────────────────────────────────────────────────────────────┤
-│                                                                          │
-│  ┌──────────────────────────────────────────────────────────────────┐   │
-│  │                        Django 6.0 Backend                        │   │
-│  │                                                                   │   │
-│  │   ┌─────────────┐   ┌─────────────┐   ┌─────────────────────┐   │   │
-│  │   │    URL      │   │  Phishing   │   │      Email          │   │   │
-│  │   │   Threat    │   │  Detection  │   │    Validation       │   │   │
-│  │   │  Detection  │   │             │   │                     │   │   │
-│  │   │             │   │             │   │                     │   │   │
-│  │   │ • 3 Models  │   │ • PyTorch   │   │ • 300+ domains     │   │   │
-│  │   │ • 35 feats  │   │ • 87 feats  │   │ • DNS lookup       │   │   │
-│  │   │ • Ensemble  │   │ • Deep NN   │   │ • Pattern match    │   │   │
-│  │   └─────────────┘   └─────────────┘   └─────────────────────┘   │   │
-│  │                                                                   │   │
-│  │                     ┌─────────────────────┐                      │   │
-│  │                     │    REST APIs        │                      │   │
-│  │                     │  • /api/analyze/    │                      │   │
-│  │                     │  • /api/validate/   │                      │   │
-│  │                     └─────────────────────┘                      │   │
-│  └──────────────────────────────────────────────────────────────────┘   │
-│                                                                          │
-│  ┌──────────────────────────────────────────────────────────────────┐   │
-│  │                      Frontend (HTML/CSS/JS)                       │   │
-│  │                                                                   │   │
-│  │   • Responsive Design      • Real-time Feedback                  │   │
-│  │   • Modern UI/UX           • Interactive Results                 │   │
-│  └──────────────────────────────────────────────────────────────────┘   │
-│                                                                          │
-│  ┌──────────────────────────────────────────────────────────────────┐   │
-│  │                    Machine Learning Models                        │   │
-│  │                                                                   │   │
-│  │  ┌─────────────────┐  ┌─────────────────┐  ┌──────────────────┐  │   │
-│  │  │ Decision Tree   │  │ Random Forest   │  │  Extra Trees     │  │   │
-│  │  │ (.joblib)       │  │ (.joblib)       │  │  (.joblib)       │  │   │
-│  │  └─────────────────┘  └─────────────────┘  └──────────────────┘  │   │
-│  │                                                                   │   │
-│  │  ┌─────────────────┐  ┌─────────────────┐                        │   │
-│  │  │ PyTorch Model   │  │ Feature Scaler  │                        │   │
-│  │  │ (.pth)          │  │ (.joblib)       │                        │   │
-│  │  └─────────────────┘  └─────────────────┘                        │   │
-│  └──────────────────────────────────────────────────────────────────┘   │
-│                                                                          │
-└─────────────────────────────────────────────────────────────────────────┘
-```
-
-### Technology Stack
-
-| Layer               | Technology                               |
-| ------------------- | ---------------------------------------- |
-| **Backend**         | Django 6.0, Python 3.8+                  |
-| **ML Framework**    | PyTorch, scikit-learn                    |
-| **Data Processing** | pandas, numpy                            |
-| **DNS/Email**       | dnspython, email-validator               |
-| **URL Analysis**    | tldextract, beautifulsoup4, python-whois |
-| **Database**        | SQLite (dev), PostgreSQL (prod)          |
-| **Frontend**        | HTML5, CSS3, JavaScript ES6+             |
-
----
-
-## 📦 Installation
-
-### Prerequisites
-
-- Python 3.8 or higher
-- pip (Python package manager)
-- Git
-- Virtual environment support
-
-### Quick Start
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/yourusername/cyberx.git
-cd cyberx
-
-# 2. Create virtual environment
-python -m venv env
-
-# 3. Activate virtual environment
-# Windows:
-env\Scripts\activate
-# macOS/Linux:
-source env/bin/activate
-
-# 4. Install dependencies
-pip install -r requirements.txt
-
-# 5. Navigate to App directory
-cd App
-
-# 6. Run migrations
-python manage.py migrate
-
-# 7. Start development server
-python manage.py runserver
-
-# 8. Open browser
-# http://127.0.0.1:8000/
-```
-
-### Verify Installation
-
-After starting the server, you should see:
-
-```
-✅ Using enhanced production URL analyzer v3.0
-System check identified no issues (0 silenced).
-Django version 6.0, using settings 'CyberX.settings'
-Starting development server at http://127.0.0.1:8000/
-```
-
----
-
-## 💻 Usage
-
-### Web Interface
-
-| Module                   | URL                                         | Description              |
-| ------------------------ | ------------------------------------------- | ------------------------ |
-| **Home**                 | `http://127.0.0.1:8000/`                    | Main dashboard           |
-| **URL Threat Detection** | `http://127.0.0.1:8000/urlthreatdetection/` | Analyze URLs for threats |
-| **Phishing Detection**   | `http://127.0.0.1:8000/phishingdetection/`  | Check for phishing       |
-| **Email Validation**     | `http://127.0.0.1:8000/emailvalidation/`    | Validate emails          |
-
-### Example Workflows
-
-#### Analyzing a URL for Threats
-
-1. Go to `/urlthreatdetection/`
-2. Enter URL: `https://example.com`
-3. Click "Analyze"
-4. View threat level, confidence, and indicators
-
-#### Checking for Phishing
-
-1. Go to `/phishingdetection/`
-2. Enter suspicious URL
-3. Get instant risk assessment
-4. Review risk factors and recommendations
-
-#### Validating an Email
-
-1. Go to `/emailvalidation/`
-2. Enter email address
-3. View validation results
-4. Check if it's a temporary email
-
----
-
-## 🔌 API Reference
-
-### URL Threat Detection API
-
-```bash
-POST /urlthreatdetection/api/analyze/
-Content-Type: application/json
-
-{
-    "url": "https://example.com"
-}
-```
-
-**Response**:
-
-```json
-{
-  "success": true,
-  "url": "https://example.com",
-  "is_malicious": false,
-  "threat_level": "safe",
-  "threat_score": 12,
-  "confidence": 94.5,
-  "threat_indicators": [],
-  "processing_time_ms": 45.2
-}
-```
-
-### Phishing Detection API
-
-```bash
-POST /phishingdetection/api/analyze/
-Content-Type: application/json
-
-{
-    "url": "https://suspicious-site.com"
-}
-```
-
-**Response**:
-
-```json
-{
-  "success": true,
-  "url": "https://suspicious-site.com",
-  "is_phishing": true,
-  "confidence": 92.3,
-  "risk_score": 78,
-  "risk_factors": ["Suspicious TLD detected", "New domain (15 days old)"],
-  "security_indicators": [],
-  "model_used": true
-}
-```
-
-### Email Validation API
-
-```bash
-POST /emailvalidation/api/validate/
-Content-Type: application/json
-
-{
-    "email": "user@example.com"
-}
-```
-
-**Response**:
-
-```json
-{
-  "success": true,
-  "email": "user@example.com",
-  "is_valid": true,
-  "is_temporary": false,
-  "quality_score": 95,
-  "risk_level": "low",
-  "validation": {
-    "syntax": { "valid": true },
-    "dns": { "valid": true, "has_mx": true }
-  }
-}
-```
-
----
-
-## 🧠 Machine Learning
-
-### URL Threat Detection Models
-
-| Model        | Algorithm       | Features | Accuracy  |
-| ------------ | --------------- | -------- | --------- |
-| Model 1      | Decision Tree   | 35       | 93.2%     |
-| Model 2      | Random Forest   | 35       | 96.1%     |
-| Model 3      | Extra Trees     | 35       | 95.8%     |
-| **Ensemble** | Weighted Voting | 35       | **96.5%** |
-
-### Phishing Detection Neural Network
-
-```
-Architecture:
-├── Input Layer: 87 features
-├── Hidden Layer 1: 300 neurons (ReLU + BatchNorm)
-├── Hidden Layer 2: 100 neurons (ReLU + BatchNorm + Dropout)
-└── Output Layer: 1 neuron (Sigmoid)
-
-Training:
-├── Dataset: 11,431 URLs
-├── Split: 80% train, 20% test
-├── Optimizer: Adam (lr=0.001)
-├── Loss: Binary Cross-Entropy
-└── Epochs: 100 (early stopping)
-
-Performance:
-├── Accuracy: ~95%
-├── Precision: ~94%
-├── Recall: ~96%
-└── F1-Score: ~95%
-```
-
-### Feature Importance (Top 10)
-
-| Rank | Feature              | Importance |
-| ---- | -------------------- | ---------- |
-| 1    | `domain_age`         | 0.085      |
-| 2    | `https_token`        | 0.078      |
-| 3    | `nb_subdomains`      | 0.065      |
-| 4    | `length_url`         | 0.058      |
-| 5    | `dns_record`         | 0.055      |
-| 6    | `shortening_service` | 0.052      |
-| 7    | `phish_hints`        | 0.048      |
-| 8    | `ip`                 | 0.045      |
-| 9    | `suspicious_tld`     | 0.042      |
-| 10   | `login_form`         | 0.038      |
-
----
-
-## 📁 Project Structure
+## Project Structure
 
 ```
 CyberX/
-├── App/                              # Django Application
-│   ├── CyberX/                       # Main Django project
-│   │   ├── __init__.py
-│   │   ├── settings.py               # Django settings
-│   │   ├── urls.py                   # Main URL routing
-│   │   ├── wsgi.py                   # WSGI config
-│   │   └── asgi.py                   # ASGI config
-│   │
-│   ├── Home/                         # Home app
-│   │   ├── views.py
-│   │   └── urls.py
-│   │
-│   ├── EmailValidation/              # Email validation module
-│   │   ├── views.py                  # Validation logic (655 lines)
-│   │   ├── urls.py
-│   │   └── README.md                 # Module documentation
-│   │
-│   ├── UrlThreadDetection/           # URL threat detection module
-│   │   ├── views.py                  # View handlers (347 lines)
-│   │   ├── url_analyzer_production.py # ML analyzer
-│   │   ├── urls.py
-│   │   └── README.md                 # Module documentation
-│   │
-│   ├── PhisingDetection/             # Phishing detection module
-│   │   ├── views.py                  # View handlers (605 lines)
-│   │   ├── feature_extractor.py      # 87-feature extraction
-│   │   ├── urls.py
-│   │   ├── README.md                 # Module documentation
-│   │   └── models/                   # Model files
-│   │       ├── phishing_model.pth    # PyTorch model
-│   │       ├── phishing_scaler.joblib # Feature scaler
-│   │       └── feature_names.json    # Feature reference
-│   │
-│   ├── Frontend/                     # Frontend templates
-│   │   ├── templates/
-│   │   │   ├── base.html             # Base template
-│   │   │   ├── home.html             # Home page
-│   │   │   ├── EmailValidation.html  # Email validation UI
-│   │   │   ├── URLThreatDetection.html # URL detection UI
-│   │   │   └── PhishingDetection.html # Phishing detection UI
-│   │   └── static/
-│   │       ├── css/                  # Stylesheets
-│   │       └── js/                   # JavaScript
-│   │
-│   ├── manage.py                     # Django management
-│   └── db.sqlite3                    # Development database
-│
-├── Services/                         # ML Training Services
-│   ├── EmailValidation/
-│   │   ├── Main.ipynb                # Email validation notebook
-│   │   └── README.md
-│   │
-│   ├── Phishing-detection/
-│   │   ├── Model.ipynb               # Model training notebook
-│   │   ├── Dataset/                  # Training data
-│   │   ├── phishing_model.pth        # Trained model
-│   │   ├── phishing_scaler.joblib    # Fitted scaler
-│   │   └── feature_names.json        # Feature names
-│   │
-│   └── URL threat scanning/
-│       ├── Main.ipynb                # Training notebook
-│       ├── README.md
-│       └── models/                   # Trained models
-│           ├── Decision_Tree_*.joblib
-│           ├── Random_Forest_*.joblib
-│           └── Extra_Trees_*.joblib
-│
-├── env/                              # Virtual environment
-├── requirements.txt                  # Python dependencies
-├── README.md                         # This file
-└── .gitignore                        # Git ignore rules
++-- App/                          # Django project root
+|   +-- manage.py
+|   +-- db.sqlite3
+|   +-- CyberX/                   # Django settings & URL config
+|   |   +-- settings.py
+|   |   +-- urls.py
+|   |   +-- wsgi.py / asgi.py
+|   +-- Home/                     # Landing page app
+|   +-- EmailValidation/          # Email validation service
+|   +-- UrlThreadDetection/       # URL threat scanning service
+|   +-- PhisingDetection/         # Phishing URL detection service
+|   |   +-- models/               # Trained phishing model files
+|   +-- MalwareAnalysis/          # Malware file analysis service
+|   +-- NetworkIDS/               # Network intrusion detection service
+|   |   +-- models/               # Trained NIDS model files
+|   +-- Frontend/                 # Shared templates, static CSS/JS
+|       +-- templates/
+|       +-- static/
+|           +-- css/              # main.css, home.css, services.css
+|           +-- js/
++-- Services/                     # ML training notebooks & model artifacts
+|   +-- EmailValidation/
+|   +-- MalwareAnalysis/
+|   |   +-- model.ipynb
+|   |   +-- models/               # Trained malware models (loaded at runtime)
+|   +-- NetworkIDS/
+|   |   +-- model.ipynb
+|   |   +-- Dataset/
+|   |   +-- models/
+|   +-- Phishing-detection/
+|   |   +-- Model.ipynb
+|   |   +-- Dataset/
+|   +-- URL threat scanning/
+|       +-- Main.ipynb
+|       +-- models/               # Trained URL threat models (loaded at runtime)
++-- requirements.txt
++-- .gitignore
++-- README.md
 ```
 
 ---
 
-## ⚙️ Configuration
+## Step-by-Step Setup
 
-### Dependencies (requirements.txt)
-
-```txt
-# Django
-Django>=6.0
-
-# Machine Learning
-torch>=2.0.0
-scikit-learn>=1.8.0
-pandas>=2.0.0
-numpy>=1.23.0
-joblib>=1.3.0
-
-# URL/Domain Analysis
-tldextract>=3.0.0
-beautifulsoup4>=4.11.0
-python-whois>=0.8.0
-requests>=2.28.0
-
-# DNS/Email
-dnspython>=2.3.0
-email-validator>=2.0.0
-```
-
-### Environment Variables (Production)
+### 1. Clone the Repository
 
 ```bash
-# Django
-SECRET_KEY=your-secret-key-here
-DEBUG=False
-ALLOWED_HOSTS=your-domain.com
-
-# Database
-DATABASE_URL=postgres://user:pass@host:5432/dbname
-
-# Security
-CSRF_TRUSTED_ORIGINS=https://your-domain.com
+git clone https://github.com/<your-username>/CyberX.git
+cd CyberX
 ```
 
-### Django Settings Highlights
+### 2. Create a Virtual Environment
 
-```python
-# settings.py
+**Windows (PowerShell):**
 
-INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+```powershell
+python -m venv env
+.\env\Scripts\Activate.ps1
+```
 
-    # CyberX Apps
-    'Home',
-    'EmailValidation',
-    'UrlThreadDetection',
-    'PhisingDetection',
-    'Frontend',
-]
+**Windows (Command Prompt):**
 
-# Template Configuration
-TEMPLATES = [
-    {
-        'DIRS': [BASE_DIR / 'Frontend' / 'templates'],
-        ...
-    },
-]
+```cmd
+python -m venv env
+env\Scripts\activate.bat
+```
 
-# Static Files
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'Frontend' / 'static']
+**macOS / Linux:**
+
+```bash
+python3 -m venv env
+source env/bin/activate
+```
+
+You should see `(env)` in your terminal prompt.
+
+### 3. Install Dependencies
+
+```bash
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+> **Note on PyTorch:** The default `pip install torch` installs the CPU-only version. If you have an NVIDIA GPU and want faster inference for the Phishing Detection module, install PyTorch with CUDA support instead:
+>
+> ```bash
+> pip install torch --index-url https://download.pytorch.org/whl/cu121
+> ```
+>
+> See [pytorch.org/get-started](https://pytorch.org/get-started/locally/) for the exact command for your system.
+
+### 4. Train / Obtain ML Models
+
+The application loads pre-trained ML models at runtime. Some model files are large binary files and are **not** committed to Git. You have two options:
+
+#### Option A - Train the Models Yourself (Recommended)
+
+Each service includes a Jupyter notebook that trains and saves the required model files.
+
+| Module | Notebook | Output Directory |
+|--------|----------|-----------------|
+| **URL Threat Detection** | `Services/URL threat scanning/Main.ipynb` | `Services/URL threat scanning/models/` |
+| **Phishing Detection** | `Services/Phishing-detection/Model.ipynb` | `Services/Phishing-detection/` then copy to `App/PhisingDetection/models/` |
+| **Malware Analysis** | `Services/MalwareAnalysis/model.ipynb` | `Services/MalwareAnalysis/models/` |
+| **Network IDS** | `Services/NetworkIDS/model.ipynb` | `Services/NetworkIDS/models/` then copy to `App/NetworkIDS/models/` |
+
+```bash
+pip install jupyter
+jupyter notebook
+```
+
+Open each notebook and **Run All Cells**. The trained model files will be saved to the paths listed above.
+
+#### Option B - Copy Pre-trained Models
+
+If you already have the `.joblib` / `.pth` / `.json` model files (from a teammate or shared drive), place them in these exact locations:
+
+**Phishing Detection** - copy into `App/PhisingDetection/models/`:
+
+```
+App/PhisingDetection/models/
++-- phishing_model.pth
++-- phishing_scaler.joblib
++-- feature_names.json
+```
+
+**Network IDS** - copy into `App/NetworkIDS/models/`:
+
+```
+App/NetworkIDS/models/
++-- nids_model.joblib
++-- nids_scaler.joblib
++-- nids_feature_names.json
++-- nids_label_encoder.json
+```
+
+**Malware Analysis** - the app loads models from `Services/MalwareAnalysis/models/`:
+
+```
+Services/MalwareAnalysis/models/
++-- malware_rf_model.joblib
++-- malware_gb_model.joblib
++-- malware_scaler.joblib
++-- malware_feature_names.json
+```
+
+**URL Threat Detection** - the app loads models from `Services/URL threat scanning/models/`:
+
+```
+Services/URL threat scanning/models/
++-- Decision_Tree_Classifier_URL_Threat_Detection.joblib
++-- Random_Forest_Classifier_URL_Threat_Detection.joblib
++-- Extra_Trees_Classifier_URL_Threat_Detection.joblib
+```
+
+> **Important:** The Email Validation module does **not** use ML - it works out of the box with no model files.
+
+### 5. Apply Migrations
+
+```bash
+cd App
+python manage.py migrate
+```
+
+### 6. Run the Development Server
+
+```bash
+python manage.py runserver
+```
+
+Open your browser and navigate to **http://127.0.0.1:8000/**
+
+You are all set! The CyberX dashboard should load with all five services accessible from the navigation bar.
+
+---
+
+## Module Details
+
+### Email Validation
+
+**Path:** `/emailvalidation/`
+
+Validates email addresses through a multi-layer pipeline:
+
+1. **Regex format check** - RFC-compliant pattern matching
+2. **Library validation** - `email-validator` deep checks
+3. **Temporary email detection** - 200+ disposable domain database
+4. **MX record lookup** - real-time DNS verification via `dnspython`
+5. **Confidence scoring** - aggregated pass/fail across all layers
+
+**No ML models required** - works immediately after setup.
+
+---
+
+### URL Threat Detection
+
+**Path:** `/urlthreatdetection/`
+
+Analyzes URLs using a 3-model ensemble:
+
+- Decision Tree Classifier
+- Random Forest Classifier
+- Extra Trees Classifier
+
+Extracts 35+ URL features (length, special characters, TLD risk, IP usage, homograph detection, etc.) and uses majority voting across all three models.
+
+**Model files needed:** 3 `.joblib` files in `Services/URL threat scanning/models/`
+
+---
+
+### Phishing Detection
+
+**Path:** `/phishingdetection/`
+
+Deep-learning phishing URL detector built with PyTorch:
+
+- **Architecture:** Multi-Layer Perceptron (87 -> 300 -> 100 -> 1 sigmoid)
+- **Features:** URL structural analysis, HTML content scanning (via `requests` + `BeautifulSoup`), WHOIS age, domain entropy, brand impersonation checks
+- **Fallback:** If the model file is not found, the system uses heuristic scoring
+
+**Model files needed:** `phishing_model.pth`, `phishing_scaler.joblib`, `feature_names.json` in `App/PhisingDetection/models/`
+
+---
+
+### Malware Analysis
+
+**Path:** `/malwareanalysis/`
+
+Multi-engine malware scanner that combines three detection methods:
+
+1. **Signature-based** - MD5/SHA hash matching against known malware signatures
+2. **Heuristic analysis** - 10 behavioral rules (entropy, packed executables, suspicious imports, etc.)
+3. **Machine Learning** - Random Forest + Gradient Boosting ensemble on extracted features
+
+Supports any file type. PE (`.exe`, `.dll`) files get deeper analysis via the `pefile` library.
+
+**Model files needed:** 3 `.joblib` + 1 `.json` in `Services/MalwareAnalysis/models/`
+
+---
+
+### Network IDS
+
+**Path:** `/networkids/`
+
+Real-time network intrusion detection with two input modes:
+
+- **PCAP Upload** - analyze captured network traffic files (`.pcap`, `.pcapng`, `.cap`)
+- **Live Capture** - sniff packets directly from a network interface (requires admin privileges + Npcap on Windows)
+
+Extracts 78 CICFlowMeter-compatible bidirectional flow features and classifies traffic as one of 7 classes: **Benign, DoS, DDoS, Port Scan, Brute Force, Web Attack, Botnet/C2**.
+
+**Model files needed:** `nids_model.joblib`, `nids_scaler.joblib`, + 2 `.json` files in `App/NetworkIDS/models/`
+
+> **Windows:** Install [Npcap](https://npcap.com/) with *WinPcap API-compatible Mode* for live capture.
+> **Linux:** Scapy uses raw sockets - run the server with `sudo python manage.py runserver`.
+
+---
+
+## API Endpoints
+
+| Method | URL | Description |
+|--------|-----|-------------|
+| `GET` | `/` | Home / Dashboard |
+| `GET/POST` | `/emailvalidation/` | Email validation form and results |
+| `GET/POST` | `/urlthreatdetection/` | URL threat scanner form and results |
+| `GET/POST` | `/phishingdetection/` | Phishing URL detector form and results |
+| `GET/POST` | `/malwareanalysis/` | Malware file upload and analysis |
+| `GET/POST` | `/networkids/` | Network IDS (PCAP upload + live capture) |
+
+All endpoints accept `GET` for the form page and `POST` for analysis submission.
+
+---
+
+## Configuration
+
+Key settings in `App/CyberX/settings.py`:
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `DEBUG` | `True` | Set to `False` in production |
+| `ALLOWED_HOSTS` | `['*']` | Restrict in production |
+| `DATA_UPLOAD_MAX_MEMORY_SIZE` | `104857600` (100 MB) | Max upload size for PCAP/malware files |
+| `FILE_UPLOAD_MAX_MEMORY_SIZE` | `104857600` (100 MB) | In-memory upload limit |
+| Database | SQLite (`db.sqlite3`) | Default - switch to PostgreSQL for production |
+
+---
+
+## Troubleshooting
+
+### `ModuleNotFoundError: No module named 'django'`
+
+Your virtual environment is not activated. Run:
+
+```powershell
+.\env\Scripts\Activate.ps1   # Windows PowerShell
+source env/bin/activate       # macOS / Linux
+```
+
+### `ModuleNotFoundError: No module named 'scapy'`
+
+Scapy is needed for the Network IDS module:
+
+```bash
+pip install scapy
+```
+
+### Models not loading / "ML model not loaded" warning
+
+Ensure model files are in the correct directories (see [Step 4](#4-train--obtain-ml-models)). The services will fall back to heuristic analysis if models are missing.
+
+### Network IDS live capture not working (Windows)
+
+1. Install [Npcap](https://npcap.com/) with **WinPcap API-compatible Mode** enabled
+2. Run your terminal / VS Code **as Administrator**
+3. Ensure the `netifaces` package is installed: `pip install netifaces`
+
+### Network IDS live capture not working (Linux/macOS)
+
+Run Django with elevated privileges:
+
+```bash
+sudo python manage.py runserver
+```
+
+### `ImportError: No module named 'pefile'`
+
+Required only for the Malware Analysis module PE file analysis:
+
+```bash
+pip install pefile
+```
+
+### PyTorch CUDA errors
+
+If you get CUDA-related errors but do not have a GPU, ensure you installed CPU-only torch:
+
+```bash
+pip install torch --index-url https://download.pytorch.org/whl/cpu
+```
+
+### Port 8000 already in use
+
+```bash
+python manage.py runserver 8080   # Use a different port
+```
+
+### Static files not loading
+
+Run collectstatic if deploying behind a web server:
+
+```bash
+python manage.py collectstatic
 ```
 
 ---
 
-## 🤝 Contributing
-
-### How to Contribute
+## Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
+2. Create a feature branch: `git checkout -b feature/your-feature`
+3. Commit changes: `git commit -m "Add your feature"`
+4. Push: `git push origin feature/your-feature`
 5. Open a Pull Request
 
-### Reporting Issues
-
-- Use GitHub Issues for bug reports
-- Include reproduction steps
-- Provide system information
-
-### Development Setup
-
-```bash
-# Install dev dependencies
-pip install -r requirements-dev.txt
-
-# Run tests
-python manage.py test
-
-# Check code style
-flake8 .
-
-# Format code
-black .
-```
-
 ---
 
-## 📝 License
+## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 🙏 Acknowledgments
-
-- [PhishTank](https://phishtank.org/) - Phishing URL database
-- [Kaggle](https://kaggle.com/) - Phishing detection dataset
-- [URLhaus](https://urlhaus.abuse.ch/) - Malware URL feed
-- Django & PyTorch communities
-
----
-
-## 📞 Support
-
-- **Documentation**: Check individual module READMEs
-- **Issues**: [GitHub Issues](https://github.com/yourusername/cyberx/issues)
-- **Email**: support@cyberx.example.com
-
----
-
-<p align="center">
-  <b>CyberX</b> - Protecting users with AI-powered cybersecurity
-  <br><br>
-  Made with ❤️ for a safer internet
-</p>
+This project is for educational and research purposes.

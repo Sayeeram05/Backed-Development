@@ -1,307 +1,62 @@
 {% extends 'base.html' %} {% load static %} {% block title %}URL Threat
 Detection - CyberX Security Platform{% endblock %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/services.css' %}" />
 <style>
-  /* ===== URL THREAT DETECTION PAGE STYLES ===== */
+  /* ===== URL THREAT DETECTION — PAGE-SPECIFIC STYLES ===== */
 
-  /* Hero Section */
-  .hero-section {
-    padding: 60px 0 40px;
-    text-align: center;
-    position: relative;
-  }
-
-  .hero-section .glitch {
-    font-size: 2.8rem;
-    margin-bottom: 15px;
-  }
-
-  .hero-subtitle {
-    color: var(--text-secondary);
-    font-size: 1.1rem;
-    margin-bottom: 30px;
-    max-width: 700px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
+  /* Accent override: blue theme */
   .version-badge {
-    display: inline-block;
     background: linear-gradient(
       45deg,
       var(--accent-blue),
       var(--primary-color)
     );
-    color: var(--dark-bg);
-    padding: 6px 16px;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 700;
-    margin-left: 15px;
-    vertical-align: middle;
   }
 
-  /* Stats Row */
-  .stats-row {
-    display: flex;
-    justify-content: center;
-    gap: 40px;
-    margin-top: 30px;
-    flex-wrap: wrap;
-  }
-
-  .stat-item {
-    text-align: center;
-  }
-
-  .stat-number {
-    font-family: "Orbitron", monospace;
-    font-size: 2rem;
-    color: var(--accent-blue);
-    font-weight: 700;
-    display: block;
-  }
-
-  .stat-label {
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-  }
-
-  /* Scanner Section */
-  .scanner-section {
-    padding: 40px 0;
-  }
-
-  .scanner-card {
-    max-width: 700px;
-    margin: 0 auto;
-    background: rgba(26, 26, 46, 0.8);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(0, 212, 255, 0.2);
-    border-radius: 20px;
-    padding: 40px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  }
-
-  .form-header {
-    text-align: center;
-    margin-bottom: 30px;
-  }
-
-  .form-header h2 {
-    font-family: "Orbitron", monospace;
-    color: var(--accent-blue);
-    font-size: 1.5rem;
-    margin-bottom: 10px;
-  }
-
-  .form-header p {
-    color: var(--text-secondary);
-    font-size: 0.95rem;
-  }
-
-  .input-group {
-    position: relative;
-    margin-bottom: 25px;
-  }
-
-  .input-group label {
-    display: block;
-    color: var(--text-secondary);
-    font-weight: 500;
-    margin-bottom: 10px;
-    font-size: 0.95rem;
-  }
-
-  .input-group .input-icon {
-    position: absolute;
-    left: 18px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--accent-blue);
-    font-size: 1.1rem;
-    margin-top: 15px;
-  }
-
-  .input-group input {
-    width: 100%;
-    padding: 16px 20px 16px 50px;
-    border: 2px solid rgba(0, 212, 255, 0.2);
-    border-radius: 12px;
-    background: rgba(15, 15, 35, 0.6);
-    color: var(--text-primary);
-    font-size: 1rem;
-    transition: all 0.3s ease;
-  }
-
-  .input-group input:focus {
-    outline: none;
-    border-color: var(--accent-blue);
-    box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
-    background: rgba(15, 15, 35, 0.9);
-  }
-
-  .input-group input::placeholder {
-    color: rgba(255, 255, 255, 0.3);
-  }
-
-  .btn-scan {
-    width: 100%;
-    padding: 16px;
+  .btn-service {
     background: linear-gradient(
       45deg,
       var(--accent-blue),
       var(--primary-color)
     );
-    color: var(--dark-bg);
-    border: none;
-    border-radius: 12px;
-    font-size: 1.1rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
   }
 
-  .btn-scan:hover {
-    transform: translateY(-3px);
+  .btn-service:hover {
     box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
   }
 
-  .btn-scan:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-    transform: none;
-  }
-
-  /* Loading State */
-  .loading-indicator {
-    display: none;
-    text-align: center;
-    padding: 30px;
-  }
-
   .loading-spinner {
-    width: 50px;
-    height: 50px;
-    border: 3px solid rgba(0, 212, 255, 0.1);
-    border-top: 3px solid var(--accent-blue);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 15px;
+    border-color: rgba(0, 212, 255, 0.1);
+    border-top-color: var(--accent-blue);
   }
 
-  @keyframes spin {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
+  .stat-number {
+    color: var(--accent-blue);
   }
 
-  .loading-text {
-    color: var(--text-secondary);
-    font-size: 0.95rem;
+  .service-form-card {
+    border-color: rgba(0, 212, 255, 0.2);
   }
 
-  /* Results Section */
-  .results-section {
-    max-width: 900px;
-    margin: 40px auto;
-    padding: 0 20px;
+  .form-header h2 {
+    color: var(--accent-blue);
   }
 
-  .result-card {
-    background: rgba(26, 26, 46, 0.8);
-    backdrop-filter: blur(20px);
-    border-radius: 20px;
-    overflow: hidden;
-    border: 1px solid rgba(0, 212, 255, 0.2);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  .input-group .input-icon {
+    color: var(--accent-blue);
   }
 
-  /* Result Header */
-  .result-header {
-    padding: 25px 30px;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  .input-group input {
+    border-color: rgba(0, 212, 255, 0.2);
   }
 
-  .result-header.safe {
-    background: linear-gradient(
-      135deg,
-      rgba(0, 255, 136, 0.15),
-      rgba(0, 212, 255, 0.1)
-    );
-  }
-  .result-header.suspicious {
-    background: linear-gradient(
-      135deg,
-      rgba(255, 193, 7, 0.15),
-      rgba(255, 152, 0, 0.1)
-    );
-  }
-  .result-header.malicious {
-    background: linear-gradient(
-      135deg,
-      rgba(255, 71, 87, 0.15),
-      rgba(220, 53, 69, 0.1)
-    );
+  .input-group input:focus {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
   }
 
-  .result-icon {
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2rem;
-  }
-
-  .result-icon.safe {
-    background: rgba(0, 255, 136, 0.2);
-    color: var(--primary-color);
-  }
-  .result-icon.suspicious {
-    background: rgba(255, 193, 7, 0.2);
-    color: #ffc107;
-  }
-  .result-icon.malicious {
-    background: rgba(255, 71, 87, 0.2);
-    color: var(--accent-red);
-  }
-
-  .result-title {
-    flex: 1;
-  }
-
-  .result-title h3 {
-    font-family: "Orbitron", monospace;
-    font-size: 1.5rem;
-    margin-bottom: 5px;
-  }
-
-  .result-title.safe h3 {
-    color: var(--primary-color);
-  }
-  .result-title.suspicious h3 {
-    color: #ffc107;
-  }
-  .result-title.malicious h3 {
-    color: var(--accent-red);
-  }
-
-  .result-title p {
-    color: var(--text-secondary);
-    font-size: 0.95rem;
+  .feature-icon i {
+    color: var(--accent-blue);
   }
 
   /* Threat Score */
@@ -361,69 +116,7 @@ Detection - CyberX Security Platform{% endblock %} {% block extra_css %}
     border: 1px solid rgba(0, 212, 255, 0.1);
   }
 
-  /* Detail Grid */
-  .detail-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-    margin-bottom: 25px;
-  }
-
-  @media (max-width: 768px) {
-    .detail-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  @media (max-width: 500px) {
-    .detail-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .detail-item {
-    background: rgba(15, 15, 35, 0.5);
-    padding: 15px;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    text-align: center;
-  }
-
-  .detail-label {
-    color: var(--text-secondary);
-    font-size: 0.8rem;
-    margin-bottom: 5px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  .detail-value {
-    color: var(--text-primary);
-    font-weight: 600;
-    font-size: 0.95rem;
-  }
-
-  /* Section Cards */
-  .section-card {
-    background: rgba(15, 15, 35, 0.5);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-  }
-
-  .section-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 15px;
-    color: var(--accent-blue);
-    font-weight: 600;
-  }
-
-  .section-header i {
-    font-size: 1.1rem;
-  }
+  /* (detail grid & section card styles from services.css) */
 
   /* Threat Indicators */
   .threat-indicators {
@@ -567,80 +260,7 @@ Detection - CyberX Security Platform{% endblock %} {% block extra_css %}
     margin-top: 5px;
   }
 
-  /* Features Section */
-  .features-section {
-    padding: 60px 0;
-    background: rgba(15, 15, 35, 0.3);
-  }
-
-  .features-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 25px;
-    max-width: 1100px;
-    margin: 0 auto;
-  }
-
-  @media (max-width: 1000px) {
-    .features-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  @media (max-width: 600px) {
-    .features-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .feature-card {
-    background: rgba(26, 26, 46, 0.6);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(0, 212, 255, 0.1);
-    border-radius: 16px;
-    padding: 25px;
-    text-align: center;
-    transition: all 0.3s ease;
-  }
-
-  .feature-card:hover {
-    border-color: var(--accent-blue);
-    transform: translateY(-5px);
-    box-shadow: 0 15px 40px rgba(0, 212, 255, 0.15);
-  }
-
-  .feature-icon {
-    width: 60px;
-    height: 60px;
-    background: linear-gradient(
-      135deg,
-      rgba(0, 212, 255, 0.1),
-      rgba(0, 255, 136, 0.1)
-    );
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 15px;
-  }
-
-  .feature-icon i {
-    font-size: 1.5rem;
-    color: var(--accent-blue);
-  }
-
-  .feature-card h3 {
-    font-family: "Orbitron", monospace;
-    color: var(--text-primary);
-    font-size: 0.95rem;
-    margin-bottom: 8px;
-  }
-
-  .feature-card p {
-    color: var(--text-secondary);
-    font-size: 0.85rem;
-    line-height: 1.5;
-  }
+  /* (features section styles from services.css) */
 
   /* Progress Bar */
   .progress-bar {
@@ -674,7 +294,7 @@ Detection - CyberX Security Platform{% endblock %} {% block extra_css %}
 {% endblock %} {% block content %}
 <div class="container">
   <!-- Hero Section -->
-  <section class="hero-section">
+  <section class="service-hero">
     <h1 class="glitch" data-text="URL THREAT DETECTION">
       URL THREAT DETECTION
       <span class="version-badge">v3.0</span>
@@ -705,7 +325,7 @@ Detection - CyberX Security Platform{% endblock %} {% block extra_css %}
 
   <!-- Scanner Section -->
   <section class="scanner-section">
-    <div class="scanner-card">
+    <div class="service-form-card">
       <div class="form-header">
         <h2><i class="fas fa-radar"></i> URL Threat Scanner</h2>
         <p>
@@ -733,7 +353,7 @@ Detection - CyberX Security Platform{% endblock %} {% block extra_css %}
           />
         </div>
 
-        <button type="submit" class="btn-scan" id="submitBtn">
+        <button type="submit" class="btn-service" id="submitBtn">
           <i class="fas fa-shield-virus"></i>
           <span>Scan URL</span>
         </button>
@@ -922,8 +542,9 @@ Detection - CyberX Security Platform{% endblock %} {% block extra_css %}
   {% endif %}
 
   <!-- Features Section -->
-  <section class="features-section">
+  <section class="service-features-section">
     <div class="container">
+      <h2 class="section-title">Detection Features</h2>
       <div class="features-grid">
         <div class="feature-card">
           <div class="feature-icon">

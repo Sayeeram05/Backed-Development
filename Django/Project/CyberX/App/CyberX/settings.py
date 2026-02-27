@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'UrlThreadDetection',
     "PhisingDetection",
     'MalwareAnalysis',
+    'NetworkIDS',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -124,6 +125,10 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'Frontend' / 'static',
 ]
+
+# File upload limits (for PCAP uploads up to 100 MB)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600   # 100 MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 104857600   # 100 MB
 # Logging configuration for detailed debugging
 LOGGING = {
     'version': 1,
@@ -175,6 +180,11 @@ LOGGING = {
             'propagate': False,
         },
         'UrlThreatDetection': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'NetworkIDS': {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': False,
