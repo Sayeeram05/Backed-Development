@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Emergency Contact Notifier</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🚨 Emergency Contact Notifier</h1>
+        <p>Stay safe and keep your loved ones informed via email alerts</p>
+      </div>
+
+      <div class="nav-buttons">
+        <button onclick="showRegistration()" class="nav-btn">Register</button>
+        <button onclick="showAlert()" class="nav-btn">Send Alert</button>
+      </div>
+
+      <!-- Registration Form -->
+      <div id="registration-section" class="section">
+        <h2>Register User & Emergency Contacts</h2>
+        <form id="registration-form">
+          <div class="form-group">
+            <label for="name">Full Name:</label>
+            <input type="text" id="name" name="name" required />
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required />
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required />
+          </div>
+
+          <h3>Emergency Contacts (Email Only)</h3>
+          <div id="contacts-container">
+            <div class="contact-group">
+              <h4>Contact 1</h4>
+              <div class="form-group">
+                <label for="contact-name-1">Contact Name:</label>
+                <input
+                  type="text"
+                  id="contact-name-1"
+                  name="contact-name-1"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="contact-email-1">Contact Email:</label>
+                <input
+                  type="email"
+                  id="contact-email-1"
+                  name="contact-email-1"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
+          <button type="button" onclick="addContact()" class="add-btn">
+            Add Another Contact
+          </button>
+          <button type="submit" class="submit-btn">Register</button>
+        </form>
+      </div>
+
+      <!-- Alert Section -->
+      <div id="alert-section" class="section hidden">
+        <h2>Send Emergency Alert</h2>
+        <form id="alert-form">
+          <div class="form-group">
+            <label for="alert-email">Your Email:</label>
+            <input type="email" id="alert-email" name="alert-email" required />
+          </div>
+
+          <div class="form-group">
+            <label for="custom-message">Emergency Message:</label>
+            <textarea
+              id="custom-message"
+              name="custom-message"
+              rows="3"
+              placeholder="I'm in danger! Please reach me immediately."
+            ></textarea>
+          </div>
+
+          <div class="form-group location-group">
+            <label>
+              <input
+                type="checkbox"
+                id="include-location"
+                name="include-location"
+                checked
+              />
+              Include my current location automatically
+            </label>
+            <small
+              >Location will be obtained automatically when sending alert</small
+            >
+          </div>
+
+          <button type="submit" class="alert-btn">
+            🚨 Send Emergency Alert
+          </button>
+        </form>
+
+        <div id="user-info" class="user-info hidden">
+          <h3>Your Information</h3>
+          <p><strong>Name:</strong> <span id="user-name"></span></p>
+
+          <h3>Emergency Contacts</h3>
+          <div id="contacts-list"></div>
+        </div>
+      </div>
+
+      <!-- Response Messages -->
+      <div id="message" class="message hidden"></div>
+
+      <!-- Auto-location indicator -->
+      <div id="location-status" class="location-status hidden">
+        <span id="location-text">Getting location...</span>
+      </div>
+    </div>
+
+    <script src="js/app.js"></script>
+  </body>
+</html>

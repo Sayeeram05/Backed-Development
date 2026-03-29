@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Restaurant WebSocket Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 40px;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      .section {
+        margin: 20px 0;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
+      button {
+        padding: 10px 20px;
+        margin: 5px;
+        cursor: pointer;
+      }
+      #messages {
+        height: 300px;
+        overflow-y: scroll;
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin: 10px 0;
+      }
+      input,
+      select {
+        padding: 8px;
+        margin: 5px;
+      }
+      .customer {
+        background-color: #e3f2fd;
+      }
+      .owner {
+        background-color: #f3e5f5;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Restaurant WebSocket Test Interface</h1>
+
+      <!-- Customer Section -->
+      <div class="section customer">
+        <h2>Customer Interface</h2>
+        <div>
+          <input
+            type="text"
+            id="customerId"
+            placeholder="Customer ID"
+            value="cust123"
+          />
+          <input
+            type="text"
+            id="itemName"
+            placeholder="Item Name"
+            value="Mango Juice"
+          />
+          <input
+            type="number"
+            id="quantity"
+            placeholder="Quantity"
+            value="2"
+            min="1"
+          />
+          <button onclick="connectCustomer()">Connect as Customer</button>
+          <button onclick="sendOrder()">Send Order</button>
+          <button onclick="disconnectCustomer()">Disconnect</button>
+        </div>
+        <div>Status: <span id="customerStatus">Disconnected</span></div>
+      </div>
+
+      <!-- Owner Section -->
+      <div class="section owner">
+        <h2>Owner Interface</h2>
+        <div>
+          <button onclick="connectOwner()">Connect as Owner</button>
+          <button onclick="disconnectOwner()">Disconnect</button>
+          <button onclick="clearMessages()">Clear Messages</button>
+        </div>
+        <div>Status: <span id="ownerStatus">Disconnected</span></div>
+      </div>
+
+      <!-- Messages -->
+      <div class="section">
+        <h2>Real-time Messages</h2>
+        <div id="messages"></div>
+      </div>
+    </div>
+
+    <script>
+      let customerSocket = null;
+      let ownerSocket = null;
+
+      function addMessage(message, type = "info") {
+        const messages = document.getElementById("messages");
+        const timestamp = new Date().toLocaleTimeString();
+        const color =
+          type === "customer"
+            ? "#1976d2"
+            : type === "owner"
+            ? "#7b1fa2"
+            : "#666";
+        messages.innerHTML += `<div style="color: ${color}; margin: 5px 0;">[${timestamp}] ${message}</div>`;
+        messages.scrollTop = messages.scrollHeight;
+      }
+
+      function connectCustomer() {
+        if (customerSocket) {
+          customerSocket.close();
+        }
+
+        customerSocket = new WebSocket("ws://localhost:8000/ws/customer/");
+
+        customerSocket.onopen = function (e) {
+          document.getElementById("customerStatus").textContent = "Connected";
+          addMessage("Customer connected to WebSocket", "customer");
+        };
+
+        customerSocket.onmessage = function (e) {
+          const data = JSON.parse(e.data);
+          addMessage(`Customer received: ${JSON.stringify(data)}`, "customer");
+        };
+
+        customerSocket.onclose = function (e) {
+          document.getElementById("customerStatus").textContent =
+            "Disconnected";
+          addMessage("Customer disconnected from WebSocket", "customer");
+        };
+
+        customerSocket.onerror = function (e) {
+          addMessage("Customer WebSocket error occurred", "customer");
+        };
+      }
+
+      function connectOwner() {
+        if (ownerSocket) {
+          ownerSocket.close();
+        }
+
+        ownerSocket = new WebSocket("ws://localhost:8000/ws/owner/");
+
+        ownerSocket.onopen = function (e) {
+          document.getElementById("ownerStatus").textContent = "Connected";
+          addMessage("Owner connected to WebSocket", "owner");
+        };
+
+        ownerSocket.onmessage = function (e) {
+          const data = JSON.parse(e.data);
+          if (data.type === "new_order") {
+            addMessage(
+              `🔔 NEW ORDER: ${data.data.item_name} (${data.data.quantity}x) from ${data.data.customer_id}`,
+              "owner"
+            );
+          } else {
+            addMessage(`Owner received: ${JSON.stringify(data)}`, "owner");
+          }
+        };
+
+        ownerSocket.onclose = function (e) {
+          document.getElementById("ownerStatus").textContent = "Disconnected";
+          addMessage("Owner disconnected from WebSocket", "owner");
+        };
+
+        ownerSocket.onerror = function (e) {
+          addMessage("Owner WebSocket error occurred", "owner");
+        };
+      }
+
+      function sendOrder() {
+        if (!customerSocket || customerSocket.readyState !== WebSocket.OPEN) {
+          addMessage("Customer not connected!", "customer");
+          return;
+        }
+
+        const order = {
+          customer_id: document.getElementById("customerId").value,
+          item_name: document.getElementById("itemName").value,
+          quantity: parseInt(document.getElementById("quantity").value),
+        };
+
+        customerSocket.send(JSON.stringify(order));
+        addMessage(
+          `📤 Order sent: ${order.item_name} (${order.quantity}x)`,
+          "customer"
+        );
+      }
+
+      function disconnectCustomer() {
+        if (customerSocket) {
+          customerSocket.close();
+        }
+      }
+
+      function disconnectOwner() {
+        if (ownerSocket) {
+          ownerSocket.close();
+        }
+      }
+
+      function clearMessages() {
+        document.getElementById("messages").innerHTML = "";
+      }
+
+      // Auto-connect for demo purposes
+      window.onload = function () {
+        addMessage(
+          "WebSocket test interface loaded. Click connect buttons to start testing.",
+          "info"
+        );
+      };
+    </script>
+  </body>
+</html>

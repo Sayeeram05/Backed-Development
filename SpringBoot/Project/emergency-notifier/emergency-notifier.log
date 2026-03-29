@@ -1,0 +1,135 @@
+2025-11-07 10:07:03 [main] INFO  c.s.p.e.EmergencyNotifierApplication - Starting EmergencyNotifierApplication using Java 21.0.2 with PID 18232 (D:\GitHub\Backend Development\SpringBoot\Project\emergency-notifier\target\classes started by SAYEERAM in D:\GitHub\Backend Development\SpringBoot\Project\emergency-notifier)
+2025-11-07 10:07:03 [main] DEBUG c.s.p.e.EmergencyNotifierApplication - Running with Spring Boot v3.5.7, Spring v6.2.12
+2025-11-07 10:07:03 [main] INFO  c.s.p.e.EmergencyNotifierApplication - No active profile set, falling back to 1 default profile: "default"
+2025-11-07 10:07:03 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-11-07 10:07:03 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 41 ms. Found 2 JPA repository interfaces.
+2025-11-07 10:07:04 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2025-11-07 10:07:04 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2025-11-07 10:07:04 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.48]
+2025-11-07 10:07:04 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-11-07 10:07:04 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1074 ms
+2025-11-07 10:07:04 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-11-07 10:07:04 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.33.Final
+2025-11-07 10:07:04 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2025-11-07 10:07:04 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-11-07 10:07:04 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2025-11-07 10:07:05 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@250a946
+2025-11-07 10:07:05 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2025-11-07 10:07:05 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 8.0.36
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-11-07 10:07:05 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-11-07 10:07:06 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-11-07 10:07:06 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-11-07 10:07:06 [main] INFO  o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+2025-11-07 10:07:06 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2025-11-07 10:07:06 [main] INFO  c.s.p.e.EmergencyNotifierApplication - Started EmergencyNotifierApplication in 3.944 seconds (process running for 4.231)
+2025-11-07 10:07:21 [http-nio-8080-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-11-07 10:07:21 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-11-07 10:07:21 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2025-11-07 10:08:52 [http-nio-8080-exec-8] INFO  c.s.p.e.EmergencyNotifierController - Getting user info for: mailforprogram01@gmail.com
+2025-11-07 10:08:52 [http-nio-8080-exec-5] INFO  c.s.p.e.EmergencyNotifierController - Getting contacts for user: mailforprogram01@gmail.com
+2025-11-07 10:08:52 [http-nio-8080-exec-9] INFO  c.s.p.e.EmergencyNotifierController - Sending emergency email alert for user: mailforprogram01@gmail.com
+2025-11-07 10:09:31 [http-nio-8080-exec-9] ERROR c.s.p.e.service.EmailService - Failed to send emergency alert to mailforprogram01@gmail.com: Mail server connection failed. Failed messages: jakarta.mail.MessagingException: Can't send command to SMTP host;
+  nested exception is:
+	java.net.SocketException: Connection reset by peer
+2025-11-07 10:09:31 [http-nio-8080-exec-9] INFO  c.s.p.e.s.EmergencyNotifierService - Alert sent to 0/1 contacts for user: mailforprogram01@gmail.com
+2025-11-07 10:11:56 [http-nio-8080-exec-1] INFO  c.s.p.e.EmergencyNotifierController - Getting user info for: mailforprogram01@gmail.com
+2025-11-07 10:11:56 [http-nio-8080-exec-2] INFO  c.s.p.e.EmergencyNotifierController - Getting contacts for user: mailforprogram01@gmail.com
+2025-11-07 10:11:56 [http-nio-8080-exec-3] INFO  c.s.p.e.EmergencyNotifierController - Sending emergency email alert for user: mailforprogram01@gmail.com
+2025-11-07 10:12:00 [http-nio-8080-exec-3] INFO  c.s.p.e.service.EmailService - Emergency alert email sent successfully to: mailforprogram01@gmail.com
+2025-11-07 10:12:00 [http-nio-8080-exec-3] INFO  c.s.p.e.s.EmergencyNotifierService - Alert sent to 1/1 contacts for user: mailforprogram01@gmail.com
+2025-11-07 10:13:42 [http-nio-8080-exec-4] WARN  o.s.w.s.m.s.DefaultHandlerExceptionResolver - Resolved [org.springframework.web.bind.MethodArgumentNotValidException: Validation failed for argument [0] in public org.springframework.http.ResponseEntity<java.util.Map<java.lang.String, java.lang.String>> com.sriram.project.emergency_notifier.EmergencyNotifierController.registerUser(com.sriram.project.emergency_notifier.dto.UserRegistrationRequest): [Field error in object 'userRegistrationRequest' on field 'password': rejected value [12345]; codes [Size.userRegistrationRequest.password,Size.password,Size.java.lang.String,Size]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [userRegistrationRequest.password,password]; arguments []; default message [password],2147483647,6]; default message [Password must be at least 6 characters]] ]
+2025-11-07 10:14:09 [http-nio-8080-exec-8] WARN  o.s.w.s.m.s.DefaultHandlerExceptionResolver - Resolved [org.springframework.web.bind.MethodArgumentNotValidException: Validation failed for argument [0] in public org.springframework.http.ResponseEntity<java.util.Map<java.lang.String, java.lang.String>> com.sriram.project.emergency_notifier.EmergencyNotifierController.registerUser(com.sriram.project.emergency_notifier.dto.UserRegistrationRequest): [Field error in object 'userRegistrationRequest' on field 'password': rejected value [12345]; codes [Size.userRegistrationRequest.password,Size.password,Size.java.lang.String,Size]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [userRegistrationRequest.password,password]; arguments []; default message [password],2147483647,6]; default message [Password must be at least 6 characters]] ]
+2025-11-07 10:14:31 [http-nio-8080-exec-5] INFO  c.s.p.e.EmergencyNotifierController - Registering user: sd3528@srmist.edu.in
+2025-11-07 10:14:31 [http-nio-8080-exec-5] INFO  c.s.p.e.s.EmergencyNotifierService - User registered successfully: sd3528@srmist.edu.in
+2025-11-07 10:14:31 [http-nio-8080-exec-5] INFO  c.s.p.e.s.EmergencyNotifierService - Saved 1 contacts for user: sd3528@srmist.edu.in
+2025-11-07 10:14:42 [http-nio-8080-exec-9] INFO  c.s.p.e.EmergencyNotifierController - Getting user info for: sd3528@srmist.edu.in
+2025-11-07 10:14:42 [http-nio-8080-exec-10] INFO  c.s.p.e.EmergencyNotifierController - Getting contacts for user: sd3528@srmist.edu.in
+2025-11-07 10:14:42 [http-nio-8080-exec-1] INFO  c.s.p.e.EmergencyNotifierController - Sending emergency email alert for user: sd3528@srmist.edu.in
+2025-11-07 10:14:47 [http-nio-8080-exec-1] INFO  c.s.p.e.service.EmailService - Emergency alert email sent successfully to: sd3528@srmist.edu.in
+2025-11-07 10:14:47 [http-nio-8080-exec-1] INFO  c.s.p.e.s.EmergencyNotifierService - Alert sent to 1/1 contacts for user: sd3528@srmist.edu.in
+2025-11-07 10:16:39 [http-nio-8080-exec-3] INFO  c.s.p.e.EmergencyNotifierController - Registering user: sb3528@srmist.edu.in
+2025-11-07 10:16:39 [http-nio-8080-exec-3] INFO  c.s.p.e.s.EmergencyNotifierService - User registered successfully: sb3528@srmist.edu.in
+2025-11-07 10:16:39 [http-nio-8080-exec-3] INFO  c.s.p.e.s.EmergencyNotifierService - Saved 1 contacts for user: sb3528@srmist.edu.in
+2025-11-07 10:16:47 [http-nio-8080-exec-6] INFO  c.s.p.e.EmergencyNotifierController - Getting user info for: sb3528@srmist.edu.in
+2025-11-07 10:16:47 [http-nio-8080-exec-4] INFO  c.s.p.e.EmergencyNotifierController - Getting contacts for user: sb3528@srmist.edu.in
+2025-11-07 10:16:47 [http-nio-8080-exec-7] INFO  c.s.p.e.EmergencyNotifierController - Sending emergency email alert for user: sb3528@srmist.edu.in
+2025-11-07 10:16:50 [http-nio-8080-exec-7] INFO  c.s.p.e.service.EmailService - Emergency alert email sent successfully to: sb3528@srmist.edu.in
+2025-11-07 10:16:50 [http-nio-8080-exec-7] INFO  c.s.p.e.s.EmergencyNotifierService - Alert sent to 1/1 contacts for user: sb3528@srmist.edu.in
+2025-11-07 10:31:50 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=10m45s55ms452µs800ns).
+2025-11-07 10:32:51 [main] INFO  c.s.p.e.EmergencyNotifierApplication - Starting EmergencyNotifierApplication using Java 21.0.2 with PID 29180 (D:\GitHub\Backend Development\SpringBoot\Project\emergency-notifier\target\classes started by SAYEERAM in D:\GitHub\Backend Development\SpringBoot\Project\emergency-notifier)
+2025-11-07 10:32:51 [main] DEBUG c.s.p.e.EmergencyNotifierApplication - Running with Spring Boot v3.5.7, Spring v6.2.12
+2025-11-07 10:32:51 [main] INFO  c.s.p.e.EmergencyNotifierApplication - No active profile set, falling back to 1 default profile: "default"
+2025-11-07 10:32:52 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-11-07 10:32:52 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 51 ms. Found 2 JPA repository interfaces.
+2025-11-07 10:32:53 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2025-11-07 10:32:53 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2025-11-07 10:32:53 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.48]
+2025-11-07 10:32:53 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-11-07 10:32:53 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1424 ms
+2025-11-07 10:32:53 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-11-07 10:32:53 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.33.Final
+2025-11-07 10:32:53 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2025-11-07 10:32:53 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-11-07 10:32:53 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2025-11-07 10:32:54 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@43a59289
+2025-11-07 10:32:54 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2025-11-07 10:32:54 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 8.0.36
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-11-07 10:32:55 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-11-07 10:32:55 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-11-07 10:32:55 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-11-07 10:32:55 [main] INFO  o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+2025-11-07 10:32:56 [main] WARN  o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'
+2025-11-07 10:32:56 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-11-07 10:32:56 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-11-07 10:32:56 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2025-11-07 10:32:56 [main] INFO  o.s.b.a.l.ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2025-11-07 10:32:56 [main] ERROR o.s.b.d.LoggingFailureAnalysisReporter - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 8080 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 8080 or configure this application to listen on another port.
+
+2025-11-07 10:33:43 [http-nio-8080-exec-5] INFO  c.s.p.e.EmergencyNotifierController - Registering user: sb8351@hotmail.com
+2025-11-07 10:33:43 [http-nio-8080-exec-5] INFO  c.s.p.e.s.EmergencyNotifierService - User registered successfully: sb8351@hotmail.com
+2025-11-07 10:33:43 [http-nio-8080-exec-5] INFO  c.s.p.e.s.EmergencyNotifierService - Saved 1 contacts for user: sb8351@hotmail.com
+2025-11-07 10:34:11 [http-nio-8080-exec-9] INFO  c.s.p.e.EmergencyNotifierController - Getting user info for: sb8351@srmist.edu.in
+2025-11-07 10:34:11 [http-nio-8080-exec-10] INFO  c.s.p.e.EmergencyNotifierController - Getting contacts for user: sb8351@srmist.edu.in
+2025-11-07 10:34:11 [http-nio-8080-exec-1] INFO  c.s.p.e.EmergencyNotifierController - Sending emergency email alert for user: sb8351@srmist.edu.in
+2025-11-07 10:34:13 [http-nio-8080-exec-2] INFO  c.s.p.e.EmergencyNotifierController - Getting user info for: sb8351@srmist.edu.in
+2025-11-07 10:34:13 [http-nio-8080-exec-3] INFO  c.s.p.e.EmergencyNotifierController - Getting contacts for user: sb8351@srmist.edu.in
+2025-11-07 10:34:13 [http-nio-8080-exec-6] INFO  c.s.p.e.EmergencyNotifierController - Sending emergency email alert for user: sb8351@srmist.edu.in
+2025-11-07 10:34:16 [http-nio-8080-exec-4] INFO  c.s.p.e.EmergencyNotifierController - Getting user info for: sb8351@srmist.edu.in
+2025-11-07 10:34:16 [http-nio-8080-exec-7] INFO  c.s.p.e.EmergencyNotifierController - Getting contacts for user: sb8351@srmist.edu.in
+2025-11-07 10:34:16 [http-nio-8080-exec-8] INFO  c.s.p.e.EmergencyNotifierController - Sending emergency email alert for user: sb8351@srmist.edu.in
+2025-11-07 10:34:32 [http-nio-8080-exec-5] INFO  c.s.p.e.EmergencyNotifierController - Registering user: sb8351@hotmail.com
+2025-11-07 10:34:43 [http-nio-8080-exec-9] INFO  c.s.p.e.EmergencyNotifierController - Getting user info for: sb8351@hotmail.com
+2025-11-07 10:34:43 [http-nio-8080-exec-10] INFO  c.s.p.e.EmergencyNotifierController - Getting contacts for user: sb8351@hotmail.com
+2025-11-07 10:34:43 [http-nio-8080-exec-1] INFO  c.s.p.e.EmergencyNotifierController - Sending emergency email alert for user: sb8351@hotmail.com
+2025-11-07 10:34:48 [http-nio-8080-exec-1] INFO  c.s.p.e.service.EmailService - Emergency alert email sent successfully to: sb8351@hotmail.com
+2025-11-07 10:34:48 [http-nio-8080-exec-1] INFO  c.s.p.e.s.EmergencyNotifierService - Alert sent to 1/1 contacts for user: sb8351@hotmail.com
+2025-11-07 11:02:56 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=25m5s899ms66µs500ns).
+2025-11-07 18:13:02 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=7h10m12s67ms788µs500ns).
